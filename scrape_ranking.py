@@ -27,6 +27,11 @@ URLS = [
     "https://hall-navi.com/hole_view?hid=254007600000001150",
     "https://hall-navi.com/hole_view?hid=254082100000000180",
     "https://hall-navi.com/hole_view?hid=259121300000077610",
+    "https://hall-navi.com/hole_view?hid=243003100000053120",
+    "https://hall-navi.com/hole_view?hid=243043300000000560",
+    "https://hall-navi.com/hole_view?hid=253007300000133710",
+    "https://hall-navi.com/hole_view?hid=253006100000016222",
+    "https://hall-navi.com/hole_view?hid=257001500000047010",
 ]
 
 
