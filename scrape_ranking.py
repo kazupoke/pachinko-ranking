@@ -47,12 +47,18 @@ def fetch_page(url):
     return resp.text
 
 
-def extract_store_data(html, today_str, tomorrow_str):
+def extract_store_data(html, today_str, tomorrow_str, page_url=""):
     """HTMLから店舗名・今日/明日のスコアとイベントを抽出"""
     soup = BeautifulSoup(html, "html.parser")
 
     h1 = soup.select_one("h1.box_hole_view_hole_name")
     store_name = h1.get_text(strip=True) if h1 else "不明"
+
+    # P-Worldリンクを取得
+    pworld_link = ""
+    for a in soup.select("a[href*='p-world']"):
+        pworld_link = a.get("href", "")
+        break
 
     entries = []
 
@@ -98,7 +104,7 @@ def extract_store_data(html, today_str, tomorrow_str):
                     "event": event_name,
                 })
 
-    return store_name, entries
+    return store_name, entries, pworld_link
 
 
 def generate_html(all_entries, today, tomorrow):
@@ -126,6 +132,8 @@ def generate_html(all_entries, today, tomorrow):
                     "date": e["date"],
                     "score": e["score"],
                     "rank": e["rank"],
+                    "url": e.get("url", ""),
+                    "pworld": e.get("pworld", ""),
                     "events": [{"rank": e["rank"], "event": e["event"]}],
                 }
             else:
@@ -155,12 +163,15 @@ def generate_html(all_entries, today, tomorrow):
                 erc = rank_color(ev["rank"])
                 event_lines += f'<div class="event-line"><span class="event-rank" style="background:{erc}">{ev["rank"]}</span> {ev["event"]}</div>'
 
+            score_link = f'<a href="{e["url"]}" class="score" target="_blank">{e["score"]}</a>' if e.get("url") else f'<div class="score">{e["score"]}</div>'
+            store_link = f'<a href="{e["pworld"]}" class="store" target="_blank">{e["store"]}</a>' if e.get("pworld") else f'<span class="store">{e["store"]}</span>'
+
             rows += f"""
                 <div class="entry">
                     <div class="rank-num">#{i}</div>
-                    <div class="score">{e['score']}</div>
+                    {score_link}
                     <div class="details">
-                        <span class="store">{e['store']}</span>
+                        {store_link}
                         <div class="events">{event_lines}</div>
                     </div>
                 </div>"""
@@ -196,7 +207,7 @@ def generate_html(all_entries, today, tomorrow):
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
-<title>パチンコ店ランキング</title>
+<title>平塚近隣パチンコ店ランキング</title>
 <style>
   * {{ margin: 0; padding: 0; box-sizing: border-box; }}
   body {{
@@ -260,9 +271,21 @@ def generate_html(all_entries, today, tomorrow):
     flex: 1;
     min-width: 0;
   }}
-  .store {{
+  a.score {{
+    text-decoration: none;
+    color: #ffd700;
+  }}
+  a.score:active {{
+    opacity: 0.7;
+  }}
+  .store, a.store {{
     font-size: 14px;
     font-weight: bold;
+    color: #eee;
+    text-decoration: none;
+  }}
+  a.store:active {{
+    opacity: 0.7;
   }}
   .events {{
     margin-top: 3px;
@@ -284,7 +307,7 @@ def generate_html(all_entries, today, tomorrow):
 </style>
 </head>
 <body>
-  <h1>パチンコ店ランキング</h1>
+  <h1>平塚近隣パチンコ店ランキング</h1>
   <div class="updated">更新: {today.strftime('%Y/%m/%d %H:%M')}</div>
   {today_section}
   {tomorrow_section}
@@ -302,7 +325,7 @@ def main():
     if sys.platform == "win32":
         sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 
-    print(f"パチンコ店ランキング生成中... ({today.strftime('%Y/%m/%d %H:%M')})")
+    print(f"平塚近隣パチンコ店ランキング生成中... ({today.strftime('%Y/%m/%d %H:%M')})")
 
     all_entries = []
 
@@ -310,10 +333,10 @@ def main():
         print(f"  [{i+1}/{len(URLS)}] ", end="", flush=True)
         try:
             html = fetch_page(url)
-            store_name, entries = extract_store_data(html, today_str, tomorrow_str)
+            store_name, entries, pworld_link = extract_store_data(html, today_str, tomorrow_str, url)
             print(f"{store_name} ({len(entries)}件)")
             for entry in entries:
-                all_entries.append({"store": store_name, **entry})
+                all_entries.append({"store": store_name, "url": url, "pworld": pworld_link, **entry})
         except Exception as e:
             print(f"エラー: {e}")
         if i < len(URLS) - 1:
