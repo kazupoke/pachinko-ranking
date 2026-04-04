@@ -109,9 +109,34 @@ def generate_html(all_entries, today, tomorrow):
     today_wd = weekdays[today.weekday()]
     tomorrow_wd = weekdays[tomorrow.weekday()]
 
+    rank_priority = {"S": 0, "A": 1, "B": 2, "C": 3}
+
     def rank_color(rank):
         colors = {"S": "#ff4444", "A": "#ff8800", "B": "#44aa44", "C": "#4488cc"}
         return colors.get(rank, "#888888")
+
+    def merge_same_store(entries):
+        """同じ店舗・同じ日のエントリをまとめる（最上位ランク＋イベント名一覧）"""
+        merged = {}
+        for e in entries:
+            key = (e["store"], e["date"])
+            if key not in merged:
+                merged[key] = {
+                    "store": e["store"],
+                    "date": e["date"],
+                    "score": e["score"],
+                    "rank": e["rank"],
+                    "events": [{"rank": e["rank"], "event": e["event"]}],
+                }
+            else:
+                merged[key]["events"].append({"rank": e["rank"], "event": e["event"]})
+                # スコアは最大値を採用
+                if e["score"] > merged[key]["score"]:
+                    merged[key]["score"] = e["score"]
+                # ランクは最上位を採用
+                if rank_priority.get(e["rank"], 99) < rank_priority.get(merged[key]["rank"], 99):
+                    merged[key]["rank"] = e["rank"]
+        return list(merged.values())
 
     def make_ranking_section(entries, date_str, label, wd):
         if not entries:
@@ -124,14 +149,19 @@ def generate_html(all_entries, today, tomorrow):
         rows = ""
         for i, e in enumerate(entries, 1):
             rc = rank_color(e["rank"])
+            # イベント名一覧を生成
+            event_lines = ""
+            for ev in e["events"]:
+                erc = rank_color(ev["rank"])
+                event_lines += f'<div class="event-line"><span class="event-rank" style="background:{erc}">{ev["rank"]}</span> {ev["event"]}</div>'
+
             rows += f"""
                 <div class="entry">
                     <div class="rank-num">#{i}</div>
                     <div class="score">{e['score']}</div>
                     <div class="details">
-                        <span class="rank-badge" style="background:{rc}">{e['rank']}</span>
                         <span class="store">{e['store']}</span>
-                        <div class="event">{e['event']}</div>
+                        <div class="events">{event_lines}</div>
                     </div>
                 </div>"""
 
@@ -141,14 +171,21 @@ def generate_html(all_entries, today, tomorrow):
                 {rows}
             </div>"""
 
-    today_entries = sorted(
-        [e for e in all_entries if e["date"] == today_str],
-        key=lambda x: x["score"], reverse=True
+    today_entries = merge_same_store(
+        sorted(
+            [e for e in all_entries if e["date"] == today_str],
+            key=lambda x: x["score"], reverse=True
+        )
     )
-    tomorrow_entries = sorted(
-        [e for e in all_entries if e["date"] == tomorrow_str],
-        key=lambda x: x["score"], reverse=True
+    today_entries.sort(key=lambda x: x["score"], reverse=True)
+
+    tomorrow_entries = merge_same_store(
+        sorted(
+            [e for e in all_entries if e["date"] == tomorrow_str],
+            key=lambda x: x["score"], reverse=True
+        )
     )
+    tomorrow_entries.sort(key=lambda x: x["score"], reverse=True)
 
     today_section = make_ranking_section(today_entries, today_str, "今日", today_wd)
     tomorrow_section = make_ranking_section(tomorrow_entries, tomorrow_str, "明日", tomorrow_wd)
@@ -223,26 +260,26 @@ def generate_html(all_entries, today, tomorrow):
     flex: 1;
     min-width: 0;
   }}
-  .rank-badge {{
-    display: inline-block;
-    color: #fff;
-    font-weight: bold;
-    font-size: 11px;
-    padding: 1px 6px;
-    border-radius: 3px;
-    margin-right: 4px;
-  }}
   .store {{
     font-size: 14px;
     font-weight: bold;
   }}
-  .event {{
+  .events {{
+    margin-top: 3px;
+  }}
+  .event-line {{
     font-size: 12px;
     color: #aaa;
     margin-top: 2px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  }}
+  .event-rank {{
+    display: inline-block;
+    color: #fff;
+    font-weight: bold;
+    font-size: 10px;
+    padding: 0px 5px;
+    border-radius: 3px;
+    margin-right: 3px;
   }}
 </style>
 </head>
