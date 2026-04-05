@@ -2,6 +2,10 @@
 パチンコ店イベント ランキング生成スクリプト
 hall-navi.com から今日・明日のイベント情報を取得し、スコア順にランキングHTMLを生成する
 
+エリア:
+  - マイホール（手動登録の近隣店舗）
+  - 神奈川県全域（自動取得）
+
 使用ライブラリ:
   curl_cffi - Cloudflare回避（ブラウザTLS指紋を模倣）
   BeautifulSoup4 - HTML解析
@@ -9,6 +13,7 @@ hall-navi.com から今日・明日のイベント情報を取得し、スコア
 
 import io
 import os
+import random
 import re
 import sys
 import time
@@ -17,22 +22,24 @@ from curl_cffi import requests
 from bs4 import BeautifulSoup
 
 
-# 対象店舗のURL一覧
-URLS = [
-    "https://hall-navi.com/hole_view?hid=254001300000014260",
-    "https://hall-navi.com/hole_view?hid=254001300000058382",
-    "https://hall-navi.com/hole_view?hid=254004300000001310",
-    "https://hall-navi.com/hole_view?hid=254004300000005180",
-    "https://hall-navi.com/hole_view?hid=254006500000041450",
-    "https://hall-navi.com/hole_view?hid=254007600000001150",
-    "https://hall-navi.com/hole_view?hid=254082100000000180",
-    "https://hall-navi.com/hole_view?hid=259121300000077610",
-    "https://hall-navi.com/hole_view?hid=243003100000053120",
-    "https://hall-navi.com/hole_view?hid=243043300000000560",
-    "https://hall-navi.com/hole_view?hid=253007300000133710",
-    "https://hall-navi.com/hole_view?hid=253006100000016222",
-    "https://hall-navi.com/hole_view?hid=257001500000047010",
+# マイホール（手動登録の近隣店舗）
+MY_HALL_HIDS = [
+    "254001300000014260",  # マルハン平塚店
+    "254001300000058382",  # ＡＲＲＯＷ平塚店
+    "254004300000001310",  # スーパーDステーション平塚駅前
+    "254004300000005180",  # キコーナ平塚店
+    "254006500000041450",  # シーザースパレス
+    "254007600000001150",  # ジャラン平塚店
+    "254082100000000180",  # ニラク平塚黒部丘店
+    "259121300000077610",  # グランドホール金目店
+    "243003100000053120",  # マルハン厚木店
+    "243043300000000560",  # キコーナ海老名店
+    "253007300000133710",  # マルハン茅ヶ崎店
+    "253006100000016222",  # キコーナ茅ヶ崎店
+    "257001500000047010",  # ジャパンニューアルファテームズ
 ]
+
+BASE_URL = "https://hall-navi.com/hole_view?hid="
 
 
 def fetch_page(url):
@@ -47,14 +54,39 @@ def fetch_page(url):
     return resp.text
 
 
-def extract_store_data(html, today_str, tomorrow_str, page_url=""):
+def fetch_kanagawa_hids():
+    """hall-naviから神奈川県の全店舗HIDを自動取得"""
+    all_hids = set()
+    page = 1
+    while True:
+        url = f"https://hall-navi.com/osusume_list?ken=2&page={page}&area=kanto"
+        try:
+            resp = requests.get(url, impersonate="chrome", timeout=30)
+            soup = BeautifulSoup(resp.text, "html.parser")
+            new_hids = set()
+            for a in soup.select('a[href*="hole_view"]'):
+                href = a.get("href", "")
+                if "hid=" in href:
+                    hid = href.split("hid=")[1].split("&")[0]
+                    new_hids.add(hid)
+            before = len(all_hids)
+            all_hids.update(new_hids)
+            if len(all_hids) == before:
+                break
+            page += 1
+            time.sleep(2)
+        except Exception:
+            break
+    return sorted(all_hids)
+
+
+def extract_store_data(html, today_str, tomorrow_str):
     """HTMLから店舗名・今日/明日のスコアとイベントを抽出"""
     soup = BeautifulSoup(html, "html.parser")
 
     h1 = soup.select_one("h1.box_hole_view_hole_name")
     store_name = h1.get_text(strip=True) if h1 else "不明"
 
-    # P-Worldリンクを取得
     pworld_link = ""
     for a in soup.select("a[href*='p-world']"):
         pworld_link = a.get("href", "")
@@ -107,8 +139,36 @@ def extract_store_data(html, today_str, tomorrow_str, page_url=""):
     return store_name, entries, pworld_link
 
 
-def generate_html(all_entries, today, tomorrow):
-    """スマホ向けランキングHTMLを生成"""
+def scrape_stores(hids, today_str, tomorrow_str, label=""):
+    """店舗リストをスクレイピング"""
+    all_entries = []
+    total = len(hids)
+
+    for i, hid in enumerate(hids):
+        url = BASE_URL + hid
+        print(f"  [{i+1}/{total}] ", end="", flush=True)
+        try:
+            html = fetch_page(url)
+            store_name, entries, pworld_link = extract_store_data(html, today_str, tomorrow_str)
+            print(f"{store_name} ({len(entries)}件)")
+            for entry in entries:
+                all_entries.append({
+                    "store": store_name,
+                    "url": url,
+                    "pworld": pworld_link,
+                    **entry,
+                })
+        except Exception as e:
+            print(f"エラー: {e}")
+
+        if i < total - 1:
+            time.sleep(random.uniform(1.5, 3.0))
+
+    return all_entries
+
+
+def generate_html(my_entries, kanagawa_entries, today, tomorrow):
+    """タブ切り替え付きランキングHTMLを生成"""
     today_str = f"{today.month}/{today.day}"
     tomorrow_str = f"{tomorrow.month}/{tomorrow.day}"
     weekdays = "月火水木金土日"
@@ -122,42 +182,30 @@ def generate_html(all_entries, today, tomorrow):
         return colors.get(rank, "#888888")
 
     def merge_same_store(entries):
-        """同じ店舗・同じ日のエントリをまとめる（最上位ランク＋イベント名一覧）"""
         merged = {}
         for e in entries:
             key = (e["store"], e["date"])
             if key not in merged:
                 merged[key] = {
-                    "store": e["store"],
-                    "date": e["date"],
-                    "score": e["score"],
-                    "rank": e["rank"],
-                    "url": e.get("url", ""),
-                    "pworld": e.get("pworld", ""),
+                    "store": e["store"], "date": e["date"],
+                    "score": e["score"], "rank": e["rank"],
+                    "url": e.get("url", ""), "pworld": e.get("pworld", ""),
                     "events": [{"rank": e["rank"], "event": e["event"]}],
                 }
             else:
                 merged[key]["events"].append({"rank": e["rank"], "event": e["event"]})
-                # スコアは最大値を採用
                 if e["score"] > merged[key]["score"]:
                     merged[key]["score"] = e["score"]
-                # ランクは最上位を採用
                 if rank_priority.get(e["rank"], 99) < rank_priority.get(merged[key]["rank"], 99):
                     merged[key]["rank"] = e["rank"]
         return list(merged.values())
 
     def make_ranking_section(entries, date_str, label, wd):
         if not entries:
-            return f"""
-            <div class="section">
-                <h2>{label} {date_str}({wd})</h2>
-                <p class="no-data">イベントなし</p>
-            </div>"""
+            return f'<div class="section"><h2>{label} {date_str}({wd})</h2><p class="no-data">イベントなし</p></div>'
 
         rows = ""
         for i, e in enumerate(entries, 1):
-            rc = rank_color(e["rank"])
-            # イベント名一覧を生成
             event_lines = ""
             for ev in e["events"]:
                 erc = rank_color(ev["rank"])
@@ -166,40 +214,26 @@ def generate_html(all_entries, today, tomorrow):
             score_link = f'<a href="{e["url"]}" class="score" target="_blank">{e["score"]}</a>' if e.get("url") else f'<div class="score">{e["score"]}</div>'
             store_link = f'<a href="{e["pworld"]}" class="store" target="_blank">{e["store"]}</a>' if e.get("pworld") else f'<span class="store">{e["store"]}</span>'
 
-            rows += f"""
-                <div class="entry">
+            rows += f"""<div class="entry">
                     <div class="rank-num">#{i}</div>
                     {score_link}
-                    <div class="details">
-                        {store_link}
-                        <div class="events">{event_lines}</div>
-                    </div>
+                    <div class="details">{store_link}<div class="events">{event_lines}</div></div>
                 </div>"""
 
-        return f"""
-            <div class="section">
-                <h2>{label} {date_str}({wd})</h2>
-                {rows}
-            </div>"""
+        return f'<div class="section"><h2>{label} {date_str}({wd})</h2>{rows}</div>'
 
-    today_entries = merge_same_store(
-        sorted(
-            [e for e in all_entries if e["date"] == today_str],
-            key=lambda x: x["score"], reverse=True
-        )
-    )
-    today_entries.sort(key=lambda x: x["score"], reverse=True)
+    def make_tab_content(entries, tab_id):
+        today_e = merge_same_store(sorted([e for e in entries if e["date"] == today_str], key=lambda x: x["score"], reverse=True))
+        today_e.sort(key=lambda x: x["score"], reverse=True)
+        tomorrow_e = merge_same_store(sorted([e for e in entries if e["date"] == tomorrow_str], key=lambda x: x["score"], reverse=True))
+        tomorrow_e.sort(key=lambda x: x["score"], reverse=True)
 
-    tomorrow_entries = merge_same_store(
-        sorted(
-            [e for e in all_entries if e["date"] == tomorrow_str],
-            key=lambda x: x["score"], reverse=True
-        )
-    )
-    tomorrow_entries.sort(key=lambda x: x["score"], reverse=True)
+        today_sec = make_ranking_section(today_e, today_str, "今日", today_wd)
+        tomorrow_sec = make_ranking_section(tomorrow_e, tomorrow_str, "明日", tomorrow_wd)
+        return f'<div id="{tab_id}" class="tab-content">{today_sec}{tomorrow_sec}</div>'
 
-    today_section = make_ranking_section(today_entries, today_str, "今日", today_wd)
-    tomorrow_section = make_ranking_section(tomorrow_entries, tomorrow_str, "明日", tomorrow_wd)
+    my_content = make_tab_content(my_entries, "tab-my")
+    kanagawa_content = make_tab_content(kanagawa_entries, "tab-kanagawa")
 
     html = f"""<!DOCTYPE html>
 <html lang="ja">
@@ -207,7 +241,7 @@ def generate_html(all_entries, today, tomorrow):
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
-<title>平塚近隣パチンコ店ランキング</title>
+<title>パチンコ店ランキング</title>
 <style>
   * {{ margin: 0; padding: 0; box-sizing: border-box; }}
   body {{
@@ -218,99 +252,75 @@ def generate_html(all_entries, today, tomorrow):
     max-width: 600px;
     margin: 0 auto;
   }}
-  h1 {{
-    text-align: center;
-    font-size: 18px;
-    padding: 12px 0;
-    border-bottom: 2px solid #e94560;
-    margin-bottom: 8px;
-  }}
-  .updated {{
-    text-align: center;
-    font-size: 11px;
-    color: #888;
+  h1 {{ text-align: center; font-size: 18px; padding: 12px 0; border-bottom: 2px solid #e94560; margin-bottom: 8px; }}
+  .updated {{ text-align: center; font-size: 11px; color: #888; margin-bottom: 12px; }}
+
+  /* タブ */
+  .tabs {{
+    display: flex;
+    gap: 4px;
     margin-bottom: 16px;
   }}
-  .section {{
-    margin-bottom: 20px;
-  }}
-  h2 {{
-    font-size: 16px;
-    padding: 8px 12px;
-    background: #16213e;
-    border-left: 4px solid #e94560;
-    border-radius: 4px;
-    margin-bottom: 8px;
-  }}
-  .no-data {{
-    padding: 12px;
-    color: #666;
-    text-align: center;
-  }}
-  .entry {{
-    display: flex;
-    align-items: center;
-    padding: 10px 8px;
-    border-bottom: 1px solid #2a2a4a;
-    gap: 10px;
-  }}
-  .rank-num {{
-    font-size: 18px;
-    font-weight: bold;
-    color: #e94560;
-    min-width: 32px;
-  }}
-  .score {{
-    font-size: 22px;
-    font-weight: bold;
-    color: #ffd700;
-    min-width: 50px;
-    text-align: right;
-  }}
-  .details {{
+  .tab-btn {{
     flex: 1;
-    min-width: 0;
-  }}
-  a.score {{
-    text-decoration: none;
-    color: #ffd700;
-  }}
-  a.score:active {{
-    opacity: 0.7;
-  }}
-  .store, a.store {{
+    padding: 10px 0;
+    background: #16213e;
+    color: #888;
+    border: none;
+    border-radius: 6px;
     font-size: 14px;
     font-weight: bold;
-    color: #eee;
-    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
   }}
-  a.store:active {{
-    opacity: 0.7;
-  }}
-  .events {{
-    margin-top: 3px;
-  }}
-  .event-line {{
-    font-size: 12px;
-    color: #aaa;
-    margin-top: 2px;
-  }}
-  .event-rank {{
-    display: inline-block;
+  .tab-btn.active {{
+    background: #e94560;
     color: #fff;
-    font-weight: bold;
-    font-size: 10px;
-    padding: 0px 5px;
-    border-radius: 3px;
-    margin-right: 3px;
   }}
+  .tab-content {{
+    display: none;
+  }}
+  .tab-content.active {{
+    display: block;
+  }}
+
+  .section {{ margin-bottom: 20px; }}
+  h2 {{ font-size: 16px; padding: 8px 12px; background: #16213e; border-left: 4px solid #e94560; border-radius: 4px; margin-bottom: 8px; }}
+  .no-data {{ padding: 12px; color: #666; text-align: center; }}
+  .entry {{ display: flex; align-items: center; padding: 10px 8px; border-bottom: 1px solid #2a2a4a; gap: 10px; }}
+  .rank-num {{ font-size: 18px; font-weight: bold; color: #e94560; min-width: 32px; }}
+  .score {{ font-size: 22px; font-weight: bold; color: #ffd700; min-width: 50px; text-align: right; }}
+  .details {{ flex: 1; min-width: 0; }}
+  a.score {{ text-decoration: none; color: #ffd700; }}
+  a.score:active {{ opacity: 0.7; }}
+  .store, a.store {{ font-size: 14px; font-weight: bold; color: #eee; text-decoration: none; }}
+  a.store:active {{ opacity: 0.7; }}
+  .events {{ margin-top: 3px; }}
+  .event-line {{ font-size: 12px; color: #aaa; margin-top: 2px; }}
+  .event-rank {{ display: inline-block; color: #fff; font-weight: bold; font-size: 10px; padding: 0px 5px; border-radius: 3px; margin-right: 3px; }}
 </style>
 </head>
 <body>
-  <h1>平塚近隣パチンコ店ランキング</h1>
+  <h1>パチンコ店ランキング</h1>
   <div class="updated">更新: {today.strftime('%Y/%m/%d %H:%M')}</div>
-  {today_section}
-  {tomorrow_section}
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('tab-my', this)">マイホール</button>
+    <button class="tab-btn" onclick="switchTab('tab-kanagawa', this)">神奈川県</button>
+  </div>
+
+  {my_content}
+  {kanagawa_content}
+
+  <script>
+  function switchTab(tabId, btn) {{
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    btn.classList.add('active');
+  }}
+  document.getElementById('tab-my').classList.add('active');
+  </script>
 </body>
 </html>"""
     return html
@@ -325,33 +335,30 @@ def main():
     if sys.platform == "win32":
         sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 
-    print(f"平塚近隣パチンコ店ランキング生成中... ({today.strftime('%Y/%m/%d %H:%M')})")
+    print(f"パチンコ店ランキング生成中... ({today.strftime('%Y/%m/%d %H:%M')})")
 
-    all_entries = []
+    # --- マイホール ---
+    print(f"\n[マイホール] {len(MY_HALL_HIDS)}店舗")
+    my_entries = scrape_stores(MY_HALL_HIDS, today_str, tomorrow_str, "マイホール")
 
-    for i, url in enumerate(URLS):
-        print(f"  [{i+1}/{len(URLS)}] ", end="", flush=True)
-        try:
-            html = fetch_page(url)
-            store_name, entries, pworld_link = extract_store_data(html, today_str, tomorrow_str, url)
-            print(f"{store_name} ({len(entries)}件)")
-            for entry in entries:
-                all_entries.append({"store": store_name, "url": url, "pworld": pworld_link, **entry})
-        except Exception as e:
-            print(f"エラー: {e}")
-        if i < len(URLS) - 1:
-            time.sleep(1.5)
+    # --- 神奈川県全域 ---
+    print("\n[神奈川県] 店舗リスト取得中...")
+    kanagawa_hids = fetch_kanagawa_hids()
+    # マイホールと重複するものも含めてスクレイピング（別タブで表示するため）
+    print(f"[神奈川県] {len(kanagawa_hids)}店舗")
+    kanagawa_entries = scrape_stores(kanagawa_hids, today_str, tomorrow_str, "神奈川県")
 
     # HTML生成
-    output_dir = os.path.join(os.path.dirname(__file__), "docs")
+    output_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "docs")
     os.makedirs(output_dir, exist_ok=True)
     output_path = os.path.join(output_dir, "index.html")
 
-    html_content = generate_html(all_entries, today, tomorrow)
+    html_content = generate_html(my_entries, kanagawa_entries, today, tomorrow)
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(html_content)
 
-    print(f"\n完了! {len(all_entries)}件のイベントを取得")
+    total = len(my_entries) + len(kanagawa_entries)
+    print(f"\n完了! マイホール{len(my_entries)}件 + 神奈川{len(kanagawa_entries)}件 = {total}件")
     print(f"HTML出力: {output_path}")
 
 
