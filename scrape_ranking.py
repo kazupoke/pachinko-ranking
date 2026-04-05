@@ -286,7 +286,7 @@ def generate_html(my_entries, kanagawa_entries, yamanashi_entries, today, tomorr
 </head>
 <body>
   <h1>パチンコ店ランキング</h1>
-  <div class="updated">更新: {today.strftime('%Y/%m/%d %H:%M')}</div>
+  <div class="updated">更新: {today.strftime('%Y/%m/%d %H:%M')} | <a href="./map.html" style="color:#e94560">マップで見る</a></div>
 
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('tab-my', this)">マイホール</button>
@@ -307,6 +307,179 @@ def generate_html(my_entries, kanagawa_entries, yamanashi_entries, today, tomorr
   }}
   document.getElementById('tab-my').classList.add('active');
   </script>
+</body>
+</html>"""
+    return html
+
+
+def generate_map_html(all_entries, today, tomorrow):
+    """スコア付きマップHTMLを生成"""
+    today_str = f"{today.month}/{today.day}"
+    tomorrow_str = f"{tomorrow.month}/{tomorrow.day}"
+    weekdays = "月火水木金土日"
+    today_wd = weekdays[today.weekday()]
+    tomorrow_wd = weekdays[tomorrow.weekday()]
+
+    # 店舗JSONから緯度経度を読み込み
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    store_coords = {}
+    for filename in ["kanagawa_stores.json", "yamanashi_stores.json"]:
+        filepath = os.path.join(base_dir, filename)
+        if os.path.exists(filepath):
+            with open(filepath, encoding="utf-8") as f:
+                for s in json.load(f):
+                    if s.get("lat") and s.get("lon"):
+                        store_coords[s["hid"]] = (s["lat"], s["lon"])
+
+    # エントリからHIDを抽出
+    def hid_from_url(url):
+        if "hid=" in url:
+            return url.split("hid=")[1].split("&")[0]
+        return ""
+
+    # 店舗ごとにスコアを集約
+    store_scores = {}
+    for e in all_entries:
+        hid = hid_from_url(e.get("url", ""))
+        if not hid or hid not in store_coords:
+            continue
+        if hid not in store_scores:
+            store_scores[hid] = {
+                "store": e["store"], "url": e["url"],
+                "pworld": e.get("pworld", ""),
+                "today_score": 0, "today_events": [],
+                "tomorrow_score": 0, "tomorrow_events": [],
+            }
+        ss = store_scores[hid]
+        if e["date"] == today_str:
+            if e["score"] > ss["today_score"]:
+                ss["today_score"] = e["score"]
+            ss["today_events"].append(f"{e['rank']} {e['event']}")
+        elif e["date"] == tomorrow_str:
+            if e["score"] > ss["tomorrow_score"]:
+                ss["tomorrow_score"] = e["score"]
+            ss["tomorrow_events"].append(f"{e['rank']} {e['event']}")
+
+    def score_color(score):
+        if score >= 15: return "#ff4444"
+        if score >= 10: return "#ff8800"
+        if score >= 5: return "#ffd700"
+        if score > 0: return "#44aa44"
+        return "#666666"
+
+    def make_markers(date_key, label):
+        markers = ""
+        for hid, (lat, lon) in store_coords.items():
+            ss = store_scores.get(hid)
+            score = 0
+            events = []
+            if ss:
+                if date_key == "today":
+                    score = ss["today_score"]
+                    events = ss["today_events"]
+                else:
+                    score = ss["tomorrow_score"]
+                    events = ss["tomorrow_events"]
+
+            name = ss["store"] if ss else ""
+            if not name:
+                continue
+
+            color = score_color(score)
+            score_text = str(score) if score > 0 else "-"
+            hall_url = f"https://hall-navi.com/hole_view?hid={hid}"
+
+            events_html = "<br>".join(e.replace('"', '\\"') for e in events[:3]) if events else "イベントなし"
+            popup = f"<b>{name.replace(chr(34), '&quot;')}</b><br>スコア: <b>{score_text}</b><br>{events_html}<br><a href=\\\"{ hall_url}\\\" target=\\\"_blank\\\">hall-navi</a>"
+
+            markers += f"""      {{lat:{lat},lon:{lon},score:"{score_text}",color:"{color}",popup:"{popup}"}},\n"""
+        return markers
+
+    today_markers = make_markers("today", "今日")
+    tomorrow_markers = make_markers("tomorrow", "明日")
+
+    html = f"""<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>パチンコ店マップ</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  body {{ margin: 0; padding: 0; font-family: sans-serif; }}
+  #map {{ width: 100%; height: 100vh; }}
+  .top-bar {{
+    position: absolute; top: 10px; left: 50px; right: 50px; z-index: 1000;
+    display: flex; gap: 8px; justify-content: center;
+  }}
+  .map-tab {{
+    padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer;
+    font-size: 14px; font-weight: bold;
+    background: rgba(26,26,46,0.85); color: #888;
+  }}
+  .map-tab.active {{ background: #e94560; color: #fff; }}
+  .back-link {{
+    position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1000;
+    background: rgba(26,26,46,0.9); color: #eee; padding: 10px 24px;
+    border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: bold;
+  }}
+  .score-icon {{
+    background: none; border: none;
+    font-size: 12px; font-weight: bold; text-align: center;
+    line-height: 22px; width: 28px; height: 22px;
+    border-radius: 4px; color: #fff;
+  }}
+</style>
+</head>
+<body>
+<div class="top-bar">
+  <button class="map-tab active" onclick="showDay('today',this)">今日 {today_str}({today_wd})</button>
+  <button class="map-tab" onclick="showDay('tomorrow',this)">明日 {tomorrow_str}({tomorrow_wd})</button>
+</div>
+<a href="./index.html" class="back-link">ランキングに戻る</a>
+<div id="map"></div>
+<script>
+var map = L.map("map").setView([35.5, 139.2], 9);
+L.tileLayer("https://{{s}}.tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png", {{
+  attribution: "&copy; OpenStreetMap"
+}}).addTo(map);
+
+var todayData = [
+{today_markers}];
+var tomorrowData = [
+{tomorrow_markers}];
+
+var currentMarkers = [];
+
+function clearMarkers() {{
+  currentMarkers.forEach(function(m) {{ map.removeLayer(m); }});
+  currentMarkers = [];
+}}
+
+function showMarkers(data) {{
+  clearMarkers();
+  data.forEach(function(d) {{
+    var icon = L.divIcon({{
+      className: 'score-icon',
+      html: '<div style="background:'+d.color+';border-radius:4px;padding:1px 3px;font-size:11px;font-weight:bold;color:#fff;text-align:center;white-space:nowrap;">'+d.score+'</div>',
+      iconSize: [30, 22],
+      iconAnchor: [15, 11]
+    }});
+    var m = L.marker([d.lat, d.lon], {{icon: icon}}).addTo(map).bindPopup(d.popup);
+    currentMarkers.push(m);
+  }});
+}}
+
+function showDay(day, btn) {{
+  document.querySelectorAll('.map-tab').forEach(function(b) {{ b.classList.remove('active'); }});
+  btn.classList.add('active');
+  showMarkers(day === 'today' ? todayData : tomorrowData);
+}}
+
+showMarkers(todayData);
+</script>
 </body>
 </html>"""
     return html
@@ -348,9 +521,17 @@ def main():
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(html_content)
 
-    total = len(my_entries) + len(kanagawa_entries) + len(yamanashi_entries)
+    # マップHTML生成（スコア付き）
+    all_entries = my_entries + kanagawa_entries + yamanashi_entries
+    map_html = generate_map_html(all_entries, today, tomorrow)
+    map_path = os.path.join(output_dir, "map.html")
+    with open(map_path, "w", encoding="utf-8") as f:
+        f.write(map_html)
+
+    total = len(all_entries)
     print(f"\n完了! マイホール{len(my_entries)}件 + 神奈川{len(kanagawa_entries)}件 + 山梨{len(yamanashi_entries)}件 = {total}件")
     print(f"HTML出力: {output_path}")
+    print(f"マップ出力: {map_path}")
 
 
 if __name__ == "__main__":
