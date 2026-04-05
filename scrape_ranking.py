@@ -3,7 +3,7 @@
 hall-navi.com から今日・明日のイベント情報を取得し、スコア順にランキングHTMLを生成する
 
 エリア:
-  - マイホール（手動登録の近隣店舗）
+  - 湘南地区（手動登録の近隣店舗）
   - 神奈川県全域（自動取得）
 
 使用ライブラリ:
@@ -23,7 +23,7 @@ from curl_cffi import requests
 from bs4 import BeautifulSoup
 
 
-# マイホール（手動登録の近隣店舗）
+# 湘南地区（手動登録の近隣店舗）
 MY_HALL_HIDS = [
     "254001300000014260",  # マルハン平塚店
     "254001300000058382",  # ＡＲＲＯＷ平塚店
@@ -160,6 +160,11 @@ def generate_html(my_entries, kanagawa_entries, yamanashi_entries, today, tomorr
 
     rank_priority = {"S": 0, "A": 1, "B": 2, "C": 3}
 
+    def hall_score_color(score):
+        if score >= 10: return "#ff4444"
+        if score >= 7: return "#22aa44"
+        return "#3388dd"
+
     def rank_color(rank):
         colors = {"S": "#ff4444", "A": "#ff8800", "B": "#44aa44", "C": "#4488cc"}
         return colors.get(rank, "#888888")
@@ -194,7 +199,8 @@ def generate_html(my_entries, kanagawa_entries, yamanashi_entries, today, tomorr
                 erc = rank_color(ev["rank"])
                 event_lines += f'<div class="event-line"><span class="event-rank" style="background:{erc}">{ev["rank"]}</span> {ev["event"]}</div>'
 
-            score_link = f'<a href="{e["url"]}" class="score" target="_blank">{e["score"]}</a>' if e.get("url") else f'<div class="score">{e["score"]}</div>'
+            sc = hall_score_color(e["score"])
+            score_link = f'<a href="{e["url"]}" class="score" style="color:{sc}" target="_blank">{e["score"]}</a>' if e.get("url") else f'<div class="score" style="color:{sc}">{e["score"]}</div>'
             store_link = f'<a href="{e["pworld"]}" class="store" target="_blank">{e["store"]}</a>' if e.get("pworld") else f'<span class="store">{e["store"]}</span>'
 
             rows += f"""<div class="entry">
@@ -237,7 +243,13 @@ def generate_html(my_entries, kanagawa_entries, yamanashi_entries, today, tomorr
     margin: 0 auto;
   }}
   h1 {{ text-align: center; font-size: 18px; padding: 12px 0; border-bottom: 2px solid #e94560; margin-bottom: 8px; }}
-  .updated {{ text-align: center; font-size: 11px; color: #888; margin-bottom: 12px; }}
+  .updated {{ text-align: center; font-size: 11px; color: #888; margin-bottom: 8px; }}
+  .map-btn {{
+    display: block; text-align: center; margin: 0 auto 16px;
+    background: #e94560; color: #fff; text-decoration: none;
+    padding: 12px 0; border-radius: 8px; font-size: 16px; font-weight: bold;
+    max-width: 300px;
+  }}
 
   /* タブ */
   .tabs {{
@@ -273,9 +285,9 @@ def generate_html(my_entries, kanagawa_entries, yamanashi_entries, today, tomorr
   .no-data {{ padding: 12px; color: #666; text-align: center; }}
   .entry {{ display: flex; align-items: center; padding: 10px 8px; border-bottom: 1px solid #2a2a4a; gap: 10px; }}
   .rank-num {{ font-size: 18px; font-weight: bold; color: #e94560; min-width: 32px; }}
-  .score {{ font-size: 22px; font-weight: bold; color: #ffd700; min-width: 50px; text-align: right; }}
+  .score {{ font-size: 22px; font-weight: bold; min-width: 50px; text-align: right; }}
   .details {{ flex: 1; min-width: 0; }}
-  a.score {{ text-decoration: none; color: #ffd700; }}
+  a.score {{ text-decoration: none; }}
   a.score:active {{ opacity: 0.7; }}
   .store, a.store {{ font-size: 14px; font-weight: bold; color: #eee; text-decoration: none; }}
   a.store:active {{ opacity: 0.7; }}
@@ -286,10 +298,11 @@ def generate_html(my_entries, kanagawa_entries, yamanashi_entries, today, tomorr
 </head>
 <body>
   <h1>パチンコ店ランキング</h1>
-  <div class="updated">更新: {today.strftime('%Y/%m/%d %H:%M')} | <a href="./map.html" style="color:#e94560">マップで見る</a></div>
+  <div class="updated">更新: {today.strftime('%Y/%m/%d %H:%M')}</div>
+  <a href="./map.html" class="map-btn">マップで見る</a>
 
   <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('tab-my', this)">マイホール</button>
+    <button class="tab-btn active" onclick="switchTab('tab-my', this)">湘南地区</button>
     <button class="tab-btn" onclick="switchTab('tab-kanagawa', this)">神奈川県</button>
     <button class="tab-btn" onclick="switchTab('tab-yamanashi', this)">山梨県</button>
   </div>
@@ -361,10 +374,9 @@ def generate_map_html(all_entries, today, tomorrow):
             ss["tomorrow_events"].append(f"{e['rank']} {e['event']}")
 
     def score_color(score):
-        if score >= 15: return "#ff4444"
-        if score >= 10: return "#ff8800"
-        if score >= 5: return "#ffd700"
-        if score > 0: return "#44aa44"
+        if score >= 10: return "#ff4444"
+        if score >= 7: return "#22aa44"
+        if score > 0: return "#3388dd"
         return "#666666"
 
     def make_markers(date_key, label):
@@ -441,7 +453,7 @@ def generate_map_html(all_entries, today, tomorrow):
 <a href="./index.html" class="back-link">ランキングに戻る</a>
 <div id="map"></div>
 <script>
-var map = L.map("map").setView([35.5, 139.2], 9);
+var map = L.map("map").setView([35.35, 139.35], 11);
 L.tileLayer("https://{{s}}.tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png", {{
   attribution: "&copy; OpenStreetMap"
 }}).addTo(map);
@@ -463,9 +475,9 @@ function showMarkers(data) {{
   data.forEach(function(d) {{
     var icon = L.divIcon({{
       className: 'score-icon',
-      html: '<div style="background:'+d.color+';border-radius:4px;padding:1px 3px;font-size:11px;font-weight:bold;color:#fff;text-align:center;white-space:nowrap;">'+d.score+'</div>',
-      iconSize: [30, 22],
-      iconAnchor: [15, 11]
+      html: '<div style="background:'+d.color+';border-radius:6px;padding:2px 6px;font-size:16px;font-weight:bold;color:#fff;text-align:center;white-space:nowrap;border:2px solid rgba(255,255,255,0.5);">'+d.score+'</div>',
+      iconSize: [44, 28],
+      iconAnchor: [22, 14]
     }});
     var m = L.marker([d.lat, d.lon], {{icon: icon}}).addTo(map).bindPopup(d.popup);
     currentMarkers.push(m);
@@ -496,9 +508,9 @@ def main():
 
     print(f"パチンコ店ランキング生成中... ({today.strftime('%Y/%m/%d %H:%M')})")
 
-    # --- マイホール ---
-    print(f"\n[マイホール] {len(MY_HALL_HIDS)}店舗")
-    my_entries = scrape_stores(MY_HALL_HIDS, today_str, tomorrow_str, "マイホール")
+    # --- 湘南地区 ---
+    print(f"\n[湘南地区] {len(MY_HALL_HIDS)}店舗")
+    my_entries = scrape_stores(MY_HALL_HIDS, today_str, tomorrow_str, "湘南地区")
 
     # --- 神奈川県全域 ---
     print("\n[神奈川県] 店舗リスト読み込み中...")
@@ -529,7 +541,7 @@ def main():
         f.write(map_html)
 
     total = len(all_entries)
-    print(f"\n完了! マイホール{len(my_entries)}件 + 神奈川{len(kanagawa_entries)}件 + 山梨{len(yamanashi_entries)}件 = {total}件")
+    print(f"\n完了! 湘南地区{len(my_entries)}件 + 神奈川{len(kanagawa_entries)}件 + 山梨{len(yamanashi_entries)}件 = {total}件")
     print(f"HTML出力: {output_path}")
     print(f"マップ出力: {map_path}")
 
