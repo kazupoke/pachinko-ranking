@@ -497,32 +497,72 @@ showMarkers(todayData);
     return html
 
 
+CACHE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "cache")
+
+
+def save_cache(key, data, date_str):
+    """スクレイピング結果をキャッシュに保存"""
+    os.makedirs(CACHE_DIR, exist_ok=True)
+    cache_path = os.path.join(CACHE_DIR, f"{key}_{date_str.replace('/', '-')}.json")
+    with open(cache_path, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False)
+
+
+def load_cache(key, date_str):
+    """当日のキャッシュがあれば読み込み、なければNone"""
+    cache_path = os.path.join(CACHE_DIR, f"{key}_{date_str.replace('/', '-')}.json")
+    if os.path.exists(cache_path):
+        with open(cache_path, encoding="utf-8") as f:
+            return json.load(f)
+    return None
+
+
+def scrape_or_cache(key, hids, today_str, tomorrow_str, label):
+    """キャッシュがあれば使用、なければスクレイピングしてキャッシュ保存"""
+    cached = load_cache(key, today_str)
+    if cached is not None:
+        print(f"  キャッシュ使用 ({len(cached)}件)")
+        return cached
+    entries = scrape_stores(hids, today_str, tomorrow_str, label)
+    save_cache(key, entries, today_str)
+    return entries
+
+
 def main():
     today = datetime.now()
     tomorrow = today + timedelta(days=1)
     today_str = f"{today.month}/{today.day}"
     tomorrow_str = f"{tomorrow.month}/{tomorrow.day}"
+    date_key = today.strftime("%Y-%m-%d")
 
     if sys.platform == "win32":
         sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+
+    # --force オプションでキャッシュ無視
+    force = "--force" in sys.argv
+
+    if force:
+        # キャッシュを削除
+        if os.path.exists(CACHE_DIR):
+            for f in os.listdir(CACHE_DIR):
+                os.remove(os.path.join(CACHE_DIR, f))
+        print("キャッシュを無視して再取得します")
 
     print(f"パチンコ店ランキング生成中... ({today.strftime('%Y/%m/%d %H:%M')})")
 
     # --- 湘南地区 ---
     print(f"\n[湘南地区] {len(MY_HALL_HIDS)}店舗")
-    my_entries = scrape_stores(MY_HALL_HIDS, today_str, tomorrow_str, "湘南地区")
+    my_entries = scrape_or_cache("shonan", MY_HALL_HIDS, today_str, tomorrow_str, "湘南地区")
 
     # --- 神奈川県全域 ---
-    print("\n[神奈川県] 店舗リスト読み込み中...")
     kanagawa_hids = load_store_hids("kanagawa_stores.json")
-    print(f"[神奈川県] {len(kanagawa_hids)}店舗")
-    kanagawa_entries = scrape_stores(kanagawa_hids, today_str, tomorrow_str, "神奈川県")
+    print(f"\n[神奈川県] {len(kanagawa_hids)}店舗")
+    kanagawa_entries = scrape_or_cache("kanagawa", kanagawa_hids, today_str, tomorrow_str, "神奈川県")
 
     # --- 山梨県全域 ---
-    print("\n[山梨県] 店舗リスト読み込み中...")
     yamanashi_hids = load_store_hids("yamanashi_stores.json")
-    print(f"[山梨県] {len(yamanashi_hids)}店舗")
-    yamanashi_entries = scrape_stores(yamanashi_hids, today_str, tomorrow_str, "山梨県")
+    print(f"\n[山梨県] {len(yamanashi_hids)}店舗")
+    yamanashi_entries = scrape_or_cache("yamanashi", yamanashi_hids, today_str, tomorrow_str, "山梨県")
 
     # HTML生成
     output_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "docs")

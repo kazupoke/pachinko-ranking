@@ -3,3 +3,4 @@ __pycache__/
 ranking_result.txt
 debug*.png
 .env
+cache/
