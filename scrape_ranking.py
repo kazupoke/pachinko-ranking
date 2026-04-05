@@ -12,6 +12,7 @@ hall-navi.com から今日・明日のイベント情報を取得し、スコア
 """
 
 import io
+import json
 import os
 import random
 import re
@@ -54,30 +55,12 @@ def fetch_page(url):
     return resp.text
 
 
-def fetch_kanagawa_hids():
-    """hall-naviから神奈川県の全店舗HIDを自動取得"""
-    all_hids = set()
-    page = 1
-    while True:
-        url = f"https://hall-navi.com/osusume_list?ken=2&page={page}&area=kanto"
-        try:
-            resp = requests.get(url, impersonate="chrome", timeout=30)
-            soup = BeautifulSoup(resp.text, "html.parser")
-            new_hids = set()
-            for a in soup.select('a[href*="hole_view"]'):
-                href = a.get("href", "")
-                if "hid=" in href:
-                    hid = href.split("hid=")[1].split("&")[0]
-                    new_hids.add(hid)
-            before = len(all_hids)
-            all_hids.update(new_hids)
-            if len(all_hids) == before:
-                break
-            page += 1
-            time.sleep(2)
-        except Exception:
-            break
-    return sorted(all_hids)
+def load_kanagawa_hids():
+    """kanagawa_stores.jsonから神奈川県のみのHIDリストを読み込む"""
+    json_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "kanagawa_stores.json")
+    with open(json_path, encoding="utf-8") as f:
+        stores = json.load(f)
+    return [s["hid"] for s in stores]
 
 
 def extract_store_data(html, today_str, tomorrow_str):
@@ -342,9 +325,8 @@ def main():
     my_entries = scrape_stores(MY_HALL_HIDS, today_str, tomorrow_str, "マイホール")
 
     # --- 神奈川県全域 ---
-    print("\n[神奈川県] 店舗リスト取得中...")
-    kanagawa_hids = fetch_kanagawa_hids()
-    # マイホールと重複するものも含めてスクレイピング（別タブで表示するため）
+    print("\n[神奈川県] 店舗リスト読み込み中...")
+    kanagawa_hids = load_kanagawa_hids()
     print(f"[神奈川県] {len(kanagawa_hids)}店舗")
     kanagawa_entries = scrape_stores(kanagawa_hids, today_str, tomorrow_str, "神奈川県")
 
