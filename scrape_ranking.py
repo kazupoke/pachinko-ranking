@@ -55,9 +55,9 @@ def fetch_page(url):
     return resp.text
 
 
-def load_kanagawa_hids():
-    """kanagawa_stores.jsonから神奈川県のみのHIDリストを読み込む"""
-    json_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "kanagawa_stores.json")
+def load_store_hids(filename):
+    """JSONファイルからHIDリストを読み込む"""
+    json_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), filename)
     with open(json_path, encoding="utf-8") as f:
         stores = json.load(f)
     return [s["hid"] for s in stores]
@@ -150,7 +150,7 @@ def scrape_stores(hids, today_str, tomorrow_str, label=""):
     return all_entries
 
 
-def generate_html(my_entries, kanagawa_entries, today, tomorrow):
+def generate_html(my_entries, kanagawa_entries, yamanashi_entries, today, tomorrow):
     """タブ切り替え付きランキングHTMLを生成"""
     today_str = f"{today.month}/{today.day}"
     tomorrow_str = f"{tomorrow.month}/{tomorrow.day}"
@@ -217,6 +217,7 @@ def generate_html(my_entries, kanagawa_entries, today, tomorrow):
 
     my_content = make_tab_content(my_entries, "tab-my")
     kanagawa_content = make_tab_content(kanagawa_entries, "tab-kanagawa")
+    yamanashi_content = make_tab_content(yamanashi_entries, "tab-yamanashi")
 
     html = f"""<!DOCTYPE html>
 <html lang="ja">
@@ -290,10 +291,12 @@ def generate_html(my_entries, kanagawa_entries, today, tomorrow):
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('tab-my', this)">マイホール</button>
     <button class="tab-btn" onclick="switchTab('tab-kanagawa', this)">神奈川県</button>
+    <button class="tab-btn" onclick="switchTab('tab-yamanashi', this)">山梨県</button>
   </div>
 
   {my_content}
   {kanagawa_content}
+  {yamanashi_content}
 
   <script>
   function switchTab(tabId, btn) {{
@@ -326,21 +329,27 @@ def main():
 
     # --- 神奈川県全域 ---
     print("\n[神奈川県] 店舗リスト読み込み中...")
-    kanagawa_hids = load_kanagawa_hids()
+    kanagawa_hids = load_store_hids("kanagawa_stores.json")
     print(f"[神奈川県] {len(kanagawa_hids)}店舗")
     kanagawa_entries = scrape_stores(kanagawa_hids, today_str, tomorrow_str, "神奈川県")
+
+    # --- 山梨県全域 ---
+    print("\n[山梨県] 店舗リスト読み込み中...")
+    yamanashi_hids = load_store_hids("yamanashi_stores.json")
+    print(f"[山梨県] {len(yamanashi_hids)}店舗")
+    yamanashi_entries = scrape_stores(yamanashi_hids, today_str, tomorrow_str, "山梨県")
 
     # HTML生成
     output_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "docs")
     os.makedirs(output_dir, exist_ok=True)
     output_path = os.path.join(output_dir, "index.html")
 
-    html_content = generate_html(my_entries, kanagawa_entries, today, tomorrow)
+    html_content = generate_html(my_entries, kanagawa_entries, yamanashi_entries, today, tomorrow)
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(html_content)
 
-    total = len(my_entries) + len(kanagawa_entries)
-    print(f"\n完了! マイホール{len(my_entries)}件 + 神奈川{len(kanagawa_entries)}件 = {total}件")
+    total = len(my_entries) + len(kanagawa_entries) + len(yamanashi_entries)
+    print(f"\n完了! マイホール{len(my_entries)}件 + 神奈川{len(kanagawa_entries)}件 + 山梨{len(yamanashi_entries)}件 = {total}件")
     print(f"HTML出力: {output_path}")
 
 

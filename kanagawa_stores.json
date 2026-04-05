@@ -1,11 +1,35 @@
 [
   {
+    "hid": "210000600000002350",
+    "name": "PIA川崎銀柳",
+    "address": "神奈川県川崎市川崎区砂子2-3-5",
+    "pworld": "https://www.p-world.co.jp/kanagawa/pia-k-g.htm",
+    "lat": 35.529808,
+    "lon": 139.699905
+  },
+  {
     "hid": "210000700000000080",
     "name": "PIA川崎ダイス",
     "address": "神奈川県川崎市川崎区駅前本町8",
     "pworld": "https://www.p-world.co.jp/kanagawa/pia-k-d.htm",
     "lat": 35.531353,
     "lon": 139.70015
+  },
+  {
+    "hid": "210000700000001610",
+    "name": "PIA京急川崎",
+    "address": "神奈川県川崎市川崎区駅前本町16-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/pia-k.htm",
+    "lat": 35.532288,
+    "lon": 139.699829
+  },
+  {
+    "hid": "210000700000002140",
+    "name": "楽園 One Wien 川崎店",
+    "address": "神奈川県川崎市川崎区駅前本町2-14",
+    "pworld": "https://www.p-world.co.jp/kanagawa/rakuen-kawasaki-one.htm",
+    "lat": 35.529381,
+    "lon": 139.698776
   },
   {
     "hid": "210000700000002180",
@@ -16,12 +40,52 @@
     "lon": 139.698776
   },
   {
+    "hid": "210001500000001970",
+    "name": "吉兆川崎中央店",
+    "address": "神奈川県川崎市川崎区南町19-7",
+    "pworld": "https://www.p-world.co.jp/kanagawa/kiccho-chuo.htm",
+    "lat": 35.525799,
+    "lon": 139.700027
+  },
+  {
+    "hid": "210002300000000230",
+    "name": "PIA川崎新川通り店",
+    "address": "神奈川県川崎市川崎区小川町2-3",
+    "pworld": "https://www.p-world.co.jp/kanagawa/ropestation2.htm",
+    "lat": 35.528378,
+    "lon": 139.69873
+  },
+  {
+    "hid": "210002300000000240",
+    "name": "楽園川崎店",
+    "address": "神奈川県川崎市川崎区小川町2-4",
+    "pworld": "https://www.p-world.co.jp/kanagawa/rakuen-kawasaki.htm",
+    "lat": 35.528378,
+    "lon": 139.69873
+  },
+  {
     "hid": "210002300000000271",
     "name": "ガイア川崎スロット専門店",
     "address": "神奈川県川崎市川崎区小川町2-7",
     "pworld": "https://www.p-world.co.jp/kanagawa/gaia-kawasaki.htm",
     "lat": 35.528378,
     "lon": 139.69873
+  },
+  {
+    "hid": "210002300000014130",
+    "name": "セブンS川崎店",
+    "address": "神奈川県川崎市川崎区小川町14-13",
+    "pworld": "https://www.p-world.co.jp/kanagawa/seven-s.htm",
+    "lat": 35.527988,
+    "lon": 139.699402
+  },
+  {
+    "hid": "210080200000001550",
+    "name": "セントラル",
+    "address": "神奈川県川崎市川崎区大師駅前1-5-5",
+    "pworld": "https://www.p-world.co.jp/kanagawa/central.htm",
+    "lat": 35.535053,
+    "lon": 139.725754
   },
   {
     "hid": "210083300000011460",
@@ -40,12 +104,52 @@
     "lon": 139.720139
   },
   {
+    "hid": "210083400000317220",
+    "name": "ニューシャトル",
+    "address": "神奈川県川崎市川崎区大島3-17-22",
+    "pworld": "https://www.p-world.co.jp/kanagawa/new-shuttle.htm",
+    "lat": 35.518707,
+    "lon": 139.718018
+  },
+  {
+    "hid": "210084700000031030",
+    "name": "パチスロイレブン",
+    "address": "神奈川県川崎市川崎区浅田3-10-3",
+    "pworld": "https://www.p-world.co.jp/kanagawa/a-eleven.htm",
+    "lat": 35.507431,
+    "lon": 139.700211
+  },
+  {
+    "hid": "210084700000034150",
+    "name": "カサブランカ",
+    "address": "神奈川県川崎市川崎区浅田3-4-15",
+    "pworld": "https://www.p-world.co.jp/kanagawa/casablanca.htm",
+    "lat": 35.508007,
+    "lon": 139.6996
+  },
+  {
     "hid": "211000400000018320",
     "name": "ヒノマル新丸子東口パチンコ館",
     "address": "神奈川県川崎市中原区新丸子東1-832",
     "pworld": "https://www.p-world.co.jp/kanagawa/h-east.htm",
     "lat": 35.579693,
     "lon": 139.66214
+  },
+  {
+    "hid": "211000500000076930",
+    "name": "ヒノマル新丸子西口スロット館",
+    "address": "神奈川県川崎市中原区新丸子町769-3",
+    "pworld": "https://www.p-world.co.jp/kanagawa/hinomaru.htm",
+    "lat": 35.579376,
+    "lon": 139.660751
+  },
+  {
+    "hid": "211001400000002810",
+    "name": "TENMAN平間店",
+    "address": "神奈川県川崎市中原区田尻町28-1",
+    "pworld": "",
+    "lat": 35.560593,
+    "lon": 139.672318
   },
   {
     "hid": "211001500000000150",
@@ -64,6 +168,38 @@
     "lon": 139.672073
   },
   {
+    "hid": "211002500000002730",
+    "name": "ザシティ/ベルシティ元住吉店",
+    "address": "神奈川県川崎市中原区木月2-7-3",
+    "pworld": "https://www.p-world.co.jp/kanagawa/city-motosumi.htm",
+    "lat": 35.563992,
+    "lon": 139.655457
+  },
+  {
+    "hid": "211003400000003510",
+    "name": "パーラーWASUKE",
+    "address": "神奈川県川崎市中原区井田中ノ町35-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/wasuke.htm",
+    "lat": 35.564465,
+    "lon": 139.648102
+  },
+  {
+    "hid": "211004100000021161",
+    "name": "オークラプラスアサヒ武蔵中原店",
+    "address": "神奈川県川崎市中原区下小田中2-1-16",
+    "pworld": "https://www.p-world.co.jp/kanagawa/o-kuramusasinakahara.htm",
+    "lat": 35.579849,
+    "lon": 139.643219
+  },
+  {
+    "hid": "211004400000003230",
+    "name": "アクセス新城店",
+    "address": "神奈川県川崎市中原区新城3-2-3",
+    "pworld": "https://www.p-world.co.jp/kanagawa/access-n.htm",
+    "lat": 35.586468,
+    "lon": 139.630051
+  },
+  {
     "hid": "211004400000005141",
     "name": "ヒノマル新城駅前スロット館",
     "address": "神奈川県川崎市中原区新城5丁目1-4",
@@ -72,12 +208,44 @@
     "lon": 139.629486
   },
   {
+    "hid": "211004400000031101",
+    "name": "アクセスⅢ",
+    "address": "神奈川県川崎市中原区新城3-1-10",
+    "pworld": "https://www.p-world.co.jp/kanagawa/access23.htm",
+    "lat": 35.58646,
+    "lon": 139.630493
+  },
+  {
+    "hid": "211004400000112161",
+    "name": "ヒノマル新城店",
+    "address": "神奈川県川崎市中原区新城1丁目12-16",
+    "pworld": "https://www.p-world.co.jp/kanagawa/hinomaru-shinjo.htm",
+    "lat": 35.584789,
+    "lon": 139.630905
+  },
+  {
     "hid": "211004400001111620",
     "name": "ヒノマル新城店スロット館",
     "address": "神奈川県川崎市中原区新城1-11-16第2セキネビル",
     "pworld": "",
     "lat": 35.584789,
     "lon": 139.631287
+  },
+  {
+    "hid": "211004500000210100",
+    "name": "ピーアーク新城マックスパチンコ",
+    "address": "神奈川県川崎市中原区上新城2-10-10",
+    "pworld": "https://www.p-world.co.jp/kanagawa/himawari-shinjo.htm",
+    "lat": 35.587025,
+    "lon": 139.630402
+  },
+  {
+    "hid": "211006300000034720",
+    "name": "小杉プラザ",
+    "address": "神奈川県川崎市中原区小杉町3-472",
+    "pworld": "https://www.p-world.co.jp/kanagawa/kosugiplaza.htm",
+    "lat": 35.575596,
+    "lon": 139.659225
   },
   {
     "hid": "212001600000000170",
@@ -96,12 +264,60 @@
     "lon": 139.685165
   },
   {
+    "hid": "212002400000021640",
+    "name": "三益球殿川崎塚越店",
+    "address": "神奈川県川崎市幸区塚越2-164",
+    "pworld": "https://www.p-world.co.jp/kanagawa/mimasu.htm",
+    "lat": 35.544884,
+    "lon": 139.679398
+  },
+  {
     "hid": "212005300000001111",
     "name": "アサヒ2鹿島田店",
     "address": "神奈川県川崎市幸区下平間111番地",
     "pworld": "https://www.p-world.co.jp/kanagawa/asahi2-kashimada.htm",
     "lat": 35.551804,
     "lon": 139.677567
+  },
+  {
+    "hid": "212005400000051890",
+    "name": "MONOS川崎",
+    "address": "神奈川県川崎市幸区小倉5-18-9",
+    "pworld": "https://www.p-world.co.jp/kanagawa/monos-kawasaki.htm",
+    "lat": 35.536507,
+    "lon": 139.666443
+  },
+  {
+    "hid": "212005500000418480",
+    "name": "セブンスター川崎",
+    "address": "神奈川県川崎市幸区南加瀬4-18-48",
+    "pworld": "https://www.p-world.co.jp/kanagawa/sevenstars.htm",
+    "lat": 35.544151,
+    "lon": 139.660217
+  },
+  {
+    "hid": "213000100000001710",
+    "name": "パチスロエムアンドエム",
+    "address": "神奈川県川崎市高津区溝口1-7-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/m-and-m.htm",
+    "lat": 35.599308,
+    "lon": 139.614105
+  },
+  {
+    "hid": "213000100000001711",
+    "name": "ニューパレス",
+    "address": "神奈川県川崎市高津区溝口1-7-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/new-palace.htm",
+    "lat": 35.599308,
+    "lon": 139.614105
+  },
+  {
+    "hid": "213000100000002970",
+    "name": "エスパス日拓溝の口駅前本館",
+    "address": "神奈川県川崎市高津区溝口2-9-7",
+    "pworld": "https://www.p-world.co.jp/kanagawa/espace-mizo1.htm",
+    "lat": 35.600746,
+    "lon": 139.610901
   },
   {
     "hid": "213000100000011211",
@@ -112,12 +328,44 @@
     "lon": 139.612717
   },
   {
+    "hid": "213000100000011250",
+    "name": "SLOT ACT",
+    "address": "神奈川県川崎市高津区溝口1-12-5",
+    "pworld": "https://www.p-world.co.jp/kanagawa/s-act.htm",
+    "lat": 35.600491,
+    "lon": 139.612717
+  },
+  {
+    "hid": "213000100000011350",
+    "name": "楽園溝の口店",
+    "address": "神奈川県川崎市高津区溝口1-13-5",
+    "pworld": "https://www.p-world.co.jp/kanagawa/rakuen-mizonokuchi.htm",
+    "lat": 35.599899,
+    "lon": 139.613907
+  },
+  {
     "hid": "213000100000017101",
     "name": "ノアアークス",
     "address": "神奈川県川崎市高津区溝口1-7-10",
     "pworld": "https://www.p-world.co.jp/kanagawa/noaharks.htm",
     "lat": 35.599308,
     "lon": 139.614105
+  },
+  {
+    "hid": "213000100000017230",
+    "name": "NOAH溝口店",
+    "address": "神奈川県川崎市高津区溝口1-7-23",
+    "pworld": "https://www.p-world.co.jp/kanagawa/noah.htm",
+    "lat": 35.599308,
+    "lon": 139.614105
+  },
+  {
+    "hid": "213000100000029190",
+    "name": "エスパス日拓溝の口駅前新館",
+    "address": "神奈川県川崎市高津区溝口2-9-19",
+    "pworld": "https://www.p-world.co.jp/kanagawa/espace-mizo2.htm",
+    "lat": 35.600746,
+    "lon": 139.610901
   },
   {
     "hid": "213002700000119410",
@@ -136,12 +384,60 @@
     "lon": 139.533005
   },
   {
+    "hid": "214000100000021541",
+    "name": "ダック2",
+    "address": "神奈川県川崎市多摩区菅2-15-4",
+    "pworld": "https://www.p-world.co.jp/kanagawa/dac2.htm",
+    "lat": 35.633198,
+    "lon": 139.529846
+  },
+  {
+    "hid": "214001200000019100",
+    "name": "バンバンブラッサム",
+    "address": "神奈川県川崎市多摩区中野島1-9-10",
+    "pworld": "https://www.p-world.co.jp/kanagawa/banban-brasam.htm",
+    "lat": 35.629375,
+    "lon": 139.548767
+  },
+  {
     "hid": "214001400000027550",
     "name": "ヒノマル向ヶ丘遊園店",
     "address": "神奈川県川崎市多摩区登戸2755",
     "pworld": "https://www.p-world.co.jp/kanagawa/hinomaru-mukougaoka.htm",
     "lat": 35.616531,
     "lon": 139.562576
+  },
+  {
+    "hid": "214001400000034140",
+    "name": "ハトヤ",
+    "address": "神奈川県川崎市多摩区登戸3414",
+    "pworld": "https://www.p-world.co.jp/kanagawa/hatoya.htm",
+    "lat": 35.620438,
+    "lon": 139.567551
+  },
+  {
+    "hid": "214001400000271050",
+    "name": "バンバンポラリス",
+    "address": "神奈川県川崎市多摩区登戸2710-5",
+    "pworld": "https://www.p-world.co.jp/kanagawa/banban-pola.htm",
+    "lat": 35.616009,
+    "lon": 139.564774
+  },
+  {
+    "hid": "214001400000346710",
+    "name": "SLOT BIC",
+    "address": "神奈川県川崎市多摩区登戸3467-1",
+    "pworld": "",
+    "lat": 35.620186,
+    "lon": 139.570175
+  },
+  {
+    "hid": "214001400002121120",
+    "name": "ギンザホール707",
+    "address": "神奈川県川崎市多摩区登戸2121-1GINZAFOREST2階",
+    "pworld": "https://www.p-world.co.jp/kanagawa/ginzahall.htm",
+    "lat": 35.61813,
+    "lon": 139.56424
   },
   {
     "hid": "215000400000011610",
@@ -160,12 +456,68 @@
     "lon": 139.515457
   },
   {
+    "hid": "215002100000629520",
+    "name": "DIVAS柿生店",
+    "address": "神奈川県川崎市麻生区上麻生6-29-52",
+    "pworld": "https://www.p-world.co.jp/kanagawa/divas-k.htm",
+    "lat": 35.588165,
+    "lon": 139.497269
+  },
+  {
+    "hid": "216000400000011120",
+    "name": "ターキー鷺沼",
+    "address": "神奈川県川崎市宮前区鷺沼1-11-2",
+    "pworld": "https://www.p-world.co.jp/kanagawa/turkey.htm",
+    "lat": 35.578003,
+    "lon": 139.573151
+  },
+  {
+    "hid": "216001100000003710",
+    "name": "プレイスポットドラゴン川崎",
+    "address": "神奈川県川崎市宮前区犬蔵3-7-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/play-spot-dragon.htm",
+    "lat": 35.589397,
+    "lon": 139.556351
+  },
+  {
+    "hid": "216001100000018100",
+    "name": "吉兆東名川崎店",
+    "address": "神奈川県川崎市宮前区犬蔵1-8-10",
+    "pworld": "https://www.p-world.co.jp/kanagawa/kiccho-tomeikawasaki.htm",
+    "lat": 35.588291,
+    "lon": 139.56691
+  },
+  {
+    "hid": "220000500000001310",
+    "name": "PIA横浜モアーズ",
+    "address": "神奈川県横浜市西区南幸1-3-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/pia-y-m.htm",
+    "lat": 35.467518,
+    "lon": 139.622421
+  },
+  {
     "hid": "220000500000011340",
     "name": "キングEX",
     "address": "神奈川県横浜市西区南幸1-13-4",
     "pworld": "https://www.p-world.co.jp/kanagawa/kingex.htm",
     "lat": 35.464794,
     "lon": 139.619324
+  },
+  {
+    "hid": "220000500000011410",
+    "name": "スーパースロットクラブZ",
+    "address": "神奈川県横浜市西区南幸1-14-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/ssclub-z.htm",
+    "lat": 35.465405,
+    "lon": 139.61937
+  },
+  {
+    "hid": "220000500000113110",
+    "name": "横浜ポパイ",
+    "address": "神奈川県横浜市西区南幸1-13-11",
+    "pworld": "https://www.p-world.co.jp/kanagawa/popeye.htm",
+    "lat": 35.465279,
+    "lon": 139.619217
   },
   {
     "hid": "220000500000114100",
@@ -176,6 +528,22 @@
     "lon": 139.619049
   },
   {
+    "hid": "220006100000020122",
+    "name": "デラックス7",
+    "address": "神奈川県横浜市西区久保町20-12",
+    "pworld": "https://www.p-world.co.jp/kanagawa/deluxe7.htm",
+    "lat": 35.450417,
+    "lon": 139.610519
+  },
+  {
+    "hid": "221000100000011710",
+    "name": "吉兆横浜西寺尾店",
+    "address": "神奈川県横浜市神奈川区西寺尾1-17-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/kiccho-nishiterao.htm",
+    "lat": 35.501759,
+    "lon": 139.643661
+  },
+  {
     "hid": "221000200000000350",
     "name": "パチンコ永楽",
     "address": "神奈川県横浜市神奈川区大口通35",
@@ -184,12 +552,52 @@
     "lon": 139.645462
   },
   {
+    "hid": "221080200000001120",
+    "name": "SKIP六角橋店",
+    "address": "神奈川県横浜市神奈川区六角橋1-1-2",
+    "pworld": "https://www.p-world.co.jp/kanagawa/skip-rokkaku.htm",
+    "lat": 35.486824,
+    "lon": 139.625961
+  },
+  {
     "hid": "221080200000001241",
     "name": "キコーナ白楽店",
     "address": "神奈川県横浜市神奈川区六角橋1-2-4",
     "pworld": "https://www.p-world.co.jp/kanagawa/kicona-hakuraku.htm",
     "lat": 35.487385,
     "lon": 139.626205
+  },
+  {
+    "hid": "221082200000001610",
+    "name": "MQリゾート東神奈川店",
+    "address": "神奈川県横浜市神奈川区西神奈川1-6-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/higashi-mq-resort.htm",
+    "lat": 35.478397,
+    "lon": 139.632355
+  },
+  {
+    "hid": "221084100000001230",
+    "name": "クラブニューヨーク横浜反町店",
+    "address": "神奈川県横浜市神奈川区松本町1-2-3",
+    "pworld": "https://www.p-world.co.jp/kanagawa/asahi-tanmachi.htm",
+    "lat": 35.475235,
+    "lon": 139.624924
+  },
+  {
+    "hid": "222000100000012511",
+    "name": "アビバ綱島南店",
+    "address": "神奈川県横浜市港北区樽町1-25-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/aviva-tunasimaminami.htm",
+    "lat": 35.529091,
+    "lon": 139.633621
+  },
+  {
+    "hid": "222000100000311380",
+    "name": "アビバ綱島樽町店",
+    "address": "神奈川県横浜市港北区樽町3-11-38",
+    "pworld": "https://www.p-world.co.jp/kanagawa/aviva-tsunashima.htm",
+    "lat": 35.531502,
+    "lon": 139.643082
   },
   {
     "hid": "222001100000005110",
@@ -208,12 +616,36 @@
     "lon": 139.61673
   },
   {
+    "hid": "222003300000021181",
+    "name": "SKIP新横浜店",
+    "address": "神奈川県横浜市港北区新横浜2-1-18",
+    "pworld": "https://www.p-world.co.jp/kanagawa/skip-shinyoko.htm",
+    "lat": 35.507751,
+    "lon": 139.61673
+  },
+  {
+    "hid": "222003300000021200",
+    "name": "サガン新横浜",
+    "address": "神奈川県横浜市港北区新横浜2-1-20",
+    "pworld": "https://www.p-world.co.jp/kanagawa/sagan.htm",
+    "lat": 35.507751,
+    "lon": 139.61673
+  },
+  {
     "hid": "223005200000016230",
     "name": "エムアンドエム綱島",
     "address": "神奈川県横浜市港北区綱島東1-6-23",
     "pworld": "https://www.p-world.co.jp/kanagawa/sunpalace.htm",
     "lat": 35.536236,
     "lon": 139.63501
+  },
+  {
+    "hid": "223005300000022200",
+    "name": "タイガー7綱島店",
+    "address": "神奈川県横浜市港北区綱島西2-2-20",
+    "pworld": "https://www.p-world.co.jp/kanagawa/tiger7tsunashima.htm",
+    "lat": 35.536274,
+    "lon": 139.633423
   },
   {
     "hid": "223005300000022220",
@@ -232,6 +664,30 @@
     "lon": 139.64653
   },
   {
+    "hid": "223006500000042010",
+    "name": "LUCCA",
+    "address": "神奈川県横浜市港北区高田東4-20-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/lucca.htm",
+    "lat": 35.549042,
+    "lon": 139.621246
+  },
+  {
+    "hid": "224000300000139200",
+    "name": "センター北サンコー",
+    "address": "神奈川県横浜市都筑区中川中央1-39-20",
+    "pworld": "https://www.p-world.co.jp/kanagawa/sanko.htm",
+    "lat": 35.555866,
+    "lon": 139.580765
+  },
+  {
+    "hid": "224002100000011010",
+    "name": "ドキわくランド北山田店",
+    "address": "神奈川県横浜市都筑区北山田1-10-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/sunshine-kitayamada.htm",
+    "lat": 35.561474,
+    "lon": 139.593079
+  },
+  {
     "hid": "224003200000000120",
     "name": "ともえセン南駅すぐよこ店",
     "address": "神奈川県横浜市都筑区茅ケ崎中央1-2",
@@ -246,6 +702,14 @@
     "pworld": "https://www.p-world.co.jp/kanagawa/ziath-c.htm",
     "lat": 35.543774,
     "lon": 139.570389
+  },
+  {
+    "hid": "224004100000001610",
+    "name": "キコーナ仲町台店",
+    "address": "神奈川県横浜市都筑区仲町台1-6-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/kicona-nakamachidai.htm",
+    "lat": 35.536045,
+    "lon": 139.589859
   },
   {
     "hid": "224004300000004810",
@@ -272,12 +736,68 @@
     "lon": 139.55925
   },
   {
+    "hid": "225001100000029130",
+    "name": "WEST END あざみ野駅前",
+    "address": "神奈川県横浜市青葉区あざみ野2-9-13",
+    "pworld": "https://www.p-world.co.jp/kanagawa/westend.htm",
+    "lat": 35.567982,
+    "lon": 139.551971
+  },
+  {
+    "hid": "225002400000020150",
+    "name": "サンパチンコ",
+    "address": "神奈川県横浜市青葉区市ケ尾町20-15",
+    "pworld": "https://www.p-world.co.jp/kanagawa/sun.htm",
+    "lat": 35.546173,
+    "lon": 139.540909
+  },
+  {
+    "hid": "225002400000106480",
+    "name": "TENMAN",
+    "address": "神奈川県横浜市青葉区市ケ尾町1064-8",
+    "pworld": "https://www.p-world.co.jp/kanagawa/tenman.htm",
+    "lat": 35.551327,
+    "lon": 139.542419
+  },
+  {
+    "hid": "226000300000017130",
+    "name": "JIN",
+    "address": "神奈川県横浜市緑区鴨居1-7-13",
+    "pworld": "https://www.p-world.co.jp/kanagawa/jin.htm",
+    "lat": 35.510418,
+    "lon": 139.568207
+  },
+  {
+    "hid": "226000400000001731",
+    "name": "マルコ",
+    "address": "神奈川県横浜市緑区鴨居町1-7-3",
+    "pworld": "https://www.p-world.co.jp/kanagawa/p-marco.htm",
+    "lat": 35.498283,
+    "lon": 139.56752
+  },
+  {
+    "hid": "226001100000032610",
+    "name": "中山UNO",
+    "address": "神奈川県横浜市緑区中山町326-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/1130uno.htm",
+    "lat": 35.51601,
+    "lon": 139.539886
+  },
+  {
     "hid": "226001400000028011",
     "name": "ゾロン中山",
     "address": "神奈川県横浜市緑区台村町280-1",
     "pworld": "https://www.p-world.co.jp/kanagawa/2100zoron.htm",
     "lat": 35.514622,
     "lon": 139.537659
+  },
+  {
+    "hid": "226002500000088370",
+    "name": "クリエ十日市場店",
+    "address": "神奈川県横浜市緑区十日市場町883-7",
+    "pworld": "https://www.p-world.co.jp/kanagawa/creer-tokaichiba.htm",
+    "lat": 35.526009,
+    "lon": 139.517807
   },
   {
     "hid": "227006300000001710",
@@ -288,12 +808,60 @@
     "lon": 139.516006
   },
   {
+    "hid": "230000400000021100",
+    "name": "マルハン鶴見店",
+    "address": "神奈川県横浜市鶴見区元宮2-1-10",
+    "pworld": "https://www.p-world.co.jp/kanagawa/maruhan-tsurumi.htm",
+    "lat": 35.524284,
+    "lon": 139.678421
+  },
+  {
+    "hid": "230004200000002640",
+    "name": "スリーセブン2",
+    "address": "神奈川県横浜市鶴見区仲通2-64",
+    "pworld": "https://www.p-world.co.jp/kanagawa/three-seven.htm",
+    "lat": 35.50193,
+    "lon": 139.688919
+  },
+  {
     "hid": "230004200000268200",
     "name": "シーパワーⅢ",
     "address": "神奈川県横浜市鶴見区仲通2-68-20",
     "pworld": "",
     "lat": 35.501644,
     "lon": 139.689865
+  },
+  {
+    "hid": "230005100000001340",
+    "name": "鶴見UNO",
+    "address": "神奈川県横浜市鶴見区鶴見中央1-3-4",
+    "pworld": "https://www.p-world.co.jp/kanagawa/2080uno.htm",
+    "lat": 35.508324,
+    "lon": 139.677536
+  },
+  {
+    "hid": "230005100000003761",
+    "name": "キコーナ鶴見中央店",
+    "address": "神奈川県横浜市鶴見区鶴見中央3-7-6",
+    "pworld": "https://www.p-world.co.jp/kanagawa/kicona-turumichuo.htm",
+    "lat": 35.51202,
+    "lon": 139.684464
+  },
+  {
+    "hid": "230005200000003290",
+    "name": "ZAP生麦店",
+    "address": "神奈川県横浜市鶴見区生麦3-2-9",
+    "pworld": "https://www.p-world.co.jp/kanagawa/zapnamamugi.htm",
+    "lat": 35.49509,
+    "lon": 139.666946
+  },
+  {
+    "hid": "230005200000037260",
+    "name": "パーラースーパーセブン生麦店",
+    "address": "神奈川県横浜市鶴見区生麦3-7-26",
+    "pworld": "https://www.p-world.co.jp/kanagawa/parlor-superseven.htm",
+    "lat": 35.494671,
+    "lon": 139.668076
   },
   {
     "hid": "230006100000002260",
@@ -312,6 +880,70 @@
     "lon": 139.674866
   },
   {
+    "hid": "230007100000024330",
+    "name": "吉兆横浜駒岡店",
+    "address": "神奈川県横浜市鶴見区駒岡2-4-33",
+    "pworld": "https://www.p-world.co.jp/kanagawa/kiccho-komaoka.htm",
+    "lat": 35.525715,
+    "lon": 139.648315
+  },
+  {
+    "hid": "231003300000001180",
+    "name": "横浜マリーン",
+    "address": "神奈川県横浜市中区長者町1-1-8",
+    "pworld": "https://www.p-world.co.jp/kanagawa/yokohamamarine.htm",
+    "lat": 35.437553,
+    "lon": 139.637253
+  },
+  {
+    "hid": "231003300000811910",
+    "name": "キコーナ伊勢佐木店",
+    "address": "神奈川県横浜市中区長者町8-119-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/kicona-isezaki.htm",
+    "lat": 35.443298,
+    "lon": 139.6297
+  },
+  {
+    "hid": "231004500000001230",
+    "name": "PIA伊勢佐木町",
+    "address": "神奈川県横浜市中区伊勢佐木町1-2-3",
+    "pworld": "https://www.p-world.co.jp/kanagawa/pia-isezaki.htm",
+    "lat": 35.445164,
+    "lon": 139.63353
+  },
+  {
+    "hid": "231004500000003960",
+    "name": "PIA伊勢佐木3丁目店",
+    "address": "神奈川県横浜市中区伊勢佐木町3-96",
+    "pworld": "https://www.p-world.co.jp/kanagawa/santrope.htm",
+    "lat": 35.442764,
+    "lon": 139.630295
+  },
+  {
+    "hid": "231004500000310720",
+    "name": "スーパーハリウッド",
+    "address": "神奈川県横浜市中区伊勢佐木町3-107-2",
+    "pworld": "https://www.p-world.co.jp/kanagawa/sh-isezaki.htm",
+    "lat": 35.441864,
+    "lon": 139.629608
+  },
+  {
+    "hid": "231004700000000250",
+    "name": "アビバ関内店",
+    "address": "神奈川県横浜市中区羽衣町2-5",
+    "pworld": "https://www.p-world.co.jp/kanagawa/aviva-kannnai.htm",
+    "lat": 35.443768,
+    "lon": 139.633987
+  },
+  {
+    "hid": "231004700000001110",
+    "name": "SKIP関内店",
+    "address": "神奈川県横浜市中区羽衣町1-1-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/skip-kannai.htm",
+    "lat": 35.443878,
+    "lon": 139.634888
+  },
+  {
     "hid": "231004700000001111",
     "name": "SKIPスロットクラブ関内店",
     "address": "神奈川県横浜市中区羽衣町1-1-1",
@@ -328,12 +960,52 @@
     "lon": 139.630081
   },
   {
+    "hid": "231082100000001010",
+    "name": "アークス本牧",
+    "address": "神奈川県横浜市中区本牧原10-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/arks-h.htm",
+    "lat": 35.427094,
+    "lon": 139.665665
+  },
+  {
+    "hid": "231082100000001410",
+    "name": "エスタディオ本牧店",
+    "address": "神奈川県横浜市中区本牧原14-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/estadio.htm",
+    "lat": 35.424931,
+    "lon": 139.665863
+  },
+  {
+    "hid": "232002100000000130",
+    "name": "SKIP横浜橋店",
+    "address": "神奈川県横浜市南区真金町1-3",
+    "pworld": "https://www.p-world.co.jp/kanagawa/skip-yokohama.htm",
+    "lat": 35.436779,
+    "lon": 139.628601
+  },
+  {
+    "hid": "232004100000013450",
+    "name": "ニューセブン",
+    "address": "神奈川県横浜市南区睦町1-34-5",
+    "pworld": "",
+    "lat": 35.429848,
+    "lon": 139.61821
+  },
+  {
     "hid": "232005200000001530",
     "name": "ビッグパンドラ井土ヶ谷店新館",
     "address": "神奈川県横浜市南区井土ケ谷中町153",
     "pworld": "https://www.p-world.co.jp/kanagawa/pandora-is.htm",
     "lat": 35.432686,
     "lon": 139.601852
+  },
+  {
+    "hid": "232005300000002201",
+    "name": "ドキわくランド 井土ヶ谷店",
+    "address": "神奈川県横浜市南区井土ケ谷下町220",
+    "pworld": "https://www.p-world.co.jp/kanagawa/dokiwakuland-idogaya.htm",
+    "lat": 35.432732,
+    "lon": 139.60289
   },
   {
     "hid": "232005300000021440",
@@ -352,12 +1024,68 @@
     "lon": 139.601364
   },
   {
+    "hid": "232006700000026021",
+    "name": "PASSAGE 弘明寺駅前",
+    "address": "神奈川県横浜市南区弘明寺町260-2",
+    "pworld": "https://www.p-world.co.jp/kanagawa/psg-gumyouziekimae.htm",
+    "lat": 35.424469,
+    "lon": 139.597641
+  },
+  {
+    "hid": "233000200000011390",
+    "name": "プラザ上大岡アンドミラージュ",
+    "address": "神奈川県横浜市港南区上大岡西1-13-9",
+    "pworld": "https://www.p-world.co.jp/kanagawa/mirage-pk.htm",
+    "lat": 35.410263,
+    "lon": 139.595764
+  },
+  {
+    "hid": "233000200000011481",
+    "name": "アビバ上大岡店",
+    "address": "神奈川県横浜市港南区上大岡西1-14-8",
+    "pworld": "https://www.p-world.co.jp/kanagawa/aviva-kamioka.htm",
+    "lat": 35.40963,
+    "lon": 139.595871
+  },
+  {
+    "hid": "233000200000021120",
+    "name": "ジアス上大岡",
+    "address": "神奈川県横浜市港南区上大岡西2-1-12",
+    "pworld": "https://www.p-world.co.jp/kanagawa/ziath-kami.htm",
+    "lat": 35.406242,
+    "lon": 139.596008
+  },
+  {
     "hid": "233001300000011290",
     "name": "Dステーション上永谷",
     "address": "神奈川県横浜市港南区丸山台1-12-9",
     "pworld": "https://www.p-world.co.jp/kanagawa/dstation-kaminagaya.htm",
     "lat": 35.40062,
     "lon": 139.572739
+  },
+  {
+    "hid": "233001300000011370",
+    "name": "楽園上永谷店",
+    "address": "神奈川県横浜市港南区丸山台1-13-7",
+    "pworld": "https://www.p-world.co.jp/kanagawa/rakuenkaminagaya.htm",
+    "lat": 35.401363,
+    "lon": 139.572266
+  },
+  {
+    "hid": "233001300000113210",
+    "name": "パーラーノア上永谷店",
+    "address": "神奈川県横浜市港南区丸山台1-13-21",
+    "pworld": "https://www.p-world.co.jp/kanagawa/noah-kaminagaya.htm",
+    "lat": 35.400852,
+    "lon": 139.57254
+  },
+  {
+    "hid": "234005400000041740",
+    "name": "ジアス港南台",
+    "address": "神奈川県横浜市港南区港南台4-17-4",
+    "pworld": "https://www.p-world.co.jp/kanagawa/ziath-k.htm",
+    "lat": 35.375278,
+    "lon": 139.57576
   },
   {
     "hid": "234005500000032130",
@@ -368,12 +1096,76 @@
     "lon": 139.570633
   },
   {
+    "hid": "235000700000012180",
+    "name": "宝島根岸店",
+    "address": "神奈川県横浜市磯子区西町12-18",
+    "pworld": "https://www.p-world.co.jp/kanagawa/takara.htm",
+    "lat": 35.416382,
+    "lon": 139.634521
+  },
+  {
+    "hid": "235001600000036230",
+    "name": "@! [アット] 磯子",
+    "address": "神奈川県横浜市磯子区磯子3-6-23",
+    "pworld": "https://www.p-world.co.jp/kanagawa/at-isogo.htm",
+    "lat": 35.40099,
+    "lon": 139.617645
+  },
+  {
     "hid": "235002300000011020",
     "name": "パチンコプラザ",
     "address": "神奈川県横浜市磯子区森1-10-2",
     "pworld": "https://www.p-world.co.jp/kanagawa/pachinko-plaza.htm",
     "lat": 35.399704,
     "lon": 139.616821
+  },
+  {
+    "hid": "235003200000000310",
+    "name": "アビバ新杉田店",
+    "address": "神奈川県横浜市磯子区新杉田町3-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/aviva-shinsugita.htm",
+    "lat": 35.387005,
+    "lon": 139.619049
+  },
+  {
+    "hid": "235003300000110210",
+    "name": "デイズ",
+    "address": "神奈川県横浜市磯子区杉田1-10-21",
+    "pworld": "https://www.p-world.co.jp/kanagawa/days.htm",
+    "lat": 35.384823,
+    "lon": 139.619064
+  },
+  {
+    "hid": "235003600000013400",
+    "name": "ザシティ/ベルシティ新杉田店",
+    "address": "神奈川県横浜市磯子区中原1-3-40",
+    "pworld": "https://www.p-world.co.jp/kanagawa/city-sugita.htm",
+    "lat": 35.38979,
+    "lon": 139.615952
+  },
+  {
+    "hid": "236000500000021370",
+    "name": "シーサイドプラザ",
+    "address": "神奈川県横浜市金沢区並木2-13-7",
+    "pworld": "https://www.p-world.co.jp/kanagawa/seasideplaza.htm",
+    "lat": 35.361904,
+    "lon": 139.639282
+  },
+  {
+    "hid": "236001600000003712",
+    "name": "スリーエイト",
+    "address": "神奈川県横浜市金沢区谷津町371",
+    "pworld": "https://www.p-world.co.jp/kanagawa/888-threeeight.htm",
+    "lat": 35.343002,
+    "lon": 139.622421
+  },
+  {
+    "hid": "236002100000002450",
+    "name": "グランドアクア",
+    "address": "神奈川県横浜市金沢区泥亀2-4-5",
+    "pworld": "https://www.p-world.co.jp/kanagawa/grand-aqua.htm",
+    "lat": 35.339668,
+    "lon": 139.624023
   },
   {
     "hid": "236002700000019210",
@@ -392,6 +1184,38 @@
     "lon": 139.626892
   },
   {
+    "hid": "237006800000001350",
+    "name": "SS ZAP 追浜店",
+    "address": "神奈川県横須賀市追浜本町1-35",
+    "pworld": "https://www.p-world.co.jp/kanagawa/zap.htm",
+    "lat": 35.316628,
+    "lon": 139.62709
+  },
+  {
+    "hid": "238000700000000130",
+    "name": "アビバ横須賀中央店",
+    "address": "神奈川県横須賀市若松町1-3",
+    "pworld": "https://www.p-world.co.jp/kanagawa/abiva-yokosuka.htm",
+    "lat": 35.279995,
+    "lon": 139.670624
+  },
+  {
+    "hid": "238000700000002410",
+    "name": "PIA横須賀中央",
+    "address": "神奈川県横須賀市若松町2-4-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/pia-y-c.htm",
+    "lat": 35.279613,
+    "lon": 139.669983
+  },
+  {
+    "hid": "238000700000002750",
+    "name": "スカスロZAP中央店",
+    "address": "神奈川県横須賀市若松町2-7-5",
+    "pworld": "",
+    "lat": 35.279095,
+    "lon": 139.67041
+  },
+  {
     "hid": "238001400000000410",
     "name": "アフェスタ三春町店",
     "address": "神奈川県横須賀市三春町4-1",
@@ -406,6 +1230,30 @@
     "pworld": "https://www.p-world.co.jp/kanagawa/aviva-miharucho.htm",
     "lat": 35.26899,
     "lon": 139.682541
+  },
+  {
+    "hid": "238003100000000240",
+    "name": "ZAP衣笠店",
+    "address": "神奈川県横須賀市衣笠栄町2-4",
+    "pworld": "https://www.p-world.co.jp/kanagawa/zap-kinugasa.htm",
+    "lat": 35.257973,
+    "lon": 139.661072
+  },
+  {
+    "hid": "238003100000265800",
+    "name": "夢球殿衣笠店",
+    "address": "神奈川県横須賀市衣笠栄町2-65-80",
+    "pworld": "https://www.p-world.co.jp/kanagawa/yumekyuden.htm",
+    "lat": 35.258259,
+    "lon": 139.659805
+  },
+  {
+    "hid": "238010100000330610",
+    "name": "アビバ三浦海岸店",
+    "address": "神奈川県三浦市南下浦町上宮田3306-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/aviva-miura.htm",
+    "lat": 35.186741,
+    "lon": 139.655716
   },
   {
     "hid": "238010100003338140",
@@ -424,12 +1272,44 @@
     "lon": 139.635452
   },
   {
+    "hid": "239080500000011230",
+    "name": "ZAP舟倉店",
+    "address": "神奈川県横須賀市舟倉1-1-23",
+    "pworld": "https://www.p-world.co.jp/kanagawa/zap-funagura.htm",
+    "lat": 35.23914,
+    "lon": 139.697144
+  },
+  {
     "hid": "239080500000011270",
     "name": "ZAP PRESTIGE",
     "address": "神奈川県横須賀市舟倉1-1-27",
     "pworld": "https://www.p-world.co.jp/kanagawa/zap-prestig.htm",
     "lat": 35.23914,
     "lon": 139.697144
+  },
+  {
+    "hid": "239080700000034110",
+    "name": "アビバANNEX&SQUARE",
+    "address": "神奈川県横須賀市根岸町3-4-11",
+    "pworld": "https://www.p-world.co.jp/kanagawa/aviva-anex.htm",
+    "lat": 35.24921,
+    "lon": 139.685104
+  },
+  {
+    "hid": "239080800000012280",
+    "name": "横須賀馬堀マリーン",
+    "address": "神奈川県横須賀市大津町1-22-8",
+    "pworld": "https://www.p-world.co.jp/kanagawa/yokosukamarine.htm",
+    "lat": 35.264606,
+    "lon": 139.694916
+  },
+  {
+    "hid": "239083100000000110",
+    "name": "ZAPJR久里浜店",
+    "address": "神奈川県横須賀市久里浜1-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/zapjrkurihama.htm",
+    "lat": 35.234051,
+    "lon": 139.701324
   },
   {
     "hid": "239083100000015110",
@@ -440,12 +1320,52 @@
     "lon": 139.701553
   },
   {
+    "hid": "239083100000015111",
+    "name": "SS ZAP 京急久里浜店",
+    "address": "神奈川県横須賀市久里浜1-5-11",
+    "pworld": "https://www.p-world.co.jp/kanagawa/sszapkqkurihama.htm",
+    "lat": 35.230984,
+    "lon": 139.701553
+  },
+  {
+    "hid": "239083100000046180",
+    "name": "ZAP京急久里浜店",
+    "address": "神奈川県横須賀市久里浜4-6-18",
+    "pworld": "https://www.p-world.co.jp/kanagawa/zapkqkurihama.htm",
+    "lat": 35.229935,
+    "lon": 139.702866
+  },
+  {
+    "hid": "239083500000005111",
+    "name": "ニューリッチランド",
+    "address": "神奈川県横須賀市佐原5-1-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/newrichland.htm",
+    "lat": 35.238705,
+    "lon": 139.691772
+  },
+  {
+    "hid": "240000100000000150",
+    "name": "ピカデリー",
+    "address": "神奈川県横浜市保土ケ谷区川辺町15",
+    "pworld": "https://www.p-world.co.jp/kanagawa/piccadilly.htm",
+    "lat": 35.461742,
+    "lon": 139.594833
+  },
+  {
     "hid": "240000300000023660",
     "name": "GUSTY",
     "address": "神奈川県横浜市保土ケ谷区天王町2-36-6",
     "pworld": "https://www.p-world.co.jp/kanagawa/gusty.htm",
     "lat": 35.454868,
     "lon": 139.604156
+  },
+  {
+    "hid": "240000600000037180",
+    "name": "ガイア和田町店",
+    "address": "神奈川県横浜市保土ケ谷区星川3-7-18",
+    "pworld": "https://www.p-world.co.jp/kanagawa/gaia-wadamachi.htm",
+    "lat": 35.46312,
+    "lon": 139.587219
   },
   {
     "hid": "240002300000001111",
@@ -456,6 +1376,30 @@
     "lon": 139.599106
   },
   {
+    "hid": "240002500000016910",
+    "name": "フェスタ8",
+    "address": "神奈川県横浜市保土ケ谷区狩場町169-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/toyoko-festa8.htm",
+    "lat": 35.444988,
+    "lon": 139.579376
+  },
+  {
+    "hid": "240005200000009300",
+    "name": "ルビーセブン",
+    "address": "神奈川県横浜市保土ケ谷区西谷町930",
+    "pworld": "",
+    "lat": 35.479328,
+    "lon": 139.565369
+  },
+  {
+    "hid": "241000100000076711",
+    "name": "新！ガーデン四季の森店",
+    "address": "神奈川県横浜市旭区上白根町767-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/garden-shikinomori.htm",
+    "lat": 35.49791,
+    "lon": 139.53743
+  },
+  {
     "hid": "241002100000013830",
     "name": "ジャパンニューアルファ鶴ヶ峰店",
     "address": "神奈川県横浜市旭区鶴ケ峰本町1-38-3",
@@ -464,12 +1408,44 @@
     "lon": 139.543381
   },
   {
+    "hid": "241002200000002220",
+    "name": "パラッツォ鶴ヶ峰店",
+    "address": "神奈川県横浜市旭区鶴ケ峰2-22",
+    "pworld": "https://www.p-world.co.jp/kanagawa/palazzo-tsurugamine.htm",
+    "lat": 35.47538,
+    "lon": 139.548355
+  },
+  {
+    "hid": "241002200000022010",
+    "name": "くいーぷ鶴ヶ峰",
+    "address": "神奈川県横浜市旭区鶴ケ峰2-20-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/qui-pu.htm",
+    "lat": 35.475216,
+    "lon": 139.547241
+  },
+  {
     "hid": "241002200000022310",
     "name": "パラッツォ鶴ヶ峰スロット館",
     "address": "神奈川県横浜市旭区鶴ケ峰2-23-1",
     "pworld": "https://www.p-world.co.jp/kanagawa/palazzo-tsurugamines.htm",
     "lat": 35.475655,
     "lon": 139.548508
+  },
+  {
+    "hid": "241080200000001820",
+    "name": "MQ(三益球殿)上川井店",
+    "address": "神奈川県横浜市旭区上川井町18-2",
+    "pworld": "https://www.p-world.co.jp/kanagawa/mimasu-kamikawai.htm",
+    "lat": 35.494511,
+    "lon": 139.505585
+  },
+  {
+    "hid": "241081600000131170",
+    "name": "プレスト三ツ境店",
+    "address": "神奈川県横浜市旭区笹野台1-31-17",
+    "pworld": "https://www.p-world.co.jp/kanagawa/hanz-mitsukyo.htm",
+    "lat": 35.467827,
+    "lon": 139.504425
   },
   {
     "hid": "241082100000001150",
@@ -488,12 +1464,60 @@
     "lon": 139.53183
   },
   {
+    "hid": "242000100000244410",
+    "name": "やすだ大和店",
+    "address": "神奈川県大和市下鶴間2444-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/yasuda-yamato.htm",
+    "lat": 35.495872,
+    "lon": 139.463531
+  },
+  {
+    "hid": "242000600000021950",
+    "name": "甲子園2",
+    "address": "神奈川県大和市南林間2-19-5",
+    "pworld": "https://www.p-world.co.jp/kanagawa/koshien2.htm",
+    "lat": 35.494595,
+    "lon": 139.444794
+  },
+  {
+    "hid": "242000700000043120",
+    "name": "ベリーヴェリー中央林間店",
+    "address": "神奈川県大和市中央林間4-3-12",
+    "pworld": "https://www.p-world.co.jp/kanagawa/berry-very.htm",
+    "lat": 35.507431,
+    "lon": 139.44458
+  },
+  {
+    "hid": "242000700000043150",
+    "name": "サンラッキー 中央林間店",
+    "address": "神奈川県大和市中央林間4-3-15",
+    "pworld": "https://www.p-world.co.jp/kanagawa/jack-betty-chu.htm",
+    "lat": 35.507034,
+    "lon": 139.444626
+  },
+  {
     "hid": "242001200000002170",
     "name": "あそべるデルパラ大和店",
     "address": "神奈川県大和市深見東2-1-7",
     "pworld": "https://www.p-world.co.jp/kanagawa/derupara-yamato.htm",
     "lat": 35.480446,
     "lon": 139.464676
+  },
+  {
+    "hid": "242001200000003181",
+    "name": "パールショップともえ大和",
+    "address": "神奈川県大和市深見東3-1-8",
+    "pworld": "https://www.p-world.co.jp/kanagawa/yamatomo.htm",
+    "lat": 35.48296,
+    "lon": 139.464432
+  },
+  {
+    "hid": "242001600000012100",
+    "name": "PRIUS",
+    "address": "神奈川県大和市大和南1-2-10",
+    "pworld": "https://www.p-world.co.jp/kanagawa/prius.htm",
+    "lat": 35.469551,
+    "lon": 139.463028
   },
   {
     "hid": "242001800000002510",
@@ -504,6 +1528,14 @@
     "lon": 139.461472
   },
   {
+    "hid": "242002100000251450",
+    "name": "ドキわくランド大和駅前店",
+    "address": "神奈川県大和市中央2-514-5",
+    "pworld": "https://www.p-world.co.jp/kanagawa/grandohta-yamato.htm",
+    "lat": 35.471985,
+    "lon": 139.459106
+  },
+  {
     "hid": "242002400000016100",
     "name": "P'stown桜ヶ丘",
     "address": "神奈川県大和市福田1-6-10",
@@ -512,12 +1544,28 @@
     "lon": 139.465271
   },
   {
+    "hid": "242002500000031030",
+    "name": "ZAP代官店",
+    "address": "神奈川県大和市代官3-10-3",
+    "pworld": "https://www.p-world.co.jp/kanagawa/zap-daikan.htm",
+    "lat": 35.439617,
+    "lon": 139.455765
+  },
+  {
     "hid": "242002900000613350",
     "name": "トワーズ大和店",
     "address": "神奈川県大和市上草柳6-13-35",
     "pworld": "https://www.p-world.co.jp/kanagawa/towars-yamato.htm",
     "lat": 35.478973,
     "lon": 139.450089
+  },
+  {
+    "hid": "243001800000002310",
+    "name": "PIA厚木本館",
+    "address": "神奈川県厚木市中町2-3-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/pia-atsugi.htm",
+    "lat": 35.440331,
+    "lon": 139.364532
   },
   {
     "hid": "243002400000024010",
@@ -552,6 +1600,14 @@
     "lon": 139.345184
   },
   {
+    "hid": "243021100000034101",
+    "name": "キコーナ厚木北店",
+    "address": "神奈川県厚木市三田34-10",
+    "pworld": "https://www.p-world.co.jp/kanagawa/kicona-atsugikita.htm",
+    "lat": 35.482838,
+    "lon": 139.350388
+  },
+  {
     "hid": "243030300000466610",
     "name": "ドキわくランド愛川店",
     "address": "神奈川県愛甲郡愛川町中津4666-1",
@@ -560,12 +1616,28 @@
     "lon": 139.345825
   },
   {
+    "hid": "243030300003399102",
+    "name": "キコーナ愛川店",
+    "address": "神奈川県愛甲郡愛川町中津3399-10",
+    "pworld": "https://www.p-world.co.jp/kanagawa/kicona-aikawa.htm",
+    "lat": 35.515503,
+    "lon": 139.338287
+  },
+  {
     "hid": "243040100000225210",
     "name": "P-REX",
     "address": "神奈川県海老名市東柏ケ谷2-25-21",
     "pworld": "https://www.p-world.co.jp/kanagawa/p-rex.htm",
     "lat": 35.471134,
     "lon": 139.427902
+  },
+  {
+    "hid": "243041700000241010",
+    "name": "ニラク海老名本郷店",
+    "address": "神奈川県海老名市本郷2410-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/niraku-ebinahongo.htm",
+    "lat": 35.406162,
+    "lon": 139.391998
   },
   {
     "hid": "243043200000001310",
@@ -584,12 +1656,76 @@
     "lon": 139.395065
   },
   {
+    "hid": "243043300000000560",
+    "name": "キコーナ海老名店",
+    "address": "神奈川県海老名市河原口四丁目5番6号",
+    "pworld": "https://www.p-world.co.jp/kanagawa/kicona-ebina.htm",
+    "lat": 35.450134,
+    "lon": 139.378403
+  },
+  {
+    "hid": "243081300000033350",
+    "name": "SAP厚木",
+    "address": "神奈川県厚木市妻田東3-33-5",
+    "pworld": "https://www.p-world.co.jp/kanagawa/sapatsugi.htm",
+    "lat": 35.462299,
+    "lon": 139.360062
+  },
+  {
+    "hid": "244000300000000100",
+    "name": "東横フェスタ1",
+    "address": "神奈川県横浜市戸塚区戸塚町10",
+    "pworld": "https://www.p-world.co.jp/kanagawa/toyoko-festa1.htm",
+    "lat": 35.400505,
+    "lon": 139.534561
+  },
+  {
+    "hid": "244000300000000130",
+    "name": "東横フェスタ3",
+    "address": "神奈川県横浜市戸塚区戸塚町13",
+    "pworld": "https://www.p-world.co.jp/kanagawa/toyoko-festa3.htm",
+    "lat": 35.400505,
+    "lon": 139.534561
+  },
+  {
     "hid": "244000300000001610",
     "name": "東横フェスタ2",
     "address": "神奈川県横浜市戸塚区戸塚町16-1",
     "pworld": "https://www.p-world.co.jp/kanagawa/toyoko-festa2.htm",
     "lat": 35.400028,
     "lon": 139.532776
+  },
+  {
+    "hid": "244080100000051950",
+    "name": "くいーぷ東戸塚店",
+    "address": "神奈川県横浜市戸塚区品濃町519-5",
+    "pworld": "https://www.p-world.co.jp/kanagawa/p-quipu-totsuka.htm",
+    "lat": 35.428448,
+    "lon": 139.558563
+  },
+  {
+    "hid": "244080100000053930",
+    "name": "ガイア東戸塚店",
+    "address": "神奈川県横浜市戸塚区品濃町539-3",
+    "pworld": "https://www.p-world.co.jp/kanagawa/gaia-higashi-totsuka.htm",
+    "lat": 35.431007,
+    "lon": 139.556946
+  },
+  {
+    "hid": "244080300000000450",
+    "name": "東横フェスタ5",
+    "address": "神奈川県横浜市戸塚区平戸町45",
+    "pworld": "https://www.p-world.co.jp/kanagawa/toyoko-festa5.htm",
+    "lat": 35.423172,
+    "lon": 139.564972
+  },
+  {
+    "hid": "244084400000014610",
+    "name": "スクランブル田谷店",
+    "address": "神奈川県横浜市栄区田谷町146-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/scramble.htm",
+    "lat": 35.370346,
+    "lon": 139.523087
   },
   {
     "hid": "244084500000003130",
@@ -608,12 +1744,76 @@
     "lon": 139.506561
   },
   {
+    "hid": "245001600000199750",
+    "name": "エランドール泉店",
+    "address": "神奈川県横浜市泉区和泉が丘1-5-7",
+    "pworld": "https://www.p-world.co.jp/kanagawa/elandor.htm",
+    "lat": 35.403339,
+    "lon": 139.501068
+  },
+  {
     "hid": "245001800000020700",
     "name": "一番舘 横浜泉店",
     "address": "神奈川県横浜市泉区上飯田町2070",
     "pworld": "https://www.p-world.co.jp/kanagawa/ichibankan-yokohama.htm",
     "lat": 35.422836,
     "lon": 139.484207
+  },
+  {
+    "hid": "245001800002133100",
+    "name": "PASSAGE3横浜泉店",
+    "address": "神奈川県横浜市泉区上飯田町2133-10",
+    "pworld": "https://www.p-world.co.jp/kanagawa/passage.htm",
+    "lat": 35.427914,
+    "lon": 139.483795
+  },
+  {
+    "hid": "245005300000028410",
+    "name": "新！ガーデン戸塚",
+    "address": "神奈川県横浜市戸塚区上矢部町284-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/garden-totsuka.htm",
+    "lat": 35.418137,
+    "lon": 139.534988
+  },
+  {
+    "hid": "245006300000045310",
+    "name": "キコーナ戸塚店",
+    "address": "神奈川県横浜市戸塚区原宿4-53-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/kicona-totsuka.htm",
+    "lat": 35.371319,
+    "lon": 139.501266
+  },
+  {
+    "hid": "246000700000001820",
+    "name": "マルハンメガシティ横浜町田",
+    "address": "神奈川県横浜市瀬谷区目黒町18-2",
+    "pworld": "https://www.p-world.co.jp/kanagawa/maruhan-y-machida.htm",
+    "lat": 35.497005,
+    "lon": 139.470612
+  },
+  {
+    "hid": "246000700000025100",
+    "name": "グランドオータ瀬谷店",
+    "address": "神奈川県横浜市瀬谷区目黒町25-10",
+    "pworld": "https://www.p-world.co.jp/kanagawa/ohta-seya.htm",
+    "lat": 35.494091,
+    "lon": 139.471817
+  },
+  {
+    "hid": "246001300000001110",
+    "name": "ルビーセブン",
+    "address": "神奈川県横浜市瀬谷区相沢1-1-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/rubyseven.htm",
+    "lat": 35.470699,
+    "lon": 139.485428
+  },
+  {
+    "hid": "246002200000000811",
+    "name": "ガイアネクスト三ツ境",
+    "address": "神奈川県横浜市瀬谷区三ツ境8-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/gaianext-mitsukyo1.htm",
+    "lat": 35.466995,
+    "lon": 139.503647
   },
   {
     "hid": "247000500000019050",
@@ -624,12 +1824,44 @@
     "lon": 139.549057
   },
   {
+    "hid": "247005600000001710",
+    "name": "ジアス大船",
+    "address": "神奈川県鎌倉市大船1-7-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/ziath-o.htm",
+    "lat": 35.353825,
+    "lon": 139.532074
+  },
+  {
+    "hid": "247005600000001870",
+    "name": "PIA大船Ⅱ店",
+    "address": "神奈川県鎌倉市大船1-8-7",
+    "pworld": "https://www.p-world.co.jp/kanagawa/pia-ofuna2.htm",
+    "lat": 35.353687,
+    "lon": 139.532196
+  },
+  {
+    "hid": "247005600000012311",
+    "name": "PIA大船店",
+    "address": "神奈川県鎌倉市大船1-23-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/pia-ofuna.htm",
+    "lat": 35.352879,
+    "lon": 139.532318
+  },
+  {
     "hid": "247005600000015120",
     "name": "ZAP大船店",
     "address": "神奈川県鎌倉市大船1-5-12",
     "pworld": "https://www.p-world.co.jp/kanagawa/zap-ofuna.htm",
     "lat": 35.353302,
     "lon": 139.531738
+  },
+  {
+    "hid": "248002700000001350",
+    "name": "HYDRA(イドラ)",
+    "address": "神奈川県鎌倉市笛田1-3-5",
+    "pworld": "https://www.p-world.co.jp/kanagawa/hydra.htm",
+    "lat": 35.330914,
+    "lon": 139.510712
   },
   {
     "hid": "249000600000052461",
@@ -648,12 +1880,44 @@
     "lon": 139.159927
   },
   {
+    "hid": "250001100000002950",
+    "name": "SKIP小田原ダイヤ街店",
+    "address": "神奈川県小田原市栄町2-9-5",
+    "pworld": "https://www.p-world.co.jp/kanagawa/skip-odawara.htm",
+    "lat": 35.254429,
+    "lon": 139.158707
+  },
+  {
+    "hid": "250001100000029300",
+    "name": "SKIPスロットクラブ小田原錦通り店",
+    "address": "神奈川県小田原市栄町2-9-30",
+    "pworld": "https://www.p-world.co.jp/kanagawa/skip-nishiki.htm",
+    "lat": 35.255585,
+    "lon": 139.159729
+  },
+  {
     "hid": "250005500000004060",
     "name": "グランドホール小田原店",
     "address": "神奈川県小田原市久野406",
     "pworld": "https://www.p-world.co.jp/kanagawa/super-g-view.htm",
     "lat": 35.270229,
     "lon": 139.147552
+  },
+  {
+    "hid": "250012600000001231",
+    "name": "アビバ南足柄店",
+    "address": "神奈川県南足柄市狩野123",
+    "pworld": "https://www.p-world.co.jp/kanagawa/aviva-minamiashigara.htm",
+    "lat": 35.316048,
+    "lon": 139.11026
+  },
+  {
+    "hid": "250086200000078170",
+    "name": "でるたまランド無限",
+    "address": "神奈川県小田原市成田781-7",
+    "pworld": "https://www.p-world.co.jp/kanagawa/derutamaland-mugen.htm",
+    "lat": 35.294037,
+    "lon": 139.165436
   },
   {
     "hid": "251004200000011250",
@@ -664,12 +1928,44 @@
     "lon": 139.449188
   },
   {
+    "hid": "251005200000005561",
+    "name": "HAPPY G FUJISAWA",
+    "address": "神奈川県藤沢市藤沢556",
+    "pworld": "https://www.p-world.co.jp/kanagawa/happy-g-fujisawa.htm",
+    "lat": 35.340328,
+    "lon": 139.487595
+  },
+  {
     "hid": "251005500000005130",
     "name": "パラッツォ藤沢南店",
     "address": "神奈川県藤沢市南藤沢5-13",
     "pworld": "https://www.p-world.co.jp/kanagawa/palazzo-fujisawa.htm",
     "lat": 35.338127,
     "lon": 139.489334
+  },
+  {
+    "hid": "251005500000019150",
+    "name": "グリーン",
+    "address": "神奈川県藤沢市南藤沢19-15",
+    "pworld": "https://www.p-world.co.jp/kanagawa/greenholl.htm",
+    "lat": 35.337242,
+    "lon": 139.489334
+  },
+  {
+    "hid": "251087500000005640",
+    "name": "MQリゾート藤沢店",
+    "address": "神奈川県藤沢市本藤沢5-6-4",
+    "pworld": "https://www.p-world.co.jp/kanagawa/mq-fujisawa.htm",
+    "lat": 35.357338,
+    "lon": 139.467728
+  },
+  {
+    "hid": "252000300000041110",
+    "name": "スーパーDステーション座間",
+    "address": "神奈川県座間市ひばりが丘4-11-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/superdstation-zama.htm",
+    "lat": 35.480667,
+    "lon": 139.431793
   },
   {
     "hid": "252000300000041213",
@@ -680,12 +1976,44 @@
     "lon": 139.431732
   },
   {
+    "hid": "252010600000000630",
+    "name": "パチンコ&スロットSHIROYAMA",
+    "address": "神奈川県相模原市緑区広田6-3",
+    "pworld": "https://www.p-world.co.jp/kanagawa/shiroyama.htm",
+    "lat": 35.603153,
+    "lon": 139.300186
+  },
+  {
+    "hid": "252013100000003180",
+    "name": "パチンコFUJI相模原店",
+    "address": "神奈川県相模原市緑区西橋本3-1-8",
+    "pworld": "https://www.p-world.co.jp/kanagawa/fuji-sagamihara.htm",
+    "lat": 35.595089,
+    "lon": 139.332504
+  },
+  {
     "hid": "252013100000048620",
     "name": "コンパル橋本",
     "address": "神奈川県相模原市緑区西橋本4-8-62",
     "pworld": "https://www.p-world.co.jp/kanagawa/conpal.htm",
     "lat": 35.59462,
     "lon": 139.326508
+  },
+  {
+    "hid": "252013200000002990",
+    "name": "ドキわくランド橋本店",
+    "address": "神奈川県相模原市緑区橋本台2-9-9",
+    "pworld": "https://www.p-world.co.jp/kanagawa/pslandhashimoto.htm",
+    "lat": 35.584957,
+    "lon": 139.339676
+  },
+  {
+    "hid": "252013200000013411",
+    "name": "マルハン橋本台店",
+    "address": "神奈川県相模原市緑区橋本台1-34-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/maruhan-hashimotodai.htm",
+    "lat": 35.581104,
+    "lon": 139.346451
   },
   {
     "hid": "252013400000213710",
@@ -696,12 +2024,36 @@
     "lon": 139.336639
   },
   {
+    "hid": "252014300000006211",
+    "name": "チャレンジャーA館",
+    "address": "神奈川県相模原市緑区橋本6-2-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/challenger-a.htm",
+    "lat": 35.596298,
+    "lon": 139.344482
+  },
+  {
+    "hid": "252014300000006220",
+    "name": "チャレンジャー地下B館",
+    "address": "神奈川県相模原市緑区橋本6-2-2",
+    "pworld": "https://www.p-world.co.jp/kanagawa/challenger-h.htm",
+    "lat": 35.596298,
+    "lon": 139.344482
+  },
+  {
     "hid": "252014300000329120",
     "name": "チャレンジャー遊館",
     "address": "神奈川県相模原市緑区橋本3-29-12",
     "pworld": "https://www.p-world.co.jp/kanagawa/challenger-u.htm",
     "lat": 35.596241,
     "lon": 139.345718
+  },
+  {
+    "hid": "252018400000041440",
+    "name": "パーラーフジノ",
+    "address": "神奈川県相模原市緑区小渕414-4",
+    "pworld": "",
+    "lat": 35.618855,
+    "lon": 139.130875
   },
   {
     "hid": "252020300000055251",
@@ -728,6 +2080,30 @@
     "lon": 139.362442
   },
   {
+    "hid": "252020600000438101",
+    "name": "パールショップともえ淵野辺店",
+    "address": "神奈川県相模原市中央区淵野辺4-38-10",
+    "pworld": "https://www.p-world.co.jp/kanagawa/fuchitomo.htm",
+    "lat": 35.568722,
+    "lon": 139.398209
+  },
+  {
+    "hid": "252021200000038270",
+    "name": "トワーズ相模原店",
+    "address": "神奈川県相模原市中央区宮下3-8-27",
+    "pworld": "https://www.p-world.co.jp/kanagawa/towars-sagamihara.htm",
+    "lat": 35.593765,
+    "lon": 139.361862
+  },
+  {
+    "hid": "252023100000003150",
+    "name": "相模原プラザ",
+    "address": "神奈川県相模原市中央区相模原3-1-5",
+    "pworld": "https://www.p-world.co.jp/kanagawa/sagamihara-plaza.htm",
+    "lat": 35.579834,
+    "lon": 139.371323
+  },
+  {
     "hid": "252023100000710180",
     "name": "SAP相模原",
     "address": "神奈川県相模原市中央区相模原7-10-18",
@@ -744,12 +2120,76 @@
     "lon": 139.367279
   },
   {
+    "hid": "252023900000011370",
+    "name": "やすだ相模原店",
+    "address": "神奈川県相模原市中央区中央1-13-7",
+    "pworld": "https://www.p-world.co.jp/kanagawa/yasuda-sagamihara.htm",
+    "lat": 35.574448,
+    "lon": 139.370361
+  },
+  {
+    "hid": "252024300000051280",
+    "name": "RED STADIUM上溝店",
+    "address": "神奈川県相模原市中央区上溝5-12-8",
+    "pworld": "https://www.p-world.co.jp/kanagawa/stadium-kamimizo.htm",
+    "lat": 35.557537,
+    "lon": 139.35994
+  },
+  {
+    "hid": "252024400000040940",
+    "name": "チャンピオン田名店",
+    "address": "神奈川県相模原市中央区田名4094",
+    "pworld": "https://www.p-world.co.jp/kanagawa/champion-tana.htm",
+    "lat": 35.554871,
+    "lon": 139.34729
+  },
+  {
+    "hid": "252024400000343110",
+    "name": "マルハン相模原店",
+    "address": "神奈川県相模原市中央区田名3431-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/maruhan-sagamihara.htm",
+    "lat": 35.561302,
+    "lon": 139.338806
+  },
+  {
     "hid": "252030200000631120",
     "name": "大学院",
     "address": "神奈川県相模原市南区上鶴間6-31-12",
     "pworld": "https://www.p-world.co.jp/kanagawa/daigakuin.htm",
     "lat": 35.521294,
     "lon": 139.438644
+  },
+  {
+    "hid": "252030300000003910",
+    "name": "ザシティ/ベルシティ相模大野店",
+    "address": "神奈川県相模原市南区相模大野3-9-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/city-sagamioono.htm",
+    "lat": 35.532528,
+    "lon": 139.436981
+  },
+  {
+    "hid": "252030300000031320",
+    "name": "相模大野UNO",
+    "address": "神奈川県相模原市南区相模大野3-13-2",
+    "pworld": "https://www.p-world.co.jp/kanagawa/1060uno.htm",
+    "lat": 35.532257,
+    "lon": 139.435928
+  },
+  {
+    "hid": "252030300000032211",
+    "name": "ピーアーク相模大野",
+    "address": "神奈川県相模原市南区相模大野3-22-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/p-ark-sagamioono.htm",
+    "lat": 35.533504,
+    "lon": 139.436432
+  },
+  {
+    "hid": "252030300000116290",
+    "name": "ジャパンニューアルファ相模原南店",
+    "address": "神奈川県相模原市南区相模大野1-16-29",
+    "pworld": "https://www.p-world.co.jp/kanagawa/jnalpha-sagamihara.htm",
+    "lat": 35.538811,
+    "lon": 139.433533
   },
   {
     "hid": "252031300000025250",
@@ -760,6 +2200,46 @@
     "lon": 139.422775
   },
   {
+    "hid": "252031400000511190",
+    "name": "小田急相模原UNO",
+    "address": "神奈川県相模原市南区南台5-11-19",
+    "pworld": "https://www.p-world.co.jp/kanagawa/1140uno.htm",
+    "lat": 35.515804,
+    "lon": 139.420898
+  },
+  {
+    "hid": "252032400000011780",
+    "name": "キコーナ相武台店",
+    "address": "神奈川県相模原市南区相武台1-17-8",
+    "pworld": "https://www.p-world.co.jp/kanagawa/kicona-sobudai.htm",
+    "lat": 35.500023,
+    "lon": 139.40834
+  },
+  {
+    "hid": "252032800000714111",
+    "name": "サンラッキー相模原店",
+    "address": "神奈川県相模原市南区麻溝台7-14-11",
+    "pworld": "https://www.p-world.co.jp/kanagawa/sl-sagamihara.htm",
+    "lat": 35.527199,
+    "lon": 139.397705
+  },
+  {
+    "hid": "252032800000820300",
+    "name": "トワーズ麻溝台店",
+    "address": "神奈川県相模原市南区麻溝台8-20-30",
+    "pworld": "https://www.p-world.co.jp/kanagawa/towars-asamizodai.htm",
+    "lat": 35.524609,
+    "lon": 139.399521
+  },
+  {
+    "hid": "252034400000021760",
+    "name": "glow AMUSEMENT HALL",
+    "address": "神奈川県相模原市南区古淵2-17-6",
+    "pworld": "https://www.p-world.co.jp/kanagawa/glow.htm",
+    "lat": 35.554806,
+    "lon": 139.419281
+  },
+  {
     "hid": "252080100000011870",
     "name": "グランドホール長後店",
     "address": "神奈川県藤沢市長後1187",
@@ -768,12 +2248,124 @@
     "lon": 139.462418
   },
   {
+    "hid": "252080400000001212",
+    "name": "アビバ湘南台店",
+    "address": "神奈川県藤沢市湘南台1-2-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/aviva-shonandai.htm",
+    "lat": 35.397129,
+    "lon": 139.466766
+  },
+  {
+    "hid": "252080400000021412",
+    "name": "パラッツォ湘南台店",
+    "address": "神奈川県藤沢市湘南台2-14-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/palazzo-shonandai.htm",
+    "lat": 35.395676,
+    "lon": 139.46637
+  },
+  {
+    "hid": "252080700000467211",
+    "name": "ドキわくランド長後駅前店",
+    "address": "神奈川県藤沢市下土棚467-21",
+    "pworld": "https://www.p-world.co.jp/kanagawa/dokiwakuland-chogo.htm",
+    "lat": 35.412216,
+    "lon": 139.466171
+  },
+  {
+    "hid": "252081300000002410",
+    "name": "ジャパンニューアルファ藤沢店",
+    "address": "神奈川県藤沢市亀井野2-4-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/jnalpha-fujisawa.htm",
+    "lat": 35.383286,
+    "lon": 139.474609
+  },
+  {
+    "hid": "252081500000187710",
+    "name": "クリエ湘南台店",
+    "address": "神奈川県藤沢市石川1877-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/creer-shonandai.htm",
+    "lat": 35.379307,
+    "lon": 139.452927
+  },
+  {
+    "hid": "252082200000180660",
+    "name": "トワーズ藤沢店",
+    "address": "神奈川県藤沢市葛原1806-6",
+    "pworld": "https://www.p-world.co.jp/kanagawa/towars-fujisawa.htm",
+    "lat": 35.403793,
+    "lon": 139.429184
+  },
+  {
+    "hid": "252111100000510200",
+    "name": "マルハン綾瀬上土棚店",
+    "address": "神奈川県綾瀬市上土棚北5-10-20",
+    "pworld": "https://www.p-world.co.jp/kanagawa/maruhan-ayase-k.htm",
+    "lat": 35.419853,
+    "lon": 139.451859
+  },
+  {
+    "hid": "252113500000021910",
+    "name": "SKIP綾瀬店",
+    "address": "神奈川県綾瀬市寺尾釜田2-19-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/skip-ayase.htm",
+    "lat": 35.44754,
+    "lon": 139.420944
+  },
+  {
     "hid": "252113600000001290",
     "name": "ジャパンニューアルファ綾瀬寺尾店",
     "address": "神奈川県綾瀬市寺尾西1-2-9",
     "pworld": "https://www.p-world.co.jp/kanagawa/jnalpha.htm",
     "lat": 35.44989,
     "lon": 139.419937
+  },
+  {
+    "hid": "253004300000000320",
+    "name": "MONOS茅ヶ崎",
+    "address": "神奈川県茅ヶ崎市元町3-2",
+    "pworld": "https://www.p-world.co.jp/kanagawa/monos-chigasaki.htm",
+    "lat": 35.331688,
+    "lon": 139.406036
+  },
+  {
+    "hid": "253004300000003220",
+    "name": "GAUDI湘南茅ヶ崎スロット館",
+    "address": "神奈川県茅ヶ崎市元町3-22",
+    "pworld": "https://www.p-world.co.jp/kanagawa/gaudichigasaki-s.htm",
+    "lat": 35.331635,
+    "lon": 139.406616
+  },
+  {
+    "hid": "253004300000003250",
+    "name": "GAUDI湘南茅ヶ崎",
+    "address": "神奈川県茅ヶ崎市元町3-25",
+    "pworld": "https://www.p-world.co.jp/kanagawa/gaudishonanchigasaki.htm",
+    "lat": 35.331566,
+    "lon": 139.406311
+  },
+  {
+    "hid": "253006100000016222",
+    "name": "キコーナ茅ヶ崎店",
+    "address": "神奈川県茅ヶ崎市南湖1-6-22",
+    "pworld": "https://www.p-world.co.jp/kanagawa/kicona-chigasaki.htm",
+    "lat": 35.329372,
+    "lon": 139.390137
+  },
+  {
+    "hid": "253007300000133710",
+    "name": "マルハン茅ヶ崎店",
+    "address": "神奈川県茅ヶ崎市中島1337-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/maruhan-chigasaki.htm",
+    "lat": 35.331535,
+    "lon": 139.381989
+  },
+  {
+    "hid": "253010100000010390",
+    "name": "ジャパンニューアルファ倉見店",
+    "address": "神奈川県高座郡寒川町倉見1039",
+    "pworld": "https://www.p-world.co.jp/kanagawa/jnalpha-kurami.htm",
+    "lat": 35.393295,
+    "lon": 139.380737
   },
   {
     "hid": "253010600000001310",
@@ -792,12 +2384,124 @@
     "lon": 139.374802
   },
   {
+    "hid": "253011400000020330",
+    "name": "パサージュ寒川店",
+    "address": "神奈川県高座郡寒川町田端2033",
+    "pworld": "https://www.p-world.co.jp/kanagawa/passage-samukawa.htm",
+    "lat": 35.357826,
+    "lon": 139.380325
+  },
+  {
+    "hid": "254001300000014260",
+    "name": "マルハン平塚店",
+    "address": "神奈川県平塚市田村1-4-26",
+    "pworld": "https://www.p-world.co.jp/kanagawa/maruhan-hiratsuka.htm",
+    "lat": 35.365211,
+    "lon": 139.361374
+  },
+  {
+    "hid": "254001300000058382",
+    "name": "ＡＲＲＯＷ平塚店",
+    "address": "神奈川県平塚市田村5-8-38",
+    "pworld": "https://www.p-world.co.jp/kanagawa/arrow-hiratsuka.htm",
+    "lat": 35.370674,
+    "lon": 139.361755
+  },
+  {
+    "hid": "254004300000001310",
+    "name": "スーパーDステーション平塚駅前",
+    "address": "神奈川県平塚市紅谷町13-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/superdstation-hira.htm",
+    "lat": 35.328815,
+    "lon": 139.347488
+  },
+  {
+    "hid": "254004300000005180",
+    "name": "キコーナ平塚店",
+    "address": "神奈川県平塚市紅谷町5-18",
+    "pworld": "https://www.p-world.co.jp/kanagawa/kicona-hiratsuka.htm",
+    "lat": 35.328831,
+    "lon": 139.348999
+  },
+  {
+    "hid": "254006500000041450",
+    "name": "シーザースパレス",
+    "address": "神奈川県平塚市南原4-1-45",
+    "pworld": "https://www.p-world.co.jp/kanagawa/seasars-palace.htm",
+    "lat": 35.337421,
+    "lon": 139.322296
+  },
+  {
+    "hid": "254007600000001150",
+    "name": "ジャラン平塚店",
+    "address": "神奈川県平塚市新町1-15",
+    "pworld": "https://www.p-world.co.jp/kanagawa/jaran-hiratsuka.htm",
+    "lat": 35.345882,
+    "lon": 139.342743
+  },
+  {
+    "hid": "254082100000000180",
+    "name": "ニラク平塚黒部丘店",
+    "address": "神奈川県平塚市黒部丘1-8",
+    "pworld": "https://www.p-world.co.jp/kanagawa/niraku-kurobeoka.htm",
+    "lat": 35.325371,
+    "lon": 139.341827
+  },
+  {
+    "hid": "256081200000281010",
+    "name": "マルハン小田原店",
+    "address": "神奈川県小田原市国府津2810番地1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/maruhan-odawaraten.htm",
+    "lat": 35.277264,
+    "lon": 139.204315
+  },
+  {
+    "hid": "256081300000021940",
+    "name": "小田原コロナ",
+    "address": "神奈川県小田原市前川219-4",
+    "pworld": "https://www.p-world.co.jp/kanagawa/korona-odawara.htm",
+    "lat": 35.278736,
+    "lon": 139.194138
+  },
+  {
     "hid": "257000300000116141",
     "name": "キコーナ東海大前店",
     "address": "神奈川県秦野市南矢名1-16-14",
     "pworld": "https://www.p-world.co.jp/kanagawa/kicona-tokaidaimae.htm",
     "lat": 35.371815,
     "lon": 139.271851
+  },
+  {
+    "hid": "257001500000031220",
+    "name": "マルハン平沢店",
+    "address": "神奈川県秦野市平沢312-2",
+    "pworld": "https://www.p-world.co.jp/kanagawa/maruhan-hirasawa.htm",
+    "lat": 35.37476,
+    "lon": 139.19751
+  },
+  {
+    "hid": "257001500000047010",
+    "name": "ジャパンニューアルファテームズ",
+    "address": "神奈川県秦野市平沢470-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/jnalpha-thames.htm",
+    "lat": 35.371452,
+    "lon": 139.202728
+  },
+  {
+    "hid": "257003100000001610",
+    "name": "ダイナム神奈川秦野店ゆったり館",
+    "address": "神奈川県秦野市曽屋16番地1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/dynam-hadano.htm",
+    "lat": 35.383121,
+    "lon": 139.201126
+  },
+  {
+    "hid": "257003500000011150",
+    "name": "キコーナ秦野店",
+    "address": "神奈川県秦野市本町1-11-5",
+    "pworld": "https://www.p-world.co.jp/kanagawa/kicona-hadano.htm",
+    "lat": 35.37368,
+    "lon": 139.227173
   },
   {
     "hid": "258001900000000820",
@@ -808,6 +2512,14 @@
     "lon": 139.153152
   },
   {
+    "hid": "258002300000039330",
+    "name": "MQ(三益球殿)開成町店",
+    "address": "神奈川県足柄上郡開成町宮台393-3",
+    "pworld": "https://www.p-world.co.jp/kanagawa/mimasu-kaisei.htm",
+    "lat": 35.328011,
+    "lon": 139.123703
+  },
+  {
     "hid": "259030400000041200",
     "name": "共栄会館",
     "address": "神奈川県足柄下郡湯河原町宮下41-20",
@@ -816,11 +2528,43 @@
     "lon": 139.099991
   },
   {
+    "hid": "259031200000157610",
+    "name": "プレゴ湯河原店(PREGO)",
+    "address": "神奈川県足柄下郡湯河原町吉浜1576-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/prego.htm",
+    "lat": 35.144402,
+    "lon": 139.114273
+  },
+  {
     "hid": "259114300000017511",
     "name": "キコーナ伊勢原店",
     "address": "神奈川県伊勢原市下糟屋175-1",
     "pworld": "https://www.p-world.co.jp/kanagawa/kicona-isehara.htm",
     "lat": 35.404987,
     "lon": 139.318069
+  },
+  {
+    "hid": "259114700000050110",
+    "name": "パチンコFUJI伊勢原店",
+    "address": "神奈川県伊勢原市白根501-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/fuji-isehara.htm",
+    "lat": 35.399868,
+    "lon": 139.294067
+  },
+  {
+    "hid": "259121300000077610",
+    "name": "グランドホール金目店",
+    "address": "神奈川県平塚市片岡776-1",
+    "pworld": "https://www.p-world.co.jp/kanagawa/grandhall-kaname.htm",
+    "lat": 35.360237,
+    "lon": 139.300613
+  },
+  {
+    "hid": "259131300000000332",
+    "name": "パラッツォ秦野渋沢店",
+    "address": "神奈川県秦野市松原町3-3",
+    "pworld": "https://www.p-world.co.jp/kanagawa/palazzo-hadano.htm",
+    "lat": 35.375919,
+    "lon": 139.184937
   }
 ]

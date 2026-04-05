@@ -25,7 +25,7 @@ jobs:
 
       - name: Run scraper
         run: python scrape_ranking.py
-        timeout-minutes: 15
+        timeout-minutes: 30
 
       - name: Commit and push
         run: |

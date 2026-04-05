@@ -1,0 +1,370 @@
+[
+  {
+    "hid": "041052100000002440",
+    "name": "パチンコ寿楽忍野店",
+    "address": "山梨県南都留郡忍野村内野244",
+    "pworld": "",
+    "lat": 35.457283,
+    "lon": 138.856552
+  },
+  {
+    "hid": "400003200000001910",
+    "name": "オーシャン 甲府中央店",
+    "address": "山梨県甲府市中央1丁目9−1",
+    "pworld": "",
+    "lat": 35.660332,
+    "lon": 138.569092
+  },
+  {
+    "hid": "400003200000004350",
+    "name": "DAIMARU甲府本店",
+    "address": "山梨県甲府市中央4丁目3−5",
+    "pworld": "https://www.p-world.co.jp/yamanashi/p-daimaru.htm",
+    "lat": 35.660213,
+    "lon": 138.57225
+  },
+  {
+    "hid": "400004300000820100",
+    "name": "マルハン甲府店",
+    "address": "山梨県甲府市国母8丁目20-10",
+    "pworld": "https://www.p-world.co.jp/yamanashi/maruhan-kofu.htm",
+    "lat": 35.632084,
+    "lon": 138.552246
+  },
+  {
+    "hid": "400004700003128210",
+    "name": "PIA1000KOKUSAl",
+    "address": "山梨県甲府市徳行3丁目1282−1",
+    "pworld": "https://www.p-world.co.jp/yamanashi/pia.htm",
+    "lat": 35.648453,
+    "lon": 138.54097
+  },
+  {
+    "hid": "400005800000022620",
+    "name": "DAIMARU大里店",
+    "address": "山梨県甲府市宮原町226-2",
+    "pworld": "https://www.p-world.co.jp/yamanashi/daimaru-osato.htm",
+    "lat": 35.62014,
+    "lon": 138.556335
+  },
+  {
+    "hid": "400010500000294840",
+    "name": "タイホー双葉",
+    "address": "山梨県甲斐市下今井2948−4",
+    "pworld": "https://www.p-world.co.jp/yamanashi/taiho-futaba.htm",
+    "lat": 35.674618,
+    "lon": 138.499573
+  },
+  {
+    "hid": "400011800000012380",
+    "name": "DAIMARU竜王店",
+    "address": "山梨県甲斐市竜王1238",
+    "pworld": "https://www.p-world.co.jp/yamanashi/daimaru-ryu.htm",
+    "lat": 35.665562,
+    "lon": 138.511902
+  },
+  {
+    "hid": "400012400000201210",
+    "name": "ABC甲斐敷島店",
+    "address": "山梨県甲斐市中下条2012−1",
+    "pworld": "https://www.p-world.co.jp/yamanashi/abc-kaishikishima.htm",
+    "lat": 35.680138,
+    "lon": 138.534332
+  },
+  {
+    "hid": "400012600000006310",
+    "name": "ニューダイヤパート3",
+    "address": "山梨県甲斐市大下条631",
+    "pworld": "https://www.p-world.co.jp/yamanashi/daiya3.htm",
+    "lat": 35.671852,
+    "lon": 138.52301
+  },
+  {
+    "hid": "400030100000107010",
+    "name": "ダイナム山梨南アルプス店ゆったり館",
+    "address": "山梨県南アルプス市桃園1070番地1",
+    "pworld": "https://www.p-world.co.jp/yamanashi/dynam-minami-alps.htm",
+    "lat": 35.621815,
+    "lon": 138.462845
+  },
+  {
+    "hid": "400033100000031120",
+    "name": "マルハン南アルプス店",
+    "address": "山梨県南アルプス市下今井311−2",
+    "pworld": "https://www.p-world.co.jp/yamanashi/maruhan-minami.htm",
+    "lat": 35.62574,
+    "lon": 138.493057
+  },
+  {
+    "hid": "400041100000003900",
+    "name": "DAIMARU南アルプス店",
+    "address": "山梨県南アルプス市西南湖390",
+    "pworld": "https://www.p-world.co.jp/yamanashi/daimaruminami.htm",
+    "lat": 35.587635,
+    "lon": 138.496277
+  },
+  {
+    "hid": "400041300000096320",
+    "name": "ザ720KOKUSAI",
+    "address": "山梨県南アルプス市和泉963−2",
+    "pworld": "https://www.p-world.co.jp/yamanashi/the-koku.htm",
+    "lat": 35.572292,
+    "lon": 138.480057
+  },
+  {
+    "hid": "400081400000004250",
+    "name": "ABC甲府上阿原店",
+    "address": "山梨県甲府市上阿原町425",
+    "pworld": "https://www.p-world.co.jp/yamanashi/abc-kofuahara.htm",
+    "lat": 35.648369,
+    "lon": 138.608414
+  },
+  {
+    "hid": "400082800000011320",
+    "name": "やすみ時間 甲府青葉店",
+    "address": "山梨県甲府市青葉町11−32",
+    "pworld": "https://www.p-world.co.jp/yamanashi/yasumijikankoufuaoba.htm",
+    "lat": 35.645237,
+    "lon": 138.585022
+  },
+  {
+    "hid": "400084500000111210",
+    "name": "ニューアサヒ甲府南店",
+    "address": "山梨県甲府市上今井町1112−1",
+    "pworld": "https://www.p-world.co.jp/yamanashi/newasahi-kofuminami.htm",
+    "lat": 35.619934,
+    "lon": 138.573654
+  },
+  {
+    "hid": "402000100000014610",
+    "name": "DAIMARU田野倉店",
+    "address": "山梨県都留市田野倉146-1",
+    "pworld": "https://www.p-world.co.jp/yamanashi/daimaru-tanokura.htm",
+    "lat": 35.602264,
+    "lon": 138.936447
+  },
+  {
+    "hid": "402000100000025710",
+    "name": "グランドチャンピオン(田野倉)",
+    "address": "山梨県都留市田野倉神出257-1",
+    "pworld": "https://www.p-world.co.jp/yamanashi/grand-champion.htm",
+    "lat": 35.591908,
+    "lon": 138.938126
+  },
+  {
+    "hid": "402000100000095810",
+    "name": "寿楽 田野倉店",
+    "address": "山梨県都留市田野倉958−1",
+    "pworld": "https://www.p-world.co.jp/yamanashi/jyuraku-tanokura.htm",
+    "lat": 35.5895,
+    "lon": 138.931747
+  },
+  {
+    "hid": "402000500000000410",
+    "name": "寿楽",
+    "address": "山梨県都留市四日市場字小倉41",
+    "pworld": "",
+    "lat": 35.568375,
+    "lon": 138.919189
+  },
+  {
+    "hid": "402002500000006960",
+    "name": "ワールドチャンピオン",
+    "address": "山梨県都留市法能696",
+    "pworld": "",
+    "lat": 35.55106,
+    "lon": 138.925156
+  },
+  {
+    "hid": "403000400000093050",
+    "name": "AMUSEMENTSPACE WONDER",
+    "address": "山梨県富士吉田市下吉田9丁目30−5",
+    "pworld": "https://www.p-world.co.jp/yamanashi/wonder.htm",
+    "lat": 35.497986,
+    "lon": 138.814651
+  },
+  {
+    "hid": "403000400000941200",
+    "name": "DAIMARU富士吉田店",
+    "address": "山梨県富士吉田市下吉田9丁目41−20",
+    "pworld": "https://www.p-world.co.jp/yamanashi/daimarufujiyoshida.htm",
+    "lat": 35.499973,
+    "lon": 138.816635
+  },
+  {
+    "hid": "403001100000268110",
+    "name": "AMUSEMENTPARK AKASAKA",
+    "address": "山梨県富士吉田市新倉2681−1",
+    "pworld": "https://www.p-world.co.jp/yamanashi/akasaka.htm",
+    "lat": 35.491802,
+    "lon": 138.779175
+  },
+  {
+    "hid": "403001600000012180",
+    "name": "やすみ時間 富士吉田店",
+    "address": "山梨県富士吉田市松山1218",
+    "pworld": "https://www.p-world.co.jp/yamanashi/yasumijikanyosidaten.htm",
+    "lat": 35.481247,
+    "lon": 138.781158
+  },
+  {
+    "hid": "403001600000015951",
+    "name": "No.1富士吉田店",
+    "address": "山梨県富士吉田市松山字熊穴1595",
+    "pworld": "https://www.p-world.co.jp/yamanashi/no1-fujiyoshida.htm",
+    "lat": 35.487648,
+    "lon": 138.797272
+  },
+  {
+    "hid": "404003600000007010",
+    "name": "ダイマル",
+    "address": "山梨県甲州市塩山熊野70−1",
+    "pworld": "",
+    "lat": 35.690762,
+    "lon": 138.72818
+  },
+  {
+    "hid": "404004400000053810",
+    "name": "ニューダイヤ塩山店",
+    "address": "山梨県甲州市塩山下塩後538−1",
+    "pworld": "https://www.p-world.co.jp/yamanashi/newdaiya-enzan.htm",
+    "lat": 35.696075,
+    "lon": 138.716736
+  },
+  {
+    "hid": "405004200000011830",
+    "name": "ニューダイヤ 山梨店",
+    "address": "山梨県山梨市南1183",
+    "pworld": "https://www.p-world.co.jp/yamanashi/newdaiya-yamanashi.htm",
+    "lat": 35.698711,
+    "lon": 138.687668
+  },
+  {
+    "hid": "406002100000063710",
+    "name": "ABC笛吹石和店",
+    "address": "山梨県笛吹市石和町松本637−1",
+    "pworld": "https://www.p-world.co.jp/yamanashi/abc-fuefuki.htm",
+    "lat": 35.659355,
+    "lon": 138.633087
+  },
+  {
+    "hid": "406003400000010450",
+    "name": "マルハン石和店",
+    "address": "山梨県笛吹市石和町唐柏1045",
+    "pworld": "https://www.p-world.co.jp/yamanashi/maruhan-isawa.htm",
+    "lat": 35.640755,
+    "lon": 138.613068
+  },
+  {
+    "hid": "406003600000058710",
+    "name": "チャンピオン フォレスト",
+    "address": "山梨県笛吹市石和町窪中島587-1",
+    "pworld": "https://www.p-world.co.jp/yamanashi/championforest.htm",
+    "lat": 35.646889,
+    "lon": 138.626251
+  },
+  {
+    "hid": "406003600000587150",
+    "name": "DAIMARU 石和店",
+    "address": "山梨県笛吹市石和町窪中島587−15",
+    "pworld": "https://www.p-world.co.jp/yamanashi/daimaru-isawa.htm",
+    "lat": 35.646889,
+    "lon": 138.626251
+  },
+  {
+    "hid": "406004200000002010",
+    "name": "ダイナム山梨笛吹店ゆったり館",
+    "address": "山梨県笛吹市石和町今井201",
+    "pworld": "https://www.p-world.co.jp/yamanashi/dynam-fuefuki.htm",
+    "lat": 35.631672,
+    "lon": 138.603653
+  },
+  {
+    "hid": "407001500000021350",
+    "name": "マルハン韮崎店",
+    "address": "山梨県韮崎市若宮2丁目13−5",
+    "pworld": "https://www.p-world.co.jp/yamanashi/maruhan-nirasaki.htm",
+    "lat": 35.712368,
+    "lon": 138.453522
+  },
+  {
+    "hid": "407002500000018300",
+    "name": "ダイナム山梨韮崎店ゆったり館",
+    "address": "山梨県韮崎市栄1丁目8−30",
+    "pworld": "https://www.p-world.co.jp/yamanashi/dynam-nirasaki.htm",
+    "lat": 35.697342,
+    "lon": 138.464005
+  },
+  {
+    "hid": "408001100000176340",
+    "name": "オーシャン 高根店",
+    "address": "山梨県北杜市高根町箕輪新町1763−4",
+    "pworld": "https://www.p-world.co.jp/yamanashi/ocean-takane.htm",
+    "lat": 35.841522,
+    "lon": 138.434464
+  },
+  {
+    "hid": "408003400000382710",
+    "name": "オーシャン 長坂店",
+    "address": "山梨県北杜市長坂町大八田3827−1",
+    "pworld": "https://www.p-world.co.jp/yamanashi/ocean-nagasaka.htm",
+    "lat": 35.836624,
+    "lon": 138.38266
+  },
+  {
+    "hid": "409011200000020911",
+    "name": "オーシャン 上野原店",
+    "address": "山梨県上野原市上野原2091-1",
+    "pworld": "https://www.p-world.co.jp/yamanashi/7777777777.htm",
+    "lat": 35.628128,
+    "lon": 139.110855
+  },
+  {
+    "hid": "409011500000001220",
+    "name": "スバルセンター",
+    "address": "山梨県上野原市松留12-2",
+    "pworld": "https://www.p-world.co.jp/yamanashi/subaru.htm",
+    "lat": 35.615818,
+    "lon": 139.103836
+  },
+  {
+    "hid": "409342300000020580",
+    "name": "プレイゾーン白鳳",
+    "address": "山梨県南巨摩郡身延町飯富2058",
+    "pworld": "https://www.p-world.co.jp/yamanashi/hakuhou.htm",
+    "lat": 35.43515,
+    "lon": 138.435043
+  },
+  {
+    "hid": "409384300000305410",
+    "name": "KOKUSAI 530 KOKUSAI",
+    "address": "山梨県中央市西花輪3054−1",
+    "pworld": "https://www.p-world.co.jp/yamanashi/530koku.htm",
+    "lat": 35.593021,
+    "lon": 138.516586
+  },
+  {
+    "hid": "409385200000135110",
+    "name": "ABC甲府昭和通り店",
+    "address": "山梨県中巨摩郡昭和町飯喰1351−1",
+    "pworld": "https://www.p-world.co.jp/yamanashi/abc-koufusyowa.htm",
+    "lat": 35.625195,
+    "lon": 138.522278
+  },
+  {
+    "hid": "409386700000000790",
+    "name": "ABC甲府アルプス通り店",
+    "address": "山梨県中巨摩郡昭和町清水新居79",
+    "pworld": "https://www.p-world.co.jp/yamanashi/abc-kal.htm",
+    "lat": 35.650375,
+    "lon": 138.544006
+  },
+  {
+    "hid": "409386700000016111",
+    "name": "ニューアサヒ甲府昭和店",
+    "address": "山梨県中巨摩郡昭和町清水新居161−1",
+    "pworld": "https://www.p-world.co.jp/yamanashi/newasahi-kofushowa.htm",
+    "lat": 35.647869,
+    "lon": 138.546997
+  }
+]
