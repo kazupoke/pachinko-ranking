@@ -18,7 +18,9 @@ import random
 import re
 import sys
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+
+JST = timezone(timedelta(hours=9))
 from curl_cffi import requests
 from bs4 import BeautifulSoup
 
@@ -529,7 +531,7 @@ def scrape_or_cache(key, hids, today_str, tomorrow_str, label):
 
 
 def main():
-    today = datetime.now()
+    today = datetime.now(JST)
     tomorrow = today + timedelta(days=1)
     today_str = f"{today.month}/{today.day}"
     tomorrow_str = f"{tomorrow.month}/{tomorrow.day}"
