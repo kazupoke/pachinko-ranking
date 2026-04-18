@@ -57,6 +57,57 @@ def fetch_page(url):
     return resp.text
 
 
+def _extract_thumb(el):
+    """h4要素周辺からサムネイル画像URLを探す"""
+    BASE = "https://hall-navi.com"
+
+    def normalize(src):
+        if not src:
+            return ""
+        src = src.strip()
+        low = src.lower()
+        if src.endswith(".gif") or src.endswith(".svg"):
+            return ""
+        if any(x in low for x in ("icon", "logo", "banner", "arrow", "btn", "blank")):
+            return ""
+        if src.startswith("//"):
+            return "https:" + src
+        if src.startswith("/"):
+            return BASE + src
+        if src.startswith("http"):
+            return src
+        return ""
+
+    def find_img(tag):
+        if not hasattr(tag, "find"):
+            return ""
+        img = tag.find("img")
+        if not img:
+            return ""
+        for attr in ("src", "data-src", "data-original", "data-lazy"):
+            n = normalize(img.get(attr, ""))
+            if n:
+                return n
+        return ""
+
+    src = find_img(el)
+    if src:
+        return src
+    for prev in el.find_previous_siblings():
+        if getattr(prev, "name", None) in ("h3", "h4"):
+            break
+        src = find_img(prev)
+        if src:
+            return src
+    for nxt in el.find_next_siblings():
+        if getattr(nxt, "name", None) in ("h3", "h4"):
+            break
+        src = find_img(nxt)
+        if src:
+            return src
+    return ""
+
+
 def load_store_hids(filename):
     """JSONファイルからHIDリストを読み込む"""
     json_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), filename)
@@ -119,6 +170,7 @@ def extract_store_data(html, today_str, tomorrow_str):
                     "score": current_score,
                     "rank": rank,
                     "event": event_name,
+                    "thumb": _extract_thumb(el),
                 })
 
     return store_name, entries, pworld_link
@@ -162,14 +214,18 @@ def generate_html(my_entries, kanagawa_entries, yamanashi_entries, today, tomorr
 
     rank_priority = {"S": 0, "A": 1, "B": 2, "C": 3}
 
-    def hall_score_color(score):
-        if score >= 10: return "#ff4444"
-        if score >= 7: return "#22aa44"
-        return "#3388dd"
-
     def rank_color(rank):
-        colors = {"S": "#ff4444", "A": "#ff8800", "B": "#44aa44", "C": "#4488cc"}
-        return colors.get(rank, "#888888")
+        return {"S": "#ff375f", "A": "#ff9f0a", "B": "#30d158", "C": "#0a84ff"}.get(rank, "#888888")
+
+    def score_cls(score):
+        if score >= 10: return "hot"
+        if score >= 7: return "warm"
+        return "cool"
+
+    def score_color(score):
+        if score >= 10: return "#ff3b30"
+        if score >= 7: return "#30d158"
+        return "#0a84ff"
 
     def merge_same_store(entries):
         merged = {}
@@ -180,52 +236,65 @@ def generate_html(my_entries, kanagawa_entries, yamanashi_entries, today, tomorr
                     "store": e["store"], "date": e["date"],
                     "score": e["score"], "rank": e["rank"],
                     "url": e.get("url", ""), "pworld": e.get("pworld", ""),
-                    "events": [{"rank": e["rank"], "event": e["event"]}],
+                    "events": [{"rank": e["rank"], "event": e["event"], "thumb": e.get("thumb", "")}],
                 }
             else:
-                merged[key]["events"].append({"rank": e["rank"], "event": e["event"]})
+                merged[key]["events"].append({"rank": e["rank"], "event": e["event"], "thumb": e.get("thumb", "")})
                 if e["score"] > merged[key]["score"]:
                     merged[key]["score"] = e["score"]
                 if rank_priority.get(e["rank"], 99) < rank_priority.get(merged[key]["rank"], 99):
                     merged[key]["rank"] = e["rank"]
         return list(merged.values())
 
-    def make_ranking_section(entries, date_str, label, wd):
+    def make_entry(e, i, max_score):
+        sc = score_color(e["score"])
+        bar_w = int(e["score"] / max_score * 100) if max_score > 0 else 0
+        rank_cls = f"rank-{i}" if i <= 3 else ""
+
+        evts = ""
+        for ev in e["events"]:
+            erc = rank_color(ev["rank"])
+            thumb = (f'<img src="{ev["thumb"]}" class="ethumb" loading="lazy" onerror="this.style.display=\'none\'">'
+                     if ev.get("thumb") else "")
+            evts += (f'<div class="evt">'
+                     f'<span class="rbadge" style="background:{erc};box-shadow:0 0 5px {erc}66">{ev["rank"]}</span>'
+                     f'<span class="ename">{ev["event"]}</span>{thumb}</div>')
+
+        score_tag = (f'<a href="{e["url"]}" target="_blank" class="score {score_cls(e["score"])}" style="color:{sc}">{e["score"]}</a>'
+                     if e.get("url") else
+                     f'<span class="score {score_cls(e["score"])}" style="color:{sc}">{e["score"]}</span>')
+        store_tag = (f'<a href="{e["pworld"]}" target="_blank" class="sname">{e["store"]}</a>'
+                     if e.get("pworld") else
+                     f'<span class="sname">{e["store"]}</span>')
+
+        return (f'<div class="entry {rank_cls}">'
+                f'<div class="rnk">#{i}</div>'
+                f'<div class="body">'
+                f'<div class="toprow">{store_tag}{score_tag}</div>'
+                f'<div class="sbar"><div style="width:{bar_w}%;background:{sc}"></div></div>'
+                f'<div class="evts">{evts}</div>'
+                f'</div></div>')
+
+    def make_section(entries, date_str, label, wd):
         if not entries:
-            return f'<div class="section"><h2>{label} {date_str}({wd})</h2><p class="no-data">イベントなし</p></div>'
+            return (f'<div class="sec"><div class="shead">'
+                    f'<span class="slabel">{label} {date_str}({wd})</span>'
+                    f'<span class="scnt">0件</span></div>'
+                    f'<p class="nodata">イベントなし</p></div>')
+        max_s = max(e["score"] for e in entries)
+        rows = "".join(make_entry(e, i, max_s) for i, e in enumerate(entries, 1))
+        return (f'<div class="sec"><div class="shead">'
+                f'<span class="slabel">{label} {date_str}({wd})</span>'
+                f'<span class="scnt">{len(entries)}店舗</span></div>{rows}</div>')
 
-        rows = ""
-        for i, e in enumerate(entries, 1):
-            event_lines = ""
-            for ev in e["events"]:
-                erc = rank_color(ev["rank"])
-                event_lines += f'<div class="event-line"><span class="event-rank" style="background:{erc}">{ev["rank"]}</span> {ev["event"]}</div>'
-
-            sc = hall_score_color(e["score"])
-            score_link = f'<a href="{e["url"]}" class="score" style="color:{sc}" target="_blank">{e["score"]}</a>' if e.get("url") else f'<div class="score" style="color:{sc}">{e["score"]}</div>'
-            store_link = f'<a href="{e["pworld"]}" class="store" target="_blank">{e["store"]}</a>' if e.get("pworld") else f'<span class="store">{e["store"]}</span>'
-
-            rows += f"""<div class="entry">
-                    <div class="rank-num">#{i}</div>
-                    {score_link}
-                    <div class="details">{store_link}<div class="events">{event_lines}</div></div>
-                </div>"""
-
-        return f'<div class="section"><h2>{label} {date_str}({wd})</h2>{rows}</div>'
-
-    def make_tab_content(entries, tab_id):
-        today_e = merge_same_store(sorted([e for e in entries if e["date"] == today_str], key=lambda x: x["score"], reverse=True))
-        today_e.sort(key=lambda x: x["score"], reverse=True)
-        tomorrow_e = merge_same_store(sorted([e for e in entries if e["date"] == tomorrow_str], key=lambda x: x["score"], reverse=True))
-        tomorrow_e.sort(key=lambda x: x["score"], reverse=True)
-
-        today_sec = make_ranking_section(today_e, today_str, "今日", today_wd)
-        tomorrow_sec = make_ranking_section(tomorrow_e, tomorrow_str, "明日", tomorrow_wd)
-        return f'<div id="{tab_id}" class="tab-content">{today_sec}{tomorrow_sec}</div>'
-
-    my_content = make_tab_content(my_entries, "tab-my")
-    kanagawa_content = make_tab_content(kanagawa_entries, "tab-kanagawa")
-    yamanashi_content = make_tab_content(yamanashi_entries, "tab-yamanashi")
+    def make_tab(entries, tab_id):
+        te = sorted(merge_same_store([e for e in entries if e["date"] == today_str]),
+                    key=lambda x: x["score"], reverse=True)
+        me = sorted(merge_same_store([e for e in entries if e["date"] == tomorrow_str]),
+                    key=lambda x: x["score"], reverse=True)
+        return (f'<div id="{tab_id}" class="tab-content">'
+                f'{make_section(te, today_str, "今日", today_wd)}'
+                f'{make_section(me, tomorrow_str, "明日", tomorrow_wd)}</div>')
 
     html = f"""<!DOCTYPE html>
 <html lang="ja">
@@ -235,93 +304,73 @@ def generate_html(my_entries, kanagawa_entries, yamanashi_entries, today, tomorr
 <meta name="robots" content="noindex, nofollow">
 <title>パチンコ店ランキング</title>
 <style>
-  * {{ margin: 0; padding: 0; box-sizing: border-box; }}
-  body {{
-    font-family: -apple-system, 'Hiragino Sans', 'Meiryo', sans-serif;
-    background: #1a1a2e;
-    color: #eee;
-    padding: 12px;
-    max-width: 600px;
-    margin: 0 auto;
-  }}
-  h1 {{ text-align: center; font-size: 18px; padding: 12px 0; border-bottom: 2px solid #e94560; margin-bottom: 8px; }}
-  .updated {{ text-align: center; font-size: 11px; color: #888; margin-bottom: 8px; }}
-  .map-btn {{
-    display: block; text-align: center; margin: 0 auto 16px;
-    background: #e94560; color: #fff; text-decoration: none;
-    padding: 12px 0; border-radius: 8px; font-size: 16px; font-weight: bold;
-    max-width: 300px;
-  }}
-
-  /* タブ */
-  .tabs {{
-    display: flex;
-    gap: 4px;
-    margin-bottom: 16px;
-  }}
-  .tab-btn {{
-    flex: 1;
-    padding: 10px 0;
-    background: #16213e;
-    color: #888;
-    border: none;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.2s;
-  }}
-  .tab-btn.active {{
-    background: #e94560;
-    color: #fff;
-  }}
-  .tab-content {{
-    display: none;
-  }}
-  .tab-content.active {{
-    display: block;
-  }}
-
-  .section {{ margin-bottom: 20px; }}
-  h2 {{ font-size: 16px; padding: 8px 12px; background: #16213e; border-left: 4px solid #e94560; border-radius: 4px; margin-bottom: 8px; }}
-  .no-data {{ padding: 12px; color: #666; text-align: center; }}
-  .entry {{ display: flex; align-items: center; padding: 10px 8px; border-bottom: 1px solid #2a2a4a; gap: 10px; }}
-  .rank-num {{ font-size: 18px; font-weight: bold; color: #e94560; min-width: 32px; }}
-  .score {{ font-size: 22px; font-weight: bold; min-width: 50px; text-align: right; }}
-  .details {{ flex: 1; min-width: 0; }}
-  a.score {{ text-decoration: none; }}
-  a.score:active {{ opacity: 0.7; }}
-  .store, a.store {{ font-size: 14px; font-weight: bold; color: #eee; text-decoration: none; }}
-  a.store:active {{ opacity: 0.7; }}
-  .events {{ margin-top: 3px; }}
-  .event-line {{ font-size: 12px; color: #aaa; margin-top: 2px; }}
-  .event-rank {{ display: inline-block; color: #fff; font-weight: bold; font-size: 10px; padding: 0px 5px; border-radius: 3px; margin-right: 3px; }}
+*{{margin:0;padding:0;box-sizing:border-box}}
+body{{font-family:-apple-system,'Hiragino Sans','Meiryo',sans-serif;background:#0b0e1a;background-image:radial-gradient(ellipse at top,#1a1a3a 0%,#0b0e1a 70%);color:#e8eaf0;padding:12px;max-width:600px;margin:0 auto;min-height:100vh}}
+.hdr{{text-align:center;padding:16px 0 12px;border-bottom:1px solid rgba(233,69,96,.3);margin-bottom:12px}}
+.hdr h1{{font-size:20px;font-weight:800;background:linear-gradient(135deg,#e94560,#f0a500);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}}
+.hdr .sub{{font-size:11px;color:#7a7f9a;margin-top:4px}}
+.mapbtn{{display:block;text-align:center;margin:0 auto 16px;background:linear-gradient(135deg,#e94560,#c0213d);color:#fff;text-decoration:none;padding:12px 0;border-radius:12px;font-size:15px;font-weight:bold;max-width:320px;box-shadow:0 4px 20px rgba(233,69,96,.3)}}
+.mapbtn:active{{opacity:.8}}
+.tabs{{display:flex;gap:6px;margin-bottom:16px;background:rgba(255,255,255,.04);padding:4px;border-radius:12px}}
+.tb{{flex:1;padding:10px 4px;background:transparent;color:#7a7f9a;border:none;border-radius:8px;font-size:13px;font-weight:bold;cursor:pointer;transition:all .2s}}
+.tb.active{{background:#e94560;color:#fff;box-shadow:0 2px 12px rgba(233,69,96,.4)}}
+.tab-content{{display:none}}
+.tab-content.active{{display:block}}
+.sec{{margin-bottom:24px}}
+.shead{{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:rgba(233,69,96,.1);border-left:3px solid #e94560;border-radius:4px 8px 8px 4px;margin-bottom:10px}}
+.slabel{{font-size:15px;font-weight:bold;color:#fff}}
+.scnt{{font-size:12px;color:#7a7f9a}}
+.nodata{{padding:20px;color:#7a7f9a;text-align:center;font-size:14px}}
+.entry{{display:flex;gap:10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:12px;margin-bottom:8px;align-items:flex-start}}
+.entry:active{{opacity:.85}}
+.entry.rank-1{{border-color:rgba(255,214,10,.5);background:rgba(255,214,10,.06)}}
+.entry.rank-2{{border-color:rgba(192,192,192,.35);background:rgba(192,192,192,.04)}}
+.entry.rank-3{{border-color:rgba(205,127,50,.35);background:rgba(205,127,50,.04)}}
+.rnk{{min-width:28px;font-size:13px;font-weight:900;color:#555;text-align:center;padding-top:6px;line-height:1.2}}
+.entry.rank-1 .rnk{{color:#ffd60a;font-size:15px}}
+.entry.rank-2 .rnk{{color:#c0c0c0;font-size:14px}}
+.entry.rank-3 .rnk{{color:#cd7f32;font-size:14px}}
+.body{{flex:1;min-width:0}}
+.toprow{{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:5px}}
+.sname,a.sname{{font-size:14px;font-weight:bold;color:#e8eaf0;text-decoration:none;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
+a.sname:active{{opacity:.7}}
+.score,a.score{{font-size:22px;font-weight:900;text-decoration:none;flex-shrink:0}}
+a.score:active{{opacity:.7}}
+.score.hot{{color:#ff3b30;text-shadow:0 0 10px rgba(255,59,48,.5)}}
+.score.warm{{color:#30d158;text-shadow:0 0 10px rgba(48,209,88,.5)}}
+.score.cool{{color:#0a84ff;text-shadow:0 0 10px rgba(10,132,255,.5)}}
+.sbar{{height:3px;background:rgba(255,255,255,.08);border-radius:2px;margin-bottom:8px;overflow:hidden}}
+.sbar>div{{height:100%;border-radius:2px}}
+.evts{{display:flex;flex-direction:column;gap:5px}}
+.evt{{display:flex;align-items:center;gap:6px;min-height:20px}}
+.rbadge{{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:4px;font-size:10px;font-weight:bold;color:#fff;flex-shrink:0}}
+.ename{{font-size:12px;color:#9095b0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
+.ethumb{{width:44px;height:44px;border-radius:6px;object-fit:cover;flex-shrink:0;border:1px solid rgba(255,255,255,.12)}}
 </style>
 </head>
 <body>
+<div class="hdr">
   <h1>パチンコ店ランキング</h1>
-  <div class="updated">更新: {today.strftime('%Y/%m/%d %H:%M')}</div>
-  <a href="./map.html" class="map-btn">マップで見る</a>
-
-  <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('tab-my', this)">湘南地区</button>
-    <button class="tab-btn" onclick="switchTab('tab-kanagawa', this)">神奈川県</button>
-    <button class="tab-btn" onclick="switchTab('tab-yamanashi', this)">山梨県</button>
-  </div>
-
-  {my_content}
-  {kanagawa_content}
-  {yamanashi_content}
-
-  <script>
-  function switchTab(tabId, btn) {{
-    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-    document.getElementById(tabId).classList.add('active');
-    btn.classList.add('active');
-  }}
-  document.getElementById('tab-my').classList.add('active');
-  </script>
+  <div class="sub">更新: {today.strftime('%Y/%m/%d %H:%M')} JST</div>
+</div>
+<a href="./map.html" class="mapbtn">マップで見る</a>
+<div class="tabs">
+  <button class="tb active" onclick="sw('tab-my',this)">湘南地区</button>
+  <button class="tb" onclick="sw('tab-kanagawa',this)">神奈川県</button>
+  <button class="tb" onclick="sw('tab-yamanashi',this)">山梨県</button>
+</div>
+{make_tab(my_entries, "tab-my")}
+{make_tab(kanagawa_entries, "tab-kanagawa")}
+{make_tab(yamanashi_entries, "tab-yamanashi")}
+<script>
+function sw(id,btn){{
+  document.querySelectorAll('.tab-content').forEach(e=>e.classList.remove('active'));
+  document.querySelectorAll('.tb').forEach(e=>e.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}}
+document.getElementById('tab-my').classList.add('active');
+</script>
 </body>
 </html>"""
     return html
