@@ -31,16 +31,16 @@ jobs:
         working-directory: game
         run: npm run build
 
-      - name: Copy build to docs/game
+      - name: Copy build to docs/g-1d107813b2
         run: |
-          rm -rf docs/game
-          mkdir -p docs/game
-          cp -r game/dist/* docs/game/
+          rm -rf docs/g-1d107813b2
+          mkdir -p docs/g-1d107813b2
+          cp -r game/dist/* docs/g-1d107813b2/
 
       - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/game
+          git add docs/g-1d107813b2
           git diff --staged --quiet || git commit -m "ゲームビルド更新: $(date +'%Y/%m/%d %H:%M' -d '+9 hours')"
           git push
