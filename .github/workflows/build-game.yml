@@ -1,0 +1,46 @@
+name: Build Game
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'game/**'
+      - '.github/workflows/build-game.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        working-directory: game
+        run: npm ci || npm install
+
+      - name: Build
+        working-directory: game
+        run: npm run build
+
+      - name: Copy build to docs/game
+        run: |
+          rm -rf docs/game
+          mkdir -p docs/game
+          cp -r game/dist/* docs/game/
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/game
+          git diff --staged --quiet || git commit -m "ゲームビルド更新: $(date +'%Y/%m/%d %H:%M' -d '+9 hours')"
+          git push

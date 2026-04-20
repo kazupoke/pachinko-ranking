@@ -4,6 +4,7 @@ import { VitePWA } from "vite-plugin-pwa";
 import { qrcode } from "vite-plugin-qrcode";
 
 export default defineConfig({
+  base: "/pachinko-ranking/game/",
   plugins: [
     react(),
     qrcode(),
