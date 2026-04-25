@@ -51,8 +51,8 @@ export function Market() {
       const init = getInitialSupply(m);
       const ratio = supplyRatio(m, w);
       const mRarity = machineMarketRarity(m, w);
-      const price = getMarketPrice(m, w);
-      const pop = getPopularity(m);
+      const price = getMarketPrice(m, w, ALL_MACHINES);
+      const pop = getPopularity(m, ALL_MACHINES);
       return { m, withdrawn: w, cur, init, ratio, mRarity, price, pop };
     });
 

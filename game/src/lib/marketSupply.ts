@@ -7,6 +7,14 @@
  * - 流通量が少ない機種ほどレア度 UP
  */
 import type { Machine, Rarity } from "./types";
+import POPULARITY_RAW from "../data/pworld_popularity.json";
+
+interface PopEntry {
+  bbs?: number;
+  pv?: number;
+  err?: number | string;
+}
+const POPULARITY: Record<string, PopEntry> = POPULARITY_RAW as Record<string, PopEntry>;
 
 const CURRENT_YEAR = new Date().getFullYear();
 const YEARLY_DECAY = 0.8; // 1 年で 20% 減
@@ -145,12 +153,14 @@ const POP = [
 /**
  * 人気指標 (1-100)
  *
- * TODO: 将来 P-World のコメント数をスクレイピングして
- *       (コメント数 / 流通台数) で動的に算出する。
- *       スクレイパは scripts/fetch_pworld_popularity.py 予定。
- *       今はキーワード + レア度 + 年代のヒューリスティック。
+ * 実装: P-World のコメント数 (掲示板書き込み数) を流通台数で割って密度を算出。
+ *       密度の対数で 1-100 に正規化。
+ *       データは scripts/fetch_pworld_popularity.py で claude-in-chrome 経由スクレイプ。
+ *       コメント未取得 (旧データなし) はキーワードヒューリスティックでフォールバック。
  */
-export function getPopularity(m: Machine): number {
+
+/** ヒューリスティックフォールバック (コメントデータがない場合) */
+function heuristicPopularity(m: Machine): number {
   let p = 30;
   if (MEGA_POP.some((k) => m.name.includes(k))) p += 30;
   else if (POP.some((k) => m.name.includes(k))) p += 18;
@@ -160,6 +170,44 @@ export function getPopularity(m: Machine): number {
   if (m.releaseYear >= 2024) p += 10;
   else if (m.releaseYear >= 2022) p += 5;
   return Math.max(1, Math.min(100, p));
+}
+
+/** 全機種のコメント密度の最大値 (正規化用、初回計算で memo) */
+let _maxDensity: number | null = null;
+function getMaxDensity(allMachines: Iterable<Machine>): number {
+  if (_maxDensity != null) return _maxDensity;
+  let max = 0;
+  for (const m of allMachines) {
+    const e = POPULARITY[m.id];
+    if (!e || e.err) continue;
+    const bbs = e.bbs ?? 0;
+    const supply = getInitialSupply(m);
+    const density = bbs / Math.max(supply, 1);
+    if (density > max) max = density;
+  }
+  _maxDensity = max > 0 ? max : 1;
+  return _maxDensity;
+}
+
+export function getPopularity(m: Machine, allMachines?: Iterable<Machine>): number {
+  const e = POPULARITY[m.id];
+  if (!e || e.err || e.bbs === undefined) {
+    return heuristicPopularity(m);
+  }
+  const supply = getInitialSupply(m);
+  const density = (e.bbs ?? 0) / Math.max(supply, 1);
+  // 対数正規化 (外れ値を抑える)
+  // density 0 → 1, 中央 → 50, 最大 → 100
+  if (allMachines) {
+    const maxD = getMaxDensity(allMachines);
+    const ratio = Math.log1p(density * 100) / Math.log1p(maxD * 100);
+    return Math.max(1, Math.min(100, Math.round(ratio * 100)));
+  }
+  // allMachines 未指定の場合: bbs 数で簡易スケール
+  const bbs = e.bbs ?? 0;
+  if (bbs <= 0) return 5;
+  const score = Math.log1p(bbs) / Math.log1p(1000); // 1000 件で 100% の目安
+  return Math.max(1, Math.min(100, Math.round(score * 100)));
 }
 
 const RARITY_BASE_PRICE: Record<string, number> = {
@@ -177,12 +225,16 @@ const RARITY_BASE_PRICE: Record<string, number> = {
  *  - 流通が枯渇するほど指数関数的に高騰
  *  - 人気台 = 価格倍率 高
  */
-export function getMarketPrice(m: Machine, withdrawn: number = 0): number {
+export function getMarketPrice(
+  m: Machine,
+  withdrawn: number = 0,
+  allMachines?: Iterable<Machine>
+): number {
   const init = getInitialSupply(m);
   const cur = getCurrentSupply(m, withdrawn);
   const scarcity = Math.max(0, 1 - cur / init);
-  const pop = getPopularity(m);
-  const popMult = 0.5 + pop / 50; // 1: 0.52x / 100: 2.5x
+  const pop = getPopularity(m, allMachines);
+  const popMult = 0.5 + pop / 50;
   const base = RARITY_BASE_PRICE[m.rarity] ?? 20_000;
   return Math.round(base * popMult * Math.exp(2 * scarcity));
 }
