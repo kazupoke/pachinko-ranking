@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { MachineThumb } from "./MachineThumb";
 import { MACHINES_BY_ID } from "../data/machines";
 
@@ -183,77 +183,64 @@ export function ShopFloor({ entries, customerCount }: Props) {
   const cols = map.rows[0].length;
   const rows = map.rows.length;
 
-  // 初期客位置: ランダムだがフロア床の上
-  const [customers, setCustomers] = useState<CustomerPos[]>([]);
-  const tickRef = useRef<number | null>(null);
-  // フロア切替時に再配置
-  useEffect(() => {
+  // 客は機種の前 (席) に座る
+  // L タイル → 席は (x-1, y) / R タイル → 席は (x+1, y)
+  const seatedCustomers = useMemo<CustomerPos[]>(() => {
     const placed: CustomerPos[] = [];
-    const num = Math.min(customerCount, 14);
     let id = 0;
-    let attempts = 0;
-    while (placed.length < num && attempts < num * 50) {
-      attempts++;
-      const x = 1 + Math.floor(Math.random() * (cols - 2));
-      const y = 1 + Math.floor(Math.random() * (rows - 2));
-      if (map.rows[y][x] !== ".") continue;
+    // 設置中スロットに対応する席候補
+    const seats: Array<{
+      x: number;
+      y: number;
+      facing: CustomerPos["facing"];
+      machineId: string | undefined;
+      rarity: number;
+    }> = [];
+    for (let y = 0; y < map.rows.length; y++) {
+      for (let x = 0; x < map.rows[y].length; x++) {
+        const t = map.rows[y][x];
+        if (t === "L" || t === "R") {
+          const seatX = t === "L" ? x - 1 : x + 1;
+          if (seatX < 0 || seatX >= cols) continue;
+          if (map.rows[y][seatX] !== ".") continue;
+          const mid = machineMap.get(`${x},${y}`);
+          const m = mid ? MACHINES_BY_ID[mid] : undefined;
+          if (!m) continue;
+          // 設定値はわからない (ShopFloor は entries だけ持つ) → レア度で代用
+          const rarityRank =
+            m.rarity === "SSR" ? 4 : m.rarity === "SR" ? 3 : m.rarity === "R" ? 2 : 1;
+          seats.push({
+            x: seatX,
+            y,
+            facing: t === "L" ? "right" : "left",
+            machineId: mid,
+            rarity: rarityRank,
+          });
+        }
+      }
+    }
+    // レア度高い順 + ランダム少しで席を選ぶ
+    const sorted = seats
+      .map((s) => ({ ...s, score: s.rarity + Math.random() * 0.5 }))
+      .sort((a, b) => b.score - a.score);
+    const num = Math.min(customerCount, sorted.length);
+    for (let i = 0; i < num; i++) {
+      const s = sorted[i];
       const palette = CUSTOMER_COLORS[id % CUSTOMER_COLORS.length];
       placed.push({
         id: id++,
-        x,
-        y,
-        facing: ["down", "up", "left", "right"][
-          Math.floor(Math.random() * 4)
-        ] as CustomerPos["facing"],
+        x: s.x,
+        y: s.y,
+        facing: s.facing,
         color: palette.color,
         hat: palette.hat,
       });
     }
-    setCustomers(placed);
-  }, [floor, customerCount, cols, rows, map.rows]);
+    return placed;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [floor, customerCount, machineMap, cols, rows]);
 
-  // 客のランダムウォーク
-  useEffect(() => {
-    const tick = () => {
-      setCustomers((prev) =>
-        prev.map((c) => {
-          const dir = Math.floor(Math.random() * 5); // 0:stay 1-4: 動く
-          let dx = 0;
-          let dy = 0;
-          let facing: CustomerPos["facing"] = c.facing;
-          if (dir === 1) {
-            dx = -1;
-            facing = "left";
-          } else if (dir === 2) {
-            dx = 1;
-            facing = "right";
-          } else if (dir === 3) {
-            dy = -1;
-            facing = "up";
-          } else if (dir === 4) {
-            dy = 1;
-            facing = "down";
-          }
-          const nx = c.x + dx;
-          const ny = c.y + dy;
-          if (
-            ny >= 0 &&
-            ny < rows &&
-            nx >= 0 &&
-            nx < cols &&
-            map.rows[ny][nx] === "."
-          ) {
-            return { ...c, x: nx, y: ny, facing };
-          }
-          return { ...c, facing };
-        })
-      );
-    };
-    tickRef.current = window.setInterval(tick, 1200);
-    return () => {
-      if (tickRef.current) window.clearInterval(tickRef.current);
-    };
-  }, [cols, rows, map.rows]);
+  const customers = seatedCustomers;
 
   const widthPx = cols * TILE * SCALE;
   const heightPx = rows * TILE * SCALE;

@@ -2,8 +2,6 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGameStore } from "../stores/useGameStore";
 import { PageHeader } from "../components/PageHeader";
-import type { ShopInterior, Rarity } from "../lib/types";
-import { MACHINES_BY_ID } from "../data/machines";
 import { buildShareUrl } from "../lib/shareUrl";
 import { getBannerById, BANNERS } from "../data/banners";
 import { BannerImage } from "../components/BannerImage";
@@ -11,22 +9,11 @@ import { ShopFloor } from "../components/ShopFloor";
 import { BizHoursGauge } from "../components/BizHoursGauge";
 import { ShopDashboard } from "../components/ShopDashboard";
 
-const RARITY_COLOR: Record<Rarity, string> = {
-  N: "text-rarity-n",
-  R: "text-rarity-r",
-  SR: "text-rarity-sr",
-  SSR: "text-rarity-ssr",
-};
-
-
 export function MyShop() {
   const navigate = useNavigate();
   const shop = useGameStore((s) => s.shop);
-  const user = useGameStore((s) => s.user);
-  const uninstall = useGameStore((s) => s.uninstallMachine);
   const activeBannerId = useGameStore((s) => s.activeBannerId);
   const banner = getBannerById(activeBannerId) ?? BANNERS[0];
-  const [mode, setMode] = useState<"overview" | "pworld">("overview");
 
   const totalMachines = useMemo(
     () => shop?.layout.reduce((s, e) => s + e.count, 0) ?? 0,
@@ -107,51 +94,17 @@ export function MyShop() {
         <BizHoursGauge />
       </div>
 
-      {/* ダッシュボード (売上/支出/客数 等) */}
-      <ShopDashboard />
+      {/* 主要 2 メトリクス + 店舗詳細ボタン */}
+      <QuickStats />
 
-      <div className="px-4 py-4 grid grid-cols-2 gap-3">
-        <Stat label="本日の客数" value={shop.dailyCustomers.toLocaleString()} color="text-pachi-green" />
-        <Stat label="累計来店" value={shop.totalCustomers.toLocaleString()} color="text-pachi-cyan" />
-        <Stat label="所持金" value={"¥" + (user?.cash ?? 0).toLocaleString()} color="text-pachi-yellow" />
-        <Stat label="豪華度" value={calcInteriorScore(shop.interior) + " / 100"} color="text-pachi-pink" />
-      </div>
-
-      <div className="px-4 flex gap-2 text-xs">
-        <button
-          onClick={() => setMode("overview")}
-          className={`flex-1 py-2 font-dot border-2 ${
-            mode === "overview"
-              ? "bg-pachi-red border-pachi-red"
-              : "bg-bg-panel border-bg-card text-white/60"
-          }`}
-        >
-          俯瞰
-        </button>
-        <button
-          onClick={() => setMode("pworld")}
-          className={`flex-1 py-2 font-dot border-2 ${
-            mode === "pworld"
-              ? "bg-pachi-red border-pachi-red"
-              : "bg-bg-panel border-bg-card text-white/60"
-          }`}
-        >
-          ラインナップ
-        </button>
-      </div>
-
-      {mode === "overview" ? (
-        <ShopFloor
-          entries={shop.layout.map((e) => ({ machineId: e.machineId, count: e.count }))}
-          customerCount={shop.dailyCustomers}
-        />
-      ) : (
-        <PWorldView
-          shop={shop}
-          onRemove={(id) => uninstall(id, 1)}
-          onAdd={(id) => useGameStore.getState().installMachine(id, 1)}
-        />
-      )}
+      {/* 俯瞰のみ (ラインナップは パチスロタブに移動) */}
+      <ShopFloor
+        entries={shop.layout.map((e) => ({ machineId: e.machineId, count: e.count }))}
+        customerCount={shop.dailyCustomers}
+      />
+      <p className="px-4 mt-2 text-[10px] text-white/40 text-center">
+        詳細なラインナップは「パチスロ」タブから確認できます
+      </p>
 
       <div className="px-4 mt-5 grid grid-cols-2 gap-3">
         <button onClick={() => navigate("/collection")} className="pixel-btn-secondary text-xs">
@@ -178,142 +131,58 @@ export function MyShop() {
 }
 
 
-function PWorldView({
-  shop,
-  onRemove,
-  onAdd,
-}: {
-  shop: ReturnType<typeof useGameStore.getState>["shop"];
-  onRemove: (machineId: string) => void;
-  onAdd: (machineId: string) => { ok: boolean; reason?: string };
-}) {
-  const user = useGameStore((s) => s.user);
+
+function QuickStats() {
+  const shop = useGameStore((s) => s.shop);
+  const navigate = useNavigate();
+  const [showDetail, setShowDetail] = useState(false);
   if (!shop) return null;
-  if (shop.layout.length === 0) {
-    return (
-      <div className="px-4 py-10 text-center text-[11px] text-white/50">
-        まだ台が設置されていません
-      </div>
-    );
-  }
-  // 設置機種は 台数DESC + 年代DESC で並べる
-  const sortedLayout = [...shop.layout].sort((a, b) => {
-    if (b.count !== a.count) return b.count - a.count;
-    const ma = MACHINES_BY_ID[a.machineId];
-    const mb = MACHINES_BY_ID[b.machineId];
-    if (!ma || !mb) return 0;
-    return mb.releaseYear - ma.releaseYear;
-  });
+  const totalMachines = shop.layout.reduce((s, e) => s + e.count, 0);
+  // 現在店舗にいる客 (シミュ簡易): dailyCustomers / 4 を上限に
+  const playingNow = Math.min(totalMachines, Math.floor(shop.dailyCustomers / 4));
+  const todayRevenue = shop.dailyCustomers * 5_000;
   return (
-    <div className="mx-4 mt-3">
-      <div className="bg-white text-black font-dot border-2 border-black">
-        <div className="bg-black text-white px-3 py-2 flex justify-between text-xs">
-          <span>{shop.name}</span>
-          <span className="text-pachi-yellow">設置機種一覧</span>
+    <div className="px-4 mt-3">
+      <div className="grid grid-cols-2 gap-3">
+        <div className="pixel-panel p-3">
+          <p className="text-[10px] text-white/60">現在の客数</p>
+          <p className="mt-1 font-pixel text-pachi-green">
+            <span className="text-base">{playingNow}</span>{" "}
+            <span className="text-[10px] text-white/50">名</span>
+          </p>
+          <p className="text-[9px] text-white/40 mt-0.5">
+            本日 {shop.dailyCustomers.toLocaleString()} 名来店
+          </p>
         </div>
-        <table className="w-full text-[11px]">
-          <thead className="bg-gray-200">
-            <tr>
-              <th className="text-left px-2 py-1">機種名</th>
-              <th className="text-left px-2 py-1">メーカー</th>
-              <th className="text-right px-2 py-1">台数</th>
-              <th />
-            </tr>
-          </thead>
-          <tbody>
-            {sortedLayout.map((entry) => {
-              const m = MACHINES_BY_ID[entry.machineId];
-              if (!m) return null;
-              const ownedExtra = user?.ownedMachines[entry.machineId] ?? 0;
-              const canAdd = ownedExtra > 0;
-              const setting = entry.setting ?? 1;
-              const settingBg =
-                setting >= 5
-                  ? "bg-yellow-200"
-                  : setting === 4
-                    ? "bg-green-200"
-                    : setting === 3
-                      ? "bg-cyan-200"
-                      : "bg-gray-200";
-              return (
-                <tr key={entry.machineId} className="border-t border-gray-300">
-                  <td className="px-2 py-1.5 align-top">
-                    <span className="block truncate max-w-[170px]">{m.name}</span>
-                    <span className={`text-[9px] ${RARITY_COLOR[m.rarity]} font-pixel`}>
-                      {m.rarity}
-                    </span>
-                    <span
-                      className={`ml-1 inline-block text-[9px] font-pixel px-1 ${settingBg} text-gray-800`}
-                      title="設定値"
-                    >
-                      設{setting}
-                    </span>
-                  </td>
-                  <td className="px-2 py-1.5 text-gray-600 align-top">{m.maker}</td>
-                  <td className="px-2 py-1.5 text-right">
-                    <div className="flex items-center justify-end gap-1">
-                      <button
-                        onClick={() => onRemove(entry.machineId)}
-                        className="w-6 h-6 font-pixel text-[10px] bg-gray-200 border border-gray-400 text-gray-700"
-                        aria-label="台数を減らす"
-                      >
-                        −
-                      </button>
-                      <span className="font-pixel text-xs w-8 text-center">
-                        {entry.count}
-                      </span>
-                      <button
-                        onClick={() => onAdd(entry.machineId)}
-                        disabled={!canAdd}
-                        className="w-6 h-6 font-pixel text-[10px] bg-pachi-red border border-pachi-red text-white disabled:opacity-30"
-                        aria-label="台数を増やす"
-                      >
-                        +
-                      </button>
-                    </div>
-                    {ownedExtra > 0 && (
-                      <span className="block text-[9px] text-gray-500 mt-0.5">
-                        所持 +{ownedExtra}
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-1 py-1.5 text-right">
-                    <button
-                      onClick={() =>
-                        useGameStore
-                          .getState()
-                          .uninstallMachine(entry.machineId, entry.count)
-                      }
-                      className="text-[9px] text-red-600 px-1"
-                    >
-                      全外
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+        <div className="pixel-panel p-3">
+          <p className="text-[10px] text-white/60">今日の売上</p>
+          <p className="mt-1 font-pixel text-pachi-yellow">
+            <span className="text-base">¥{todayRevenue.toLocaleString()}</span>
+          </p>
+          <p className="text-[9px] text-white/40 mt-0.5">概算 (実装中)</p>
+        </div>
       </div>
+      <button
+        onClick={() => setShowDetail((v) => !v)}
+        className="pixel-btn-secondary w-full mt-2 text-[11px] py-2"
+      >
+        {showDetail ? "▲ 詳細を閉じる" : "▼ 店舗詳細を見る (売上/支出/常連)"}
+      </button>
+      {showDetail && (
+        <div className="mt-2">
+          <ShopDashboard />
+          <button
+            onClick={() => navigate("/manager/regulars")}
+            className="pixel-btn-secondary w-full mt-2 text-[11px] py-2"
+          >
+            常連リストへ →
+          </button>
+        </div>
+      )}
     </div>
   );
 }
 
-function Stat({ label, value, color }: { label: string; value: string; color: string }) {
-  return (
-    <div className="pixel-panel p-3">
-      <p className="text-[10px] text-white/60">{label}</p>
-      <p className={`mt-1 font-pixel text-xs ${color}`}>{value}</p>
-    </div>
-  );
-}
-
-
-function calcInteriorScore(i: ShopInterior): number {
-  const sum =
-    i.floor + i.wall + i.ceiling + i.entrance + i.counter + i.lounge + i.decor + i.signboard + i.restroom + i.parking;
-  return Math.round((sum / 50) * 100);
-}
 
 /** 店舗外観 (写真風プレースホルダ SVG) */
 function ShopExteriorPlaceholder({
