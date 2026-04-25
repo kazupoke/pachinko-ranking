@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { PageHeader } from "../components/PageHeader";
 import { MachineThumb } from "../components/MachineThumb";
+import { CapacityBar } from "../components/CapacityBar";
 import { useGameStore } from "../stores/useGameStore";
 import {
   GACHA_COST_SINGLE,
@@ -118,6 +119,9 @@ export function Gacha() {
           <span className="text-white/60">天井カウント</span>
           <span className="font-pixel text-pachi-cyan">{pity} / 200</span>
         </div>
+
+        {/* 理想店進捗 */}
+        <DreamProgress />
       </div>
 
       <div className="px-4 grid grid-cols-2 gap-3">
@@ -398,6 +402,48 @@ function ResultCard({
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+
+function DreamProgress() {
+  const dream = useGameStore((s) => s.dreamMachines);
+  const user = useGameStore((s) => s.user);
+  const shop = useGameStore((s) => s.shop);
+  const dreamIds = Object.keys(dream ?? {});
+  if (dreamIds.length === 0) return null;
+  const dreamTotal = Object.values(dream).reduce((a, b) => a + b, 0);
+  const owned = user?.ownedMachines ?? {};
+  const installed: Record<string, number> = {};
+  for (const e of shop?.layout ?? []) installed[e.machineId] = e.count;
+  let havingMachines = 0;
+  let havingTypes = 0;
+  for (const [mid, target] of Object.entries(dream)) {
+    const total = (owned[mid] ?? 0) + (installed[mid] ?? 0);
+    if (total > 0) havingTypes++;
+    havingMachines += Math.min(total, target);
+  }
+  return (
+    <div className="pixel-panel p-3 mt-3 border-2 border-pachi-pink">
+      <p className="font-pixel text-[10px] text-pachi-pink mb-2">
+        ★ 理想店への道
+      </p>
+      <CapacityBar
+        label="目標機種を集めた数"
+        current={havingTypes}
+        max={dreamIds.length}
+        color="bg-pachi-pink"
+      />
+      <CapacityBar
+        label="目標台数"
+        current={havingMachines}
+        max={dreamTotal}
+        color="bg-pachi-yellow"
+      />
+      <p className="text-[10px] text-white/50 mt-2 leading-relaxed">
+        ガチャを引いて、理想ラインナップを完成させよう
+      </p>
     </div>
   );
 }
