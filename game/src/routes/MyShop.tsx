@@ -2,12 +2,12 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGameStore } from "../stores/useGameStore";
 import { PageHeader } from "../components/PageHeader";
-import { MachineThumb } from "../components/MachineThumb";
 import type { ShopInterior, Rarity } from "../lib/types";
 import { MACHINES_BY_ID } from "../data/machines";
 import { buildShareUrl } from "../lib/shareUrl";
 import { getBannerById, BANNERS } from "../data/banners";
 import { BannerImage } from "../components/BannerImage";
+import { ShopFloor } from "../components/ShopFloor";
 
 const RARITY_COLOR: Record<Rarity, string> = {
   N: "text-rarity-n",
@@ -143,7 +143,10 @@ export function MyShop() {
       </div>
 
       {mode === "overview" ? (
-        <OverviewView shop={shop} />
+        <ShopFloor
+          entries={shop.layout.map((e) => ({ machineId: e.machineId, count: e.count }))}
+          customerCount={shop.dailyCustomers}
+        />
       ) : (
         <PWorldView
           shop={shop}
@@ -176,173 +179,6 @@ export function MyShop() {
   );
 }
 
-/** ドット絵の客キャラクター（ランダムカラー） */
-function PixelCustomer({ seed }: { seed: number }) {
-  const colors = ["#ff4d94", "#ffcc00", "#00e5ff", "#00ff88", "#b066ff", "#ff0066"];
-  const color = colors[seed % colors.length];
-  return (
-    <svg viewBox="0 0 8 12" width="8" height="12" style={{ imageRendering: "pixelated" }}>
-      {/* 頭 */}
-      <rect x="2" y="0" width="4" height="4" fill={color} />
-      {/* 体 */}
-      <rect x="1" y="4" width="6" height="4" fill={color} opacity="0.8" />
-      {/* 足 */}
-      <rect x="1" y="8" width="2" height="4" fill={color} opacity="0.6" />
-      <rect x="5" y="8" width="2" height="4" fill={color} opacity="0.6" />
-    </svg>
-  );
-}
-
-function OverviewView({ shop }: { shop: ReturnType<typeof useGameStore.getState>["shop"] }) {
-  if (!shop) return null;
-
-  const totalCount = shop.layout.reduce((s, e) => s + e.count, 0);
-  const customerCount = Math.min(shop.dailyCustomers, 30);
-
-  // 設置機種を島 (3 機種ごと) に分割
-  const islands: typeof shop.layout[] = [];
-  for (let i = 0; i < shop.layout.length; i += 3) {
-    islands.push(shop.layout.slice(i, i + 3));
-  }
-
-  if (shop.layout.length === 0) {
-    return (
-      <div className="mx-4 mt-3 bg-bg-panel border-2 border-bg-card p-6 relative overflow-hidden">
-        <div className="absolute inset-0 scanlines pointer-events-none opacity-30" />
-        <div className="text-center">
-          <p className="font-pixel text-xs text-pachi-yellow mb-3 animate-blink">
-            CLOSED
-          </p>
-          <p className="text-[11px] text-white/60 leading-relaxed">
-            空の店舗です
-            <br />
-            ガチャで台を引いて
-            <br />
-            コレクションで設置しよう
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="mx-4 mt-3 bg-bg-panel border-2 border-bg-card relative overflow-hidden">
-      {/* スキャンライン */}
-      <div className="absolute inset-0 scanlines pointer-events-none opacity-30" />
-
-      {/* 営業中 ネオン看板 */}
-      <div className="bg-black border-b-2 border-pachi-red px-3 py-1.5 flex justify-between items-center text-[10px]">
-        <span className="font-pixel text-pachi-pink animate-blink">● OPEN</span>
-        <span className="font-pixel text-pachi-yellow">本日 {shop.dailyCustomers} 名</span>
-      </div>
-
-      {/* フロア (背景チェッカ) */}
-      <div
-        className="relative px-3 py-3"
-        style={{
-          backgroundImage:
-            "repeating-linear-gradient(45deg, rgba(255,255,255,0.02) 0 8px, transparent 8px 16px)",
-        }}
-      >
-        {/* 島ごとに2列の台を配置 + 中央通路 */}
-        <div className="space-y-3">
-          {islands.map((island, idx) => (
-            <Island key={idx} entries={island} />
-          ))}
-        </div>
-
-        {/* 通路を歩く客 (右へ流れる) */}
-        {customerCount > 0 && (
-          <div className="mt-3 pt-2 border-t-2 border-bg-card relative h-6 overflow-hidden bg-bg-base">
-            <div
-              className="absolute inset-y-0 flex items-center gap-2 animate-[slide_18s_linear_infinite]"
-              style={{ animationName: "customerWalk" }}
-            >
-              {Array.from({ length: customerCount }, (_, i) => (
-                <PixelCustomer key={i} seed={i * 7 + totalCount} />
-              ))}
-              {/* ループ用に2セット */}
-              {Array.from({ length: customerCount }, (_, i) => (
-                <PixelCustomer key={`d${i}`} seed={i * 7 + totalCount + 999} />
-              ))}
-            </div>
-            <style>{`
-              @keyframes customerWalk {
-                0%   { transform: translateX(100%); }
-                100% { transform: translateX(-100%); }
-              }
-              .animate-\\[slide_18s_linear_infinite\\] {
-                animation: customerWalk 18s linear infinite;
-              }
-            `}</style>
-          </div>
-        )}
-
-        {/* フロア底ライン */}
-        <div className="mt-2 flex justify-between items-center text-[9px] font-pixel text-white/40">
-          <span>FLOOR · {shop.layout.length}機種 / {totalCount}台</span>
-          <span>稼働率 {Math.min(100, Math.round((shop.dailyCustomers / Math.max(totalCount, 1)) * 100))}%</span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/** 1 島 = 表裏背中合わせの台ペア (最大3機種) */
-function Island({ entries }: { entries: { machineId: string; count: number; islandX: number; islandY: number }[] }) {
-  return (
-    <div className="bg-bg-card/40 border border-bg-card p-2">
-      <div className="grid grid-cols-3 gap-1.5">
-        {entries.map((entry) => {
-          const m = MACHINES_BY_ID[entry.machineId];
-          if (!m) return null;
-          const isSsr = m.rarity === "SSR";
-          const isSr = m.rarity === "SR";
-          const borderColor =
-            m.rarity === "SSR"
-              ? "border-rarity-ssr"
-              : m.rarity === "SR"
-                ? "border-rarity-sr"
-                : m.rarity === "R"
-                  ? "border-rarity-r"
-                  : "border-bg-card";
-          return (
-            <div
-              key={entry.machineId}
-              className={`relative bg-bg-base border-2 ${borderColor} ${
-                isSsr ? "animate-ssr-glow" : isSr ? "shadow-[0_0_6px_rgba(167,139,250,0.4)]" : ""
-              }`}
-            >
-              <div className="aspect-[2/3]">
-                <MachineThumb
-                  machineId={m.id}
-                  name={m.name}
-                  rarity={m.rarity}
-                  className="w-full h-full"
-                  size={48}
-                />
-              </div>
-              {/* 台座: 椅子 + 台数バッジ */}
-              <div className="bg-black/60 px-1 py-0.5 flex justify-between items-center text-[8px] font-pixel">
-                <span className={RARITY_COLOR[m.rarity]}>{m.rarity}</span>
-                <span className="text-pachi-yellow">×{entry.count}</span>
-              </div>
-            </div>
-          );
-        })}
-        {/* 3 未満の島は空きで埋める */}
-        {Array.from({ length: 3 - entries.length }, (_, i) => (
-          <div
-            key={`empty-${i}`}
-            className="bg-bg-base/40 border-2 border-dashed border-bg-card aspect-[2/3] flex items-center justify-center"
-          >
-            <span className="text-[8px] text-white/20">空</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
 
 function PWorldView({
   shop,
