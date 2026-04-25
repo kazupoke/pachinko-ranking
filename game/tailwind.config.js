@@ -38,6 +38,14 @@ export default {
       animation: {
         blink: "blink 1s steps(2) infinite",
         shake: "shake 0.3s ease-in-out",
+        "card-flip": "card-flip 0.5s cubic-bezier(.4,2,.6,1) both",
+        "card-pop": "card-pop 0.4s cubic-bezier(.4,2,.6,1) both",
+        sparkle: "sparkle 1.4s ease-in-out infinite",
+        "ssr-glow": "ssr-glow 1.6s ease-in-out infinite",
+        "rainbow-bg": "rainbow-bg 2s linear infinite",
+        "spin-slow": "spin 4s linear infinite",
+        "rolling-pulse": "rolling-pulse 0.6s ease-in-out infinite",
+        "float-up": "float-up 1.2s ease-out forwards",
       },
       keyframes: {
         blink: {
@@ -48,6 +56,42 @@ export default {
           "0%,100%": { transform: "translateX(0)" },
           "25%": { transform: "translateX(-2px)" },
           "75%": { transform: "translateX(2px)" },
+        },
+        "card-flip": {
+          "0%": { transform: "rotateY(180deg) scale(0.85)", opacity: "0" },
+          "60%": { transform: "rotateY(0deg) scale(1.08)", opacity: "1" },
+          "100%": { transform: "rotateY(0deg) scale(1)", opacity: "1" },
+        },
+        "card-pop": {
+          "0%": { transform: "scale(0.6)", opacity: "0" },
+          "70%": { transform: "scale(1.1)", opacity: "1" },
+          "100%": { transform: "scale(1)", opacity: "1" },
+        },
+        sparkle: {
+          "0%,100%": { opacity: "0", transform: "scale(0.5) rotate(0deg)" },
+          "50%": { opacity: "1", transform: "scale(1.2) rotate(180deg)" },
+        },
+        "ssr-glow": {
+          "0%,100%": {
+            boxShadow:
+              "0 0 8px 2px rgba(251,191,36,0.7), 0 0 24px 4px rgba(255,77,148,0.4)",
+          },
+          "50%": {
+            boxShadow:
+              "0 0 16px 4px rgba(251,191,36,1), 0 0 40px 8px rgba(255,77,148,0.7)",
+          },
+        },
+        "rainbow-bg": {
+          "0%,100%": { backgroundPosition: "0% 50%" },
+          "50%": { backgroundPosition: "100% 50%" },
+        },
+        "rolling-pulse": {
+          "0%,100%": { transform: "scale(1)", opacity: "0.8" },
+          "50%": { transform: "scale(1.06)", opacity: "1" },
+        },
+        "float-up": {
+          "0%": { transform: "translateY(0)", opacity: "1" },
+          "100%": { transform: "translateY(-30px)", opacity: "0" },
         },
       },
     },
