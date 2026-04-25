@@ -1,1 +1,0 @@
-if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/pachinko-ranking/g-1d107813b2/sw.js', { scope: '/pachinko-ranking/g-1d107813b2/' })})}
