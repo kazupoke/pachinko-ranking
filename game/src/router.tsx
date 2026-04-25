@@ -19,6 +19,7 @@ import { Sell } from "./routes/manager/Sell";
 import { Maintain } from "./routes/manager/Maintain";
 import { Settings } from "./routes/manager/Settings";
 import { Regulars } from "./routes/manager/Regulars";
+import { Security } from "./routes/manager/Security";
 import { DevPreview } from "./routes/dev/Preview";
 import { NotFound } from "./routes/NotFound";
 
@@ -41,6 +42,7 @@ export const router = createBrowserRouter(
         { path: "manager/maintain", element: <Maintain /> },
         { path: "manager/settings", element: <Settings /> },
         { path: "manager/regulars", element: <Regulars /> },
+        { path: "manager/security", element: <Security /> },
         { path: "expand", element: <Expand /> },
         { path: "s/:shopId", element: <ShopView /> },
         { path: "lite", element: <LiteEntry /> },

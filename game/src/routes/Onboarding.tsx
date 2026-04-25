@@ -4,12 +4,13 @@ import { useGameStore } from "../stores/useGameStore";
 import { useLiteStore } from "../stores/useLiteStore";
 import { LitePicker } from "./lite/Picker";
 
-type Phase = "welcome" | "transition" | "intro" | "pick";
+type Phase = "welcome" | "transition" | "intro" | "pick" | "register";
 
 export function Onboarding() {
   const navigate = useNavigate();
   const initUser = useGameStore((s) => s.initUser);
   const createFullShop = useGameStore((s) => s.createShop);
+  const registerShop = useGameStore((s) => s.registerShop);
   const setDream = useGameStore((s) => s.setDreamMachines);
   const liteShop = useLiteStore((s) => s.shop);
   const liteCreate = useLiteStore((s) => s.createShop);
@@ -20,9 +21,18 @@ export function Onboarding() {
   }, [initUser]);
 
   const handlePickDone = () => {
+    setPhase("register");
+  };
+
+  const handleRegisterDone = (info: {
+    shopName: string;
+    managerName: string;
+    birthday: string;
+  }) => {
     if (!liteShop) return;
     setDream(liteShop.entries);
-    createFullShop(liteShop.name);
+    createFullShop(info.shopName);
+    registerShop(info);
     navigate("/shop");
   };
 
@@ -42,7 +52,118 @@ export function Onboarding() {
       />
     );
   }
-  return <PickPhase onDone={handlePickDone} />;
+  if (phase === "pick") {
+    return <PickPhase onDone={handlePickDone} />;
+  }
+  return <RegisterPhase onDone={handleRegisterDone} />;
+}
+
+// ============================================================
+// Phase 5: Register (店舗名 / 店長名 / 誕生日)
+// ============================================================
+
+function RegisterPhase({
+  onDone,
+}: {
+  onDone: (info: {
+    shopName: string;
+    managerName: string;
+    birthday: string;
+  }) => void;
+}) {
+  const liteShop = useLiteStore((s) => s.shop);
+  const [shopName, setShopName] = useState(
+    liteShop?.name && liteShop.name !== "マイ・ドリームホール" ? liteShop.name : ""
+  );
+  const [managerName, setManagerName] = useState("");
+  const [birthday, setBirthday] = useState("");
+
+  const trimmedShop = shopName.trim();
+  const trimmedManager = managerName.trim();
+  const ready =
+    trimmedShop.length >= 1 &&
+    trimmedManager.length >= 1 &&
+    /^\d{4}-\d{2}-\d{2}$/.test(birthday);
+
+  return (
+    <div className="min-h-dvh bg-bg-base relative px-6 py-8">
+      <div className="absolute inset-0 scanlines pointer-events-none opacity-30" />
+      <div className="relative max-w-md mx-auto">
+        <p className="font-pixel text-[10px] text-pachi-cyan tracking-widest text-center mb-2">
+          STEP 3 / 3 · 店舗登録
+        </p>
+        <h1 className="font-pixel text-lg text-center leading-tight mb-2">
+          <span className="rainbow-gradient animate-rainbow-bg bg-clip-text text-transparent">
+            あなたの店舗を世界に登録
+          </span>
+        </h1>
+        <p className="text-[11px] text-white/60 text-center leading-relaxed">
+          店舗名は世界で 1 つ。
+          <br />
+          誕生日は仮パスワードとして使われます。
+        </p>
+
+        <div className="pixel-panel p-4 mt-5 space-y-4">
+          <label className="block">
+            <span className="text-xs text-pachi-cyan font-pixel">店舗名 (ID)</span>
+            <input
+              type="text"
+              value={shopName}
+              onChange={(e) => setShopName(e.target.value)}
+              placeholder="例: 銀河パーク本店"
+              maxLength={20}
+              className="block w-full mt-1 px-3 py-3 bg-bg-base border-2 border-bg-card text-white font-dot text-sm focus:border-pachi-pink outline-none"
+            />
+            <span className="block text-[10px] text-white/50 mt-1">
+              他の店長と被らないユニークな名前を
+            </span>
+          </label>
+
+          <label className="block">
+            <span className="text-xs text-pachi-pink font-pixel">店長名</span>
+            <input
+              type="text"
+              value={managerName}
+              onChange={(e) => setManagerName(e.target.value)}
+              placeholder="例: にとう"
+              maxLength={20}
+              className="block w-full mt-1 px-3 py-3 bg-bg-base border-2 border-bg-card text-white font-dot text-sm focus:border-pachi-pink outline-none"
+            />
+          </label>
+
+          <label className="block">
+            <span className="text-xs text-pachi-yellow font-pixel">
+              店長の生年月日 (仮パスワード)
+            </span>
+            <input
+              type="date"
+              value={birthday}
+              onChange={(e) => setBirthday(e.target.value)}
+              className="block w-full mt-1 px-3 py-3 bg-bg-base border-2 border-bg-card text-white font-dot text-sm focus:border-pachi-pink outline-none"
+            />
+            <span className="block text-[10px] text-white/50 mt-1">
+              ※ 後から店長メニューでパスワードを設定できます
+            </span>
+          </label>
+        </div>
+
+        <button
+          onClick={() =>
+            onDone({
+              shopName: trimmedShop,
+              managerName: trimmedManager,
+              birthday,
+            })
+          }
+          disabled={!ready}
+          className="pixel-btn w-full mt-6 py-4 text-sm disabled:opacity-30 animate-rolling-pulse"
+          style={{ animationDuration: "1.4s" }}
+        >
+          ▶ ゲームスタート
+        </button>
+      </div>
+    </div>
+  );
 }
 
 // ============================================================

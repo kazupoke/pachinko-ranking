@@ -107,6 +107,15 @@ interface GameState {
   ownedBanners: string[];
   /** 現在表示中のバナー ID */
   activeBannerId: string | null;
+  /** 店舗認証情報 (オンボーディング登録時に設定) */
+  credentials: {
+    shopName: string;
+    managerName: string;
+    birthday: string; // YYYY-MM-DD
+    /** ユーザーが追加で設定したパスワード (任意) */
+    password: string | null;
+    registeredAt: string;
+  } | null;
   /** 抱え込んでいる常連 (最大 50 名) */
   regulars: Array<{
     id: string;
@@ -139,6 +148,13 @@ interface GameState {
   setShopSeries: (id: string) => void;
   buyBanner: (id: string, price: number) => { ok: boolean; reason?: string };
   setActiveBanner: (id: string) => void;
+  registerShop: (info: {
+    shopName: string;
+    managerName: string;
+    birthday: string;
+  }) => void;
+  setPassword: (password: string) => void;
+  clearPassword: () => void;
   resetAll: () => void;
 }
 
@@ -155,6 +171,7 @@ export const useGameStore = create<GameState>()(
       shopSeriesId: null,
       ownedBanners: ["default"],
       activeBannerId: "default",
+      credentials: null,
       regulars: [],
 
       initUser: () => {
@@ -501,6 +518,39 @@ export const useGameStore = create<GameState>()(
         set({ activeBannerId: id });
       },
 
+      registerShop: ({ shopName, managerName, birthday }) => {
+        set({
+          credentials: {
+            shopName: shopName.trim(),
+            managerName: managerName.trim(),
+            birthday,
+            password: null,
+            registeredAt: new Date().toISOString(),
+          },
+        });
+        // 店名をショップに反映
+        const shop = get().shop;
+        if (shop) {
+          set({
+            shop: { ...shop, name: shopName.trim(), updatedAt: new Date().toISOString() },
+          });
+        }
+      },
+
+      setPassword: (password) => {
+        const cred = get().credentials;
+        if (!cred) return;
+        set({
+          credentials: { ...cred, password: password || null },
+        });
+      },
+
+      clearPassword: () => {
+        const cred = get().credentials;
+        if (!cred) return;
+        set({ credentials: { ...cred, password: null } });
+      },
+
       resetAll: () =>
         set({
           user: null,
@@ -513,6 +563,7 @@ export const useGameStore = create<GameState>()(
           shopSeriesId: null,
           ownedBanners: ["default"],
           activeBannerId: "default",
+          credentials: null,
           regulars: [],
         }),
     }),
