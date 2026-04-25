@@ -22,6 +22,7 @@ import { Regulars } from "./routes/manager/Regulars";
 import { Security } from "./routes/manager/Security";
 import { Market } from "./routes/Market";
 import { Title } from "./routes/Title";
+import { Ranking } from "./routes/Ranking";
 import { DevPreview } from "./routes/dev/Preview";
 import { NotFound } from "./routes/NotFound";
 
@@ -46,6 +47,7 @@ export const router = createBrowserRouter(
         { path: "manager/regulars", element: <Regulars /> },
         { path: "manager/security", element: <Security /> },
         { path: "market", element: <Market /> },
+        { path: "ranking", element: <Ranking /> },
         { path: "expand", element: <Expand /> },
         { path: "s/:shopId", element: <ShopView /> },
         { path: "lite", element: <LiteEntry /> },
