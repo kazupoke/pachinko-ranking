@@ -21,6 +21,7 @@ import { Settings } from "./routes/manager/Settings";
 import { Regulars } from "./routes/manager/Regulars";
 import { Security } from "./routes/manager/Security";
 import { Market } from "./routes/Market";
+import { Title } from "./routes/Title";
 import { DevPreview } from "./routes/dev/Preview";
 import { NotFound } from "./routes/NotFound";
 
@@ -52,6 +53,7 @@ export const router = createBrowserRouter(
         { path: "lite/view", element: <LiteView /> },
       ],
     },
+    { path: "/title", element: <Title /> },
     { path: "/onboarding", element: <Onboarding /> },
     { path: "/share", element: <Share /> },
     { path: "/dev/preview", element: <DevPreview /> },
