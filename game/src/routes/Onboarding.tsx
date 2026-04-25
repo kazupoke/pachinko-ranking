@@ -63,10 +63,10 @@ export function Onboarding() {
   };
 
   const startPulls = () => {
-    // 10 連 × 10 = 100 連 (シリーズバイアス付き)
+    // 10 連 × 10 = 100 連 (シリーズバイアス + 6 号機限定)
     const all: PullResult[] = [];
     for (let i = 0; i < 10; i++) {
-      all.push(...pullTen(Math.random, series));
+      all.push(...pullTen(Math.random, series, 6));
     }
     setResults(all);
     setRevealedCount(0);

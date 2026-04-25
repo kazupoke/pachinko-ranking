@@ -1,4 +1,4 @@
-import type { Machine, Rarity } from "./types";
+import type { Generation, Machine, Rarity } from "./types";
 import { machinesByRarity } from "../data/machines";
 import type { ShopSeries } from "./shopSeries";
 
@@ -30,13 +30,14 @@ function pickRarity(rand: () => number): Rarity {
 function pickMachine(
   rarity: Rarity,
   rand: () => number,
-  series: ShopSeries | null = null
+  series: ShopSeries | null = null,
+  generation?: Generation
 ): Machine | null {
-  let pool = machinesByRarity(rarity);
+  let pool = machinesByRarity(rarity, generation);
   if (pool.length === 0) {
     const idx = RARITY_ORDER.indexOf(rarity);
     for (let i = idx + 1; i < RARITY_ORDER.length; i++) {
-      pool = machinesByRarity(RARITY_ORDER[i]);
+      pool = machinesByRarity(RARITY_ORDER[i], generation);
       if (pool.length > 0) break;
     }
   }
@@ -64,22 +65,24 @@ export interface PullResult {
 
 export function pullSingle(
   rand: () => number = Math.random,
-  series: ShopSeries | null = null
+  series: ShopSeries | null = null,
+  generation?: Generation
 ): PullResult | null {
   const rarity = pickRarity(rand);
-  const machine = pickMachine(rarity, rand, series);
+  const machine = pickMachine(rarity, rand, series, generation);
   if (!machine) return null;
   return { machine, rarity };
 }
 
 export function pullTen(
   rand: () => number = Math.random,
-  series: ShopSeries | null = null
+  series: ShopSeries | null = null,
+  generation?: Generation
 ): PullResult[] {
   const results: PullResult[] = [];
   let hasSrOrHigher = false;
   for (let i = 0; i < 10; i++) {
-    const r = pullSingle(rand, series);
+    const r = pullSingle(rand, series, generation);
     if (!r) continue;
     if (r.rarity === "SR" || r.rarity === "SSR") hasSrOrHigher = true;
     results.push(r);
@@ -87,8 +90,8 @@ export function pullTen(
   // 救済: 10 連に SR 以上が無ければ最後を SR 以上に差し替え
   if (!hasSrOrHigher && results.length > 0) {
     const srPool = [
-      ...machinesByRarity("SR"),
-      ...machinesByRarity("SSR"),
+      ...machinesByRarity("SR", generation),
+      ...machinesByRarity("SSR", generation),
     ];
     if (srPool.length > 0) {
       let pickFrom = srPool;
