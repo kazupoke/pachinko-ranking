@@ -92,6 +92,9 @@ const CUSTOMER_COLORS = [
 interface ShopEntry {
   machineId: string;
   count: number;
+  hp?: number;
+  brokenPart?: string;
+  setting?: number;
 }
 
 interface Props {
@@ -242,15 +245,37 @@ export function ShopFloor({ entries, customerCount }: Props) {
 
   const customers = seatedCustomers;
 
-  const widthPx = cols * TILE * SCALE;
-  const heightPx = rows * TILE * SCALE;
+  // ズーム
+  const [zoom, setZoom] = useState<1 | 1.5 | 2>(1);
+  // 選択中の台
+  const [selectedKey, setSelectedKey] = useState<string | null>(null);
+  const selectedEntry = useMemo(() => {
+    if (!selectedKey) return null;
+    const mid = machineMap.get(selectedKey);
+    if (!mid) return null;
+    const e = entries.find((x) => x.machineId === mid);
+    if (!e) return null;
+    return { ...e, machineId: mid };
+  }, [selectedKey, machineMap, entries]);
+
+  const baseW = cols * TILE * SCALE;
+  const baseH = rows * TILE * SCALE;
+  const widthPx = baseW * zoom;
+  const heightPx = baseH * zoom;
 
   return (
     <div className="mx-3 mt-3 bg-bg-panel border-2 border-bg-card overflow-hidden">
       {/* フロア切替バー */}
-      <div className="bg-black px-3 py-1.5 flex justify-between items-center text-[10px] border-b-2 border-pachi-red">
-        <span className="font-pixel text-pachi-pink animate-blink">● OPEN</span>
-        <div className="flex gap-1">
+      <div className="bg-black px-3 py-1.5 flex justify-between items-center text-[10px] border-b-2 border-pachi-red gap-2">
+        <span className="font-pixel text-pachi-pink animate-blink shrink-0">● OPEN</span>
+        <div className="flex gap-1 ml-auto">
+          {/* ズーム */}
+          <button
+            onClick={() => setZoom((z) => (z === 1 ? 1.5 : z === 1.5 ? 2 : 1) as 1 | 1.5 | 2)}
+            className="px-2 py-0.5 font-pixel text-[10px] bg-pachi-yellow text-bg-base border border-pachi-yellow"
+          >
+            🔍 ×{zoom}
+          </button>
           <FloorBtn label="1F" active={floor === "F1"} onClick={() => setFloor("F1")} />
           <FloorBtn label="B1" active={floor === "B1"} onClick={() => setFloor("B1")} />
           <FloorBtn label="B2" active={false} onClick={() => setFloor("B2")} locked />
@@ -262,12 +287,15 @@ export function ShopFloor({ entries, customerCount }: Props) {
         className="overflow-auto"
         style={{ maxHeight: "60vh", touchAction: "pan-x pan-y" }}
       >
+        <div style={{ width: widthPx, height: heightPx }}>
         <div
           className="relative"
           style={{
-            width: widthPx,
-            height: heightPx,
+            width: baseW,
+            height: baseH,
             imageRendering: "pixelated",
+            transform: `scale(${zoom})`,
+            transformOrigin: "top left",
           }}
         >
           {/* タイル */}
@@ -282,6 +310,9 @@ export function ShopFloor({ entries, customerCount }: Props) {
                     y={y}
                     side={t}
                     machineId={mid}
+                    showName={zoom >= 1.5}
+                    onClick={() => setSelectedKey(`${x},${y}`)}
+                    selected={selectedKey === `${x},${y}`}
                   />
                 );
               }
@@ -294,12 +325,64 @@ export function ShopFloor({ entries, customerCount }: Props) {
             <Customer key={c.id} pos={c} />
           ))}
         </div>
+        </div>
       </div>
+
+      {/* 選択中の台情報 */}
+      {selectedEntry && (() => {
+        const m = MACHINES_BY_ID[selectedEntry.machineId];
+        if (!m) return null;
+        const hp = selectedEntry.hp ?? 100;
+        const setting = selectedEntry.setting ?? 1;
+        const broken = selectedEntry.brokenPart;
+        return (
+          <div className="px-3 py-2 bg-bg-base border-t-2 border-pachi-yellow text-[11px]">
+            <div className="flex items-baseline justify-between gap-2">
+              <p className="font-pixel text-pachi-yellow truncate">{m.name}</p>
+              <button
+                onClick={() => setSelectedKey(null)}
+                className="text-white/40 text-[10px]"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="mt-1 grid grid-cols-2 gap-x-3 gap-y-1 text-[10px] text-white/80">
+              <span>レア: <span className="font-pixel">{m.rarity}</span></span>
+              <span>設定: <span className="font-pixel">{setting}</span></span>
+              <span>メーカー: {m.maker}</span>
+              <span>年式: {m.releaseYear}</span>
+            </div>
+            <div className="mt-1.5 flex items-center gap-2">
+              <span className="text-[9px] text-white/60 font-pixel">HP</span>
+              <div className="flex-1 h-1.5 bg-bg-panel border border-bg-card overflow-hidden">
+                <div
+                  className={`h-full ${
+                    hp >= 70
+                      ? "bg-pachi-green"
+                      : hp >= 40
+                        ? "bg-pachi-yellow"
+                        : "bg-pachi-red"
+                  }`}
+                  style={{ width: `${hp}%` }}
+                />
+              </div>
+              <span className="font-pixel text-[10px] text-pachi-yellow">
+                {Math.round(hp)}
+              </span>
+            </div>
+            {broken && (
+              <p className="mt-1 text-[10px] text-pachi-red font-pixel animate-blink">
+                ⚠ 故障中: {broken} (メンテナンスで修理可能)
+              </p>
+            )}
+          </div>
+        );
+      })()}
 
       {/* フッタ */}
       <div className="bg-bg-panel px-3 py-1.5 text-[9px] font-pixel text-white/50 flex justify-between border-t border-bg-card">
         <span>{map.name} · 客 {customers.length} 名</span>
-        <span>← → ↑ ↓ スクロールで店内を見渡せます</span>
+        <span>台クリックで詳細・🔍 で拡大</span>
       </div>
     </div>
   );
@@ -405,11 +488,17 @@ function MachineTile({
   y,
   side,
   machineId,
+  showName,
+  onClick,
+  selected,
 }: {
   x: number;
   y: number;
   side: "L" | "R";
   machineId: string | undefined;
+  showName?: boolean;
+  onClick?: () => void;
+  selected?: boolean;
 }) {
   const sz = TILE * SCALE;
   const m = machineId ? MACHINES_BY_ID[machineId] : undefined;
@@ -421,29 +510,65 @@ function MachineTile({
     height: sz,
   };
   if (!m) {
-    // 空きスロット (薄く影だけ)
-    return (
-      <div style={{ ...style, background: "#22223a", opacity: 0.4 }} />
-    );
+    return <div style={{ ...style, background: "#22223a", opacity: 0.4 }} />;
   }
-  // L はそのまま, R は左右反転 (背中合わせの島の演出)
   return (
     <div
+      onClick={onClick}
       style={{
         ...style,
-        background: m.rarity === "SSR" ? "#ffcc00" : m.rarity === "SR" ? "#a78bfa" : m.rarity === "R" ? "#4ade80" : "#22223a",
-        padding: 1,
-        boxSizing: "border-box",
-        transform: side === "R" ? "scaleX(-1)" : undefined,
+        cursor: onClick ? "pointer" : "default",
+        outline: selected ? "2px solid #ffcc00" : undefined,
+        outlineOffset: -1,
+        zIndex: selected ? 6 : 1,
       }}
     >
-      <MachineThumb
-        machineId={m.id}
-        name={m.name}
-        rarity={m.rarity}
-        size={48}
-        className="w-full h-full"
-      />
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          background:
+            m.rarity === "SSR"
+              ? "#ffcc00"
+              : m.rarity === "SR"
+                ? "#a78bfa"
+                : m.rarity === "R"
+                  ? "#4ade80"
+                  : "#22223a",
+          padding: 1,
+          boxSizing: "border-box",
+          transform: side === "R" ? "scaleX(-1)" : undefined,
+        }}
+      >
+        <MachineThumb
+          machineId={m.id}
+          name={m.name}
+          rarity={m.rarity}
+          size={48}
+          className="w-full h-full"
+        />
+      </div>
+      {showName && (
+        <div
+          style={{
+            position: "absolute",
+            bottom: -8,
+            left: -10,
+            right: -10,
+            textAlign: "center",
+            fontSize: 7,
+            color: "#fff",
+            background: "rgba(0,0,0,0.7)",
+            fontFamily: '"DotGothic16", monospace',
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            pointerEvents: "none",
+          }}
+        >
+          {m.name}
+        </div>
+      )}
     </div>
   );
 }
