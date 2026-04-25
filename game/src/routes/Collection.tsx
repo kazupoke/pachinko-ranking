@@ -111,6 +111,8 @@ export function Collection() {
         subtitle={`収録 ${ALL_MACHINES.length} 機種 · 所持 ${Object.values(user?.ownedMachines ?? {}).reduce((a, b) => a + b, 0)} 台`}
       />
 
+      {/* 検索・フィルタ群 (上部固定) */}
+      <div className="sticky top-12 z-10 bg-bg-base pb-2 border-b-2 border-bg-card">
       <div className="px-4 pt-3">
         <input
           type="text"
@@ -220,6 +222,8 @@ export function Collection() {
           </div>
         )}
       </div>
+      </div>
+      {/* /sticky filter wrapper */}
 
       {msg && (
         <div className="fixed top-14 left-1/2 -translate-x-1/2 z-30 px-4 py-2 bg-pachi-yellow text-bg-base font-dot text-xs shadow-pixel">
