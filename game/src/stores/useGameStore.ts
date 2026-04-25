@@ -80,6 +80,8 @@ interface GameState {
   gachaPity: number;
   lastTickAt: string | null;
   mysteryRecords: MysteryRecord[];
+  /** ライトモードで設定された理想ラインナップ (machine id → 目標台数) */
+  dreamMachines: Record<string, number>;
   initUser: () => void;
   tickSimulation: (machineRarityMap: Record<string, keyof typeof RARITY_WEIGHT_MAP>) => TickResult;
   createShop: (name: string) => void;
@@ -96,6 +98,8 @@ interface GameState {
   expandTypeSlot: () => { ok: boolean; reason?: string; cost: number };
   submitMysteryReport: (shopId: string, reward: number) => { ok: boolean; reason?: string };
   mysteryVisitsToday: () => number;
+  setDreamMachines: (entries: Record<string, number>) => void;
+  clearDreamMachines: () => void;
   resetAll: () => void;
 }
 
@@ -108,6 +112,7 @@ export const useGameStore = create<GameState>()(
       gachaPity: 0,
       lastTickAt: null,
       mysteryRecords: [],
+      dreamMachines: {},
 
       initUser: () => {
         if (!get().user) set({ user: createUser() });
@@ -358,6 +363,11 @@ export const useGameStore = create<GameState>()(
         return { ok: true, cost };
       },
 
+      setDreamMachines: (entries) =>
+        set({ dreamMachines: { ...entries } }),
+
+      clearDreamMachines: () => set({ dreamMachines: {} }),
+
       resetAll: () =>
         set({
           user: null,
@@ -366,6 +376,7 @@ export const useGameStore = create<GameState>()(
           gachaPity: 0,
           lastTickAt: null,
           mysteryRecords: [],
+          dreamMachines: {},
         }),
     }),
     {

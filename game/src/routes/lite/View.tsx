@@ -1,8 +1,10 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLiteStore, totalMachines, totalKinds } from "../../stores/useLiteStore";
 import { MACHINES_BY_ID } from "../../data/machines";
 import type { Machine, Rarity } from "../../lib/types";
+import { calcScore, totalCost, starRating } from "../../lib/litePricing";
+import { useGameStore } from "../../stores/useGameStore";
 
 const RARITY_ORDER: Rarity[] = ["SSR", "SR", "R", "N"];
 const RARITY_BADGE: Record<Rarity, string> = {
@@ -16,6 +18,15 @@ export function LiteView() {
   const navigate = useNavigate();
   const shop = useLiteStore((s) => s.shop);
   const removeMachine = useLiteStore((s) => s.removeMachine);
+  const fullGameShop = useGameStore((s) => s.shop);
+  const createFullShop = useGameStore((s) => s.createShop);
+
+  // 開いた瞬間の演出
+  const [revealed, setRevealed] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setRevealed(true), 250);
+    return () => clearTimeout(t);
+  }, []);
 
   const entries = shop?.entries;
   const rows = useMemo(() => {
@@ -51,9 +62,11 @@ export function LiteView() {
 
   const totalCount = totalMachines(shop);
   const kindCount = totalKinds(shop);
+  const score = calcScore(shop.entries, MACHINES_BY_ID);
+  const cost = totalCost(shop.entries, MACHINES_BY_ID);
 
   const handleShare = async () => {
-    const text = `【${shop.name}】設置 ${totalCount}台 / ${kindCount}機種\n#マイパチ店`;
+    const text = `【${shop.name}】設置 ${totalCount}台 / ${kindCount}機種\n理想店レベル ${starRating(score.total)} (${score.total.toFixed(1)})\n#マイパチ店`;
     const url = window.location.href;
     if ("share" in navigator) {
       try {
@@ -67,24 +80,116 @@ export function LiteView() {
     window.open(intent, "_blank");
   };
 
+  const handleStartFullMode = () => {
+    if (!fullGameShop) {
+      // 本格モードの店をライトの店名で作って、夢の店としてリンク
+      createFullShop(shop.name);
+    }
+    navigate("/shop");
+  };
+
   return (
     <div className="pb-6">
-      {/* P-World 風ヘッダ */}
-      <div className="bg-pachi-red text-white px-4 py-3 flex items-center justify-between">
-        <div>
-          <p className="font-pixel text-[10px] text-white/80">PACHINKO SHOP</p>
-          <h1 className="font-pixel text-sm leading-tight">{shop.name}</h1>
-        </div>
-        <div className="text-right">
-          <p className="font-pixel text-[10px] text-white/80">設置台数</p>
-          <p className="font-pixel text-sm">
-            {totalCount} <span className="text-[10px]">台</span>
+      {/* === 「これがあなたの理想のお店！」演出ヘッダ === */}
+      <div className="bg-bg-base relative overflow-hidden">
+        <div className="absolute inset-0 scanlines pointer-events-none opacity-30" />
+        <div className="px-4 py-6 text-center relative">
+          <p
+            className={`font-pixel text-[10px] text-pachi-cyan tracking-widest transition-opacity duration-700 ${
+              revealed ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            これがあなたの
           </p>
+          <h1
+            className={`mt-2 font-pixel text-base sm:text-lg leading-tight transition-all duration-700 ${
+              revealed
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-2"
+            }`}
+          >
+            <span className="rainbow-gradient animate-rainbow-bg bg-clip-text text-transparent">
+              理想のお店
+            </span>
+          </h1>
+          <p
+            className={`mt-1 font-pixel text-base text-pachi-yellow leading-tight transition-all duration-700 delay-200 ${
+              revealed
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-2"
+            }`}
+          >
+            「{shop.name}」
+          </p>
+          {/* 評価 */}
+          <div
+            className={`mt-4 inline-block transition-all duration-700 delay-400 ${
+              revealed ? "opacity-100 scale-100" : "opacity-0 scale-90"
+            }`}
+          >
+            <div className="font-pixel text-2xl text-pachi-yellow tracking-widest drop-shadow-[2px_2px_0_rgba(0,0,0,0.7)]">
+              {starRating(score.total)}
+            </div>
+            <div className="text-[10px] text-white/60 mt-1">
+              理想店レベル {score.total.toFixed(1)} / 5.0
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 評価コメント */}
+      <div className="px-4 mt-3">
+        <div className="pixel-panel p-3">
+          <p className="font-pixel text-[10px] text-pachi-cyan mb-2">
+            鑑定コメント
+          </p>
+          <ul className="space-y-1 text-[11px] text-white/80">
+            {score.comments.map((c, i) => (
+              <li key={i}>・{c}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      {/* スタッツ 4 連 */}
+      <div className="px-4 mt-3 grid grid-cols-2 gap-2">
+        <Stat label="設置台数" value={`${totalCount} 台`} color="text-pachi-green" />
+        <Stat label="機種数" value={`${kindCount} 機種`} color="text-pachi-cyan" />
+        <Stat
+          label="実現コスト"
+          value={`¥${cost.toLocaleString()}`}
+          color="text-pachi-pink"
+        />
+        <Stat
+          label="想定客数"
+          value={`${Math.round(totalCount * 0.8 + score.total * 30)} 人/日`}
+          color="text-pachi-yellow"
+        />
+      </div>
+
+      {/* 本格モードへの導線 (PRIMARY CTA) */}
+      <div className="px-4 mt-4">
+        <div className="pixel-panel p-4 border-2 border-pachi-pink relative overflow-hidden">
+          <div className="absolute inset-0 rainbow-gradient animate-rainbow-bg opacity-10 pointer-events-none" />
+          <p className="font-pixel text-[11px] text-pachi-pink mb-2">
+            ▶ NEXT STEP
+          </p>
+          <p className="text-[11px] text-white leading-relaxed">
+            この理想のお店を、本格モードで実現しよう！
+            <br />
+            ガチャで台を集めて、お店を育てよう。
+          </p>
+          <button
+            onClick={handleStartFullMode}
+            className="pixel-btn w-full mt-3 text-xs"
+          >
+            本格モードで実現する
+          </button>
         </div>
       </div>
 
       {/* P-World 風テーブル本体 */}
-      <div className="mx-3 mt-3">
+      <div className="mx-3 mt-4">
         <div className="bg-white text-black font-dot border-2 border-black">
           <div className="bg-black text-white px-3 py-2 flex justify-between text-[11px]">
             <span>設置機種一覧</span>
@@ -144,28 +249,45 @@ export function LiteView() {
         </div>
       </div>
 
-      {/* アクション */}
-      <div className="px-4 mt-5 grid grid-cols-2 gap-3">
+      {/* セカンダリアクション */}
+      <div className="px-4 mt-4 grid grid-cols-3 gap-2">
         <button
           onClick={() => navigate("/lite/build")}
           className="pixel-btn-secondary text-xs"
         >
-          機種を編集
+          編集
         </button>
         <button
           onClick={() => navigate("/lite")}
           className="pixel-btn-secondary text-xs"
         >
-          お店設定
+          設定
         </button>
         <button
           onClick={handleShare}
-          className="pixel-btn text-xs col-span-2"
+          className="pixel-btn-secondary text-xs"
           disabled={rows.length === 0}
         >
-          シェアする
+          シェア
         </button>
       </div>
+    </div>
+  );
+}
+
+function Stat({
+  label,
+  value,
+  color,
+}: {
+  label: string;
+  value: string;
+  color: string;
+}) {
+  return (
+    <div className="pixel-panel p-3">
+      <p className="text-[10px] text-white/60">{label}</p>
+      <p className={`mt-1 font-pixel text-xs ${color}`}>{value}</p>
     </div>
   );
 }

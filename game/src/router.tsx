@@ -11,6 +11,7 @@ import { ShopView } from "./routes/ShopView";
 import { LiteEntry } from "./routes/lite/Entry";
 import { LitePicker } from "./routes/lite/Picker";
 import { LiteView } from "./routes/lite/View";
+import { Onboarding } from "./routes/Onboarding";
 import { DevPreview } from "./routes/dev/Preview";
 import { NotFound } from "./routes/NotFound";
 
@@ -33,6 +34,7 @@ export const router = createBrowserRouter(
         { path: "lite/view", element: <LiteView /> },
       ],
     },
+    { path: "/onboarding", element: <Onboarding /> },
     { path: "/dev/preview", element: <DevPreview /> },
     { path: "*", element: <NotFound /> },
   ],
