@@ -385,8 +385,18 @@ export function LitePicker() {
                     {count}
                   </span>
                   <button
-                    onClick={() => incrementMachine(m.id, 1)}
-                    className="w-8 h-8 font-pixel text-sm bg-pachi-red border-2 border-pachi-red text-white"
+                    onClick={() => {
+                      // 機種枠超過: 新規追加 (count===0) のみブロック
+                      if (count === 0 && totalK >= LITE_MAX_TYPES) return;
+                      // 台数枠超過: 全体ブロック
+                      if (totalM >= LITE_MAX_MACHINES) return;
+                      incrementMachine(m.id, 1);
+                    }}
+                    disabled={
+                      totalM >= LITE_MAX_MACHINES ||
+                      (count === 0 && totalK >= LITE_MAX_TYPES)
+                    }
+                    className="w-8 h-8 font-pixel text-sm bg-pachi-red border-2 border-pachi-red text-white disabled:opacity-30"
                     aria-label="台数を増やす"
                   >
                     +

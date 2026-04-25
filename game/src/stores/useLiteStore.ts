@@ -110,7 +110,7 @@ export const useLiteStore = create<LiteState>()(
 );
 
 export const LITE_MAX_MACHINES = 200;
-export const LITE_MAX_TYPES = 40;
+export const LITE_MAX_TYPES = 20;
 
 export function totalMachines(shop: LiteShop | null): number {
   if (!shop) return 0;

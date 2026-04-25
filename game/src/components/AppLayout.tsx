@@ -67,7 +67,6 @@ const NAV_ITEMS = [
   { to: "/collection", label: "パチスロ" },
   { to: "/gacha",      label: "新台!!" },
   { to: "/manager",    label: "店長" },
-  { to: "/lite",       label: "理想店" },
 ];
 
 function TopNav() {
