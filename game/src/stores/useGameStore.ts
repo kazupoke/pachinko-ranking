@@ -1,7 +1,26 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import type { Shop, User, FMLEntry, Machine } from "../lib/types";
+import type { Shop, User, FMLEntry, Machine, Generation, MachineType } from "../lib/types";
 import { uuid, shortId, handoverCode } from "../lib/id";
+import { MACHINES_BY_ID } from "../data/machines";
+
+const MACHINES_BY_ID_GLOBAL = MACHINES_BY_ID;
+
+/** 機種名 / 世代 / type から客カテゴリを推測 (store 内軽量版) */
+function inferDominantCategory(
+  name: string,
+  generation: Generation,
+  type: MachineType
+): string {
+  if (/まどマギ|まどか|リゼロ|Re:ゼロ|戦国乙女|アイドル|ラブライブ/.test(name)) return "moe";
+  if (/ミリオン|ゴッド|GOD|凱旋|番長|麻雀物語/.test(name)) return "high_volatility";
+  if (/北斗|エヴァ|ガンダム|コードギアス|ゴッドイーター|鬼武者|バイオハザード|モンキーターン/.test(name)) return "anime";
+  if (/ジャグラー|ハナハナ|ハナビ|クランキー/.test(name)) return "a_type";
+  if (generation === 4) return "veteran";
+  if (generation === 5) return "veteran";
+  if (type === "A") return "a_type";
+  return "newbie";
+}
 
 const INITIAL_INTERIOR = {
   floor: 1,
@@ -88,6 +107,16 @@ interface GameState {
   ownedBanners: string[];
   /** 現在表示中のバナー ID */
   activeBannerId: string | null;
+  /** 抱え込んでいる常連 (最大 50 名) */
+  regulars: Array<{
+    id: string;
+    category: string;
+    favoriteMachineId: string;
+    favoriteMaker?: string;
+    level: number;
+    visits: number;
+    lastVisitAt: string;
+  }>;
   initUser: () => void;
   tickSimulation: (machineRarityMap: Record<string, keyof typeof RARITY_WEIGHT_MAP>) => TickResult;
   createShop: (name: string) => void;
@@ -126,6 +155,7 @@ export const useGameStore = create<GameState>()(
       shopSeriesId: null,
       ownedBanners: ["default"],
       activeBannerId: "default",
+      regulars: [],
 
       initUser: () => {
         if (!get().user) set({ user: createUser() });
@@ -179,6 +209,47 @@ export const useGameStore = create<GameState>()(
         const margin = totalWeight > 0 ? weightedMargin / totalWeight : 0.2;
         const revenue = newCustomers * 5000 * margin;
 
+        // 常連の発生 / レベルアップ (簡易ロジック)
+        let regulars = get().regulars;
+        if (newCustomers > 0 && shop.layout.length > 0) {
+          // 50% で新規常連発生 or 既存レベルアップ
+          if (Math.random() < 0.5) {
+            const e = shop.layout[Math.floor(Math.random() * shop.layout.length)];
+            const m = MACHINES_BY_ID_GLOBAL?.[e.machineId];
+            if (m) {
+              const cat = inferDominantCategory(m.name, m.generation, m.type);
+              const existing = regulars.find(
+                (r) => r.category === cat && r.favoriteMachineId === e.machineId
+              );
+              if (existing) {
+                regulars = regulars.map((r) =>
+                  r.id === existing.id
+                    ? {
+                        ...r,
+                        level: Math.min(100, r.level + 1 + Math.floor(Math.random() * 2)),
+                        visits: r.visits + 1,
+                        lastVisitAt: now.toISOString(),
+                      }
+                    : r
+                );
+              } else if (regulars.length < 50) {
+                regulars = [
+                  ...regulars,
+                  {
+                    id: Math.random().toString(36).slice(2, 10),
+                    category: cat,
+                    favoriteMachineId: e.machineId,
+                    favoriteMaker: m.maker,
+                    level: 5 + Math.floor(Math.random() * 10),
+                    visits: 1,
+                    lastVisitAt: now.toISOString(),
+                  },
+                ];
+              }
+            }
+          }
+        }
+
         set({
           shop: {
             ...shop,
@@ -190,6 +261,7 @@ export const useGameStore = create<GameState>()(
             ...user,
             cash: Math.max(0, user.cash + Math.round(revenue)),
           },
+          regulars,
           lastTickAt: now.toISOString(),
         });
 
@@ -441,6 +513,7 @@ export const useGameStore = create<GameState>()(
           shopSeriesId: null,
           ownedBanners: ["default"],
           activeBannerId: "default",
+          regulars: [],
         }),
     }),
     {

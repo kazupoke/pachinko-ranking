@@ -46,6 +46,13 @@ const MENU: MenuItem[] = [
     emoji: "⚙️",
     accent: "border-pachi-red",
   },
+  {
+    to: "/manager/regulars",
+    label: "常連リスト",
+    desc: "抱え込んでいる常連の確認",
+    emoji: "👥",
+    accent: "border-pachi-purple",
+  },
 ];
 
 export function ManagerHub() {
