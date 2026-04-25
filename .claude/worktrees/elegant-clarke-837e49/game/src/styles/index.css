@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-bg-base text-white font-dot;
+    image-rendering: pixelated;
+    overscroll-behavior: none;
+    touch-action: manipulation;
+  }
+
+  button {
+    @apply font-dot select-none;
+    touch-action: manipulation;
+  }
+
+  /* ピクセルアートのスケーリングを綺麗に */
+  img,
+  canvas {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+  }
+}
+
+@layer components {
+  .pixel-border {
+    box-shadow:
+      0 -4px 0 0 currentColor,
+      0 4px 0 0 currentColor,
+      -4px 0 0 0 currentColor,
+      4px 0 0 0 currentColor;
+  }
+
+  .pixel-btn {
+    @apply font-dot uppercase tracking-wider px-4 py-3 bg-pachi-red text-white
+           shadow-pixel active:shadow-pixel-sm active:translate-x-[2px] active:translate-y-[2px]
+           transition-[transform,box-shadow] duration-75;
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .pixel-btn-secondary {
+    @apply pixel-btn bg-bg-card;
+  }
+
+  .pixel-panel {
+    @apply bg-bg-panel shadow-pixel border-2 border-black;
+  }
+
+  .scanlines {
+    background-image: repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.15) 0px,
+      rgba(0, 0, 0, 0.15) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+  }
+}
