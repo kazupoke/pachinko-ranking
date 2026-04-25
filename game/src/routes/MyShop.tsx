@@ -9,6 +9,7 @@ import { getBannerById, BANNERS } from "../data/banners";
 import { BannerImage } from "../components/BannerImage";
 import { ShopFloor } from "../components/ShopFloor";
 import { BizHoursGauge } from "../components/BizHoursGauge";
+import { ShopDashboard } from "../components/ShopDashboard";
 
 const RARITY_COLOR: Record<Rarity, string> = {
   N: "text-rarity-n",
@@ -105,6 +106,9 @@ export function MyShop() {
       <div className="px-4 pt-3">
         <BizHoursGauge />
       </div>
+
+      {/* ダッシュボード (売上/支出/客数 等) */}
+      <ShopDashboard />
 
       <div className="px-4 py-4 grid grid-cols-2 gap-3">
         <Stat label="本日の客数" value={shop.dailyCustomers.toLocaleString()} color="text-pachi-green" />

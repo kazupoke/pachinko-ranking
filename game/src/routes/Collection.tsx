@@ -7,12 +7,6 @@ import type { Machine, Rarity } from "../lib/types";
 import { MAKER_GROUPS, getMakerGroup, type MakerGroup } from "../data/makerGroups";
 
 const RARITY_ORDER: Rarity[] = ["SSR", "SR", "R", "N"];
-const RARITY_COLOR: Record<Rarity, string> = {
-  N: "text-rarity-n",
-  R: "text-rarity-r",
-  SR: "text-rarity-sr",
-  SSR: "text-rarity-ssr",
-};
 
 type Filter = "owned" | "all";
 type SortKey = "rarityYear" | "yearDesc" | "yearAsc" | "name" | "makerGroup";
@@ -257,6 +251,7 @@ export function Collection() {
   );
 }
 
+/** P-World 風の白背景テーブル行 */
 function MachineRow({
   machine,
   owned,
@@ -271,46 +266,52 @@ function MachineRow({
   onInstall: () => void;
 }) {
   return (
-    <li className="pixel-panel overflow-hidden">
-      <div className="flex gap-0">
-        {/* サムネイル */}
-        <div className="shrink-0 w-16 h-20 bg-bg-base">
-          <MachineThumb
-            machineId={machine.id}
-            name={machine.name}
-            rarity={machine.rarity}
-            className="w-full h-full"
-          />
+    <li className="bg-white text-black border-2 border-black flex">
+      <div className="shrink-0 w-12 h-16 bg-bg-base border-r-2 border-black">
+        <MachineThumb
+          machineId={machine.id}
+          name={machine.name}
+          rarity={machine.rarity}
+          className="w-full h-full"
+        />
+      </div>
+      <div className="flex-1 min-w-0 px-2 py-1 flex flex-col justify-between">
+        <div>
+          <p className="font-dot text-[12px] leading-tight line-clamp-2 text-black">
+            {machine.name}
+          </p>
+          <p className="text-[10px] text-gray-600 mt-0.5 truncate">
+            {machine.maker} · {getMakerGroup(machine.maker)} · {machine.releaseYear}
+          </p>
         </div>
-        {/* 情報 */}
-        <div className="flex-1 min-w-0 p-2 flex flex-col justify-between">
-          <div>
-            <p className="font-dot text-xs leading-tight line-clamp-2">{machine.name}</p>
-            <p className="text-[10px] text-white/50 mt-1 truncate">
-              {machine.maker}{" "}
-              <span className="text-pachi-cyan">[{getMakerGroup(machine.maker)}]</span> ·{" "}
-              {machine.releaseYear}
-            </p>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className={`font-pixel text-[10px] ${RARITY_COLOR[machine.rarity]}`}>
-              {machine.rarity}
-            </span>
-            <div className="flex gap-2 text-[10px]">
-              <span className="text-white/70">所持×{owned}</span>
-              {installedCount > 0 && (
-                <span className="text-pachi-green">設置×{installedCount}</span>
-              )}
-            </div>
+        <div className="flex items-center justify-between">
+          <span
+            className={`font-pixel text-[10px] px-1 ${
+              machine.rarity === "SSR"
+                ? "bg-yellow-200 text-yellow-800"
+                : machine.rarity === "SR"
+                  ? "bg-purple-200 text-purple-800"
+                  : machine.rarity === "R"
+                    ? "bg-green-200 text-green-800"
+                    : "bg-gray-200 text-gray-700"
+            }`}
+          >
+            {machine.rarity}
+          </span>
+          <div className="flex gap-2 text-[10px] text-gray-700">
+            {owned > 0 && <span>所持×{owned}</span>}
+            {installedCount > 0 && (
+              <span className="text-pachi-red font-bold">設置×{installedCount}</span>
+            )}
           </div>
         </div>
       </div>
       {canInstall && (
         <button
           onClick={onInstall}
-          className="pixel-btn-secondary w-full text-[11px] py-2 border-t-2 border-black"
+          className="shrink-0 px-3 bg-pachi-red text-white font-pixel text-[10px] border-l-2 border-black"
         >
-          店に設置 +1台
+          設置
         </button>
       )}
     </li>
