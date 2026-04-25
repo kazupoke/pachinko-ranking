@@ -39,6 +39,13 @@ const MENU: MenuItem[] = [
     emoji: "🔧",
     accent: "border-pachi-pink",
   },
+  {
+    to: "/manager/settings",
+    label: "設定変更",
+    desc: "台ごとの設定 (1-6) を変更",
+    emoji: "⚙️",
+    accent: "border-pachi-red",
+  },
 ];
 
 export function ManagerHub() {
