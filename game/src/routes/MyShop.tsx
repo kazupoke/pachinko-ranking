@@ -136,7 +136,11 @@ export function MyShop() {
       {mode === "overview" ? (
         <OverviewView shop={shop} />
       ) : (
-        <PWorldView shop={shop} onRemove={(id) => uninstall(id, 1)} />
+        <PWorldView
+          shop={shop}
+          onRemove={(id) => uninstall(id, 1)}
+          onAdd={(id) => useGameStore.getState().installMachine(id, 1)}
+        />
       )}
 
       <div className="px-4 mt-5 grid grid-cols-2 gap-3">
@@ -334,10 +338,13 @@ function Island({ entries }: { entries: { machineId: string; count: number; isla
 function PWorldView({
   shop,
   onRemove,
+  onAdd,
 }: {
   shop: ReturnType<typeof useGameStore.getState>["shop"];
   onRemove: (machineId: string) => void;
+  onAdd: (machineId: string) => { ok: boolean; reason?: string };
 }) {
+  const user = useGameStore((s) => s.user);
   if (!shop) return null;
   if (shop.layout.length === 0) {
     return (
@@ -374,6 +381,8 @@ function PWorldView({
             {sortedLayout.map((entry) => {
               const m = MACHINES_BY_ID[entry.machineId];
               if (!m) return null;
+              const ownedExtra = user?.ownedMachines[entry.machineId] ?? 0;
+              const canAdd = ownedExtra > 0;
               return (
                 <tr key={entry.machineId} className="border-t border-gray-300">
                   <td className="px-2 py-1.5 align-top">
@@ -383,13 +392,43 @@ function PWorldView({
                     </span>
                   </td>
                   <td className="px-2 py-1.5 text-gray-600 align-top">{m.maker}</td>
-                  <td className="px-2 py-1.5 text-right font-pixel">{entry.count}</td>
+                  <td className="px-2 py-1.5 text-right">
+                    <div className="flex items-center justify-end gap-1">
+                      <button
+                        onClick={() => onRemove(entry.machineId)}
+                        className="w-6 h-6 font-pixel text-[10px] bg-gray-200 border border-gray-400 text-gray-700"
+                        aria-label="台数を減らす"
+                      >
+                        −
+                      </button>
+                      <span className="font-pixel text-xs w-8 text-center">
+                        {entry.count}
+                      </span>
+                      <button
+                        onClick={() => onAdd(entry.machineId)}
+                        disabled={!canAdd}
+                        className="w-6 h-6 font-pixel text-[10px] bg-pachi-red border border-pachi-red text-white disabled:opacity-30"
+                        aria-label="台数を増やす"
+                      >
+                        +
+                      </button>
+                    </div>
+                    {ownedExtra > 0 && (
+                      <span className="block text-[9px] text-gray-500 mt-0.5">
+                        所持 +{ownedExtra}
+                      </span>
+                    )}
+                  </td>
                   <td className="px-1 py-1.5 text-right">
                     <button
-                      onClick={() => onRemove(entry.machineId)}
-                      className="text-[10px] text-red-600 px-1"
+                      onClick={() =>
+                        useGameStore
+                          .getState()
+                          .uninstallMachine(entry.machineId, entry.count)
+                      }
+                      className="text-[9px] text-red-600 px-1"
                     >
-                      外す
+                      全外
                     </button>
                   </td>
                 </tr>
