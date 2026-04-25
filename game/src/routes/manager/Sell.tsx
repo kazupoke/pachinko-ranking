@@ -2,8 +2,9 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PageHeader } from "../../components/PageHeader";
 import { useGameStore } from "../../stores/useGameStore";
-import { MACHINES_BY_ID } from "../../data/machines";
+import { ALL_MACHINES, MACHINES_BY_ID } from "../../data/machines";
 import { MachineThumb } from "../../components/MachineThumb";
+import { getMarketPrice, formatPrice } from "../../lib/marketSupply";
 import type { Machine, Rarity } from "../../lib/types";
 
 const RARITY_COLOR: Record<Rarity, string> = {
@@ -13,13 +14,8 @@ const RARITY_COLOR: Record<Rarity, string> = {
   SSR: "text-rarity-ssr",
 };
 
-/** レア度別の売却単価 (G) — 購入価格の半分くらい */
-const SELL_PRICE: Record<Rarity, number> = {
-  N: 50_000,
-  R: 100_000,
-  SR: 250_000,
-  SSR: 600_000,
-};
+/** 売却は市場価格の 70% で店が買取 (店の取り分 30%) */
+const SELL_RATE = 0.7;
 
 const RARITY_ORDER: Rarity[] = ["SSR", "SR", "R", "N"];
 
@@ -93,9 +89,15 @@ export function Sell() {
           </span>
         </div>
       ) : (
+        <>
+        <p className="px-4 text-[10px] text-white/50 leading-relaxed">
+          ※ 買取価格 = 市場価格 × 70% (店買取分)。市場価格は台数枯渇で青天井に高騰します。
+        </p>
         <ul className="px-4 py-3 space-y-2">
           {ownedList.map(({ machine: m, count }) => {
-            const unit = SELL_PRICE[m.rarity];
+            const withdrawn = useGameStore.getState().marketWithdrawn[m.id] ?? 0;
+            const market = getMarketPrice(m, withdrawn, ALL_MACHINES);
+            const unit = Math.round(market * SELL_RATE);
             return (
               <li key={m.id} className="pixel-panel p-3 flex items-center gap-3">
                 <div className="w-12 h-16 shrink-0 border border-bg-card">
@@ -114,7 +116,14 @@ export function Sell() {
                   <p
                     className={`text-[10px] font-pixel mt-0.5 ${RARITY_COLOR[m.rarity]}`}
                   >
-                    {m.rarity} · 倉庫 {count} 台 · 単価 ¥{unit.toLocaleString()}
+                    {m.rarity} · 倉庫 {count} 台
+                  </p>
+                  <p className="text-[10px] mt-0.5 text-white/70">
+                    市場 <span className="text-pachi-pink">{formatPrice(market)}</span>
+                    {" → 買取 "}
+                    <span className="font-pixel text-pachi-yellow">
+                      {formatPrice(unit)}
+                    </span>
                   </p>
                 </div>
                 <div className="flex flex-col gap-1 shrink-0">
@@ -135,6 +144,7 @@ export function Sell() {
             );
           })}
         </ul>
+        </>
       )}
     </div>
   );
