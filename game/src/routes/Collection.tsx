@@ -90,7 +90,7 @@ export function Collection() {
           : res.reason === "capacity-types"
             ? "機種枠上限に達しています"
             : res.reason === "not-enough-owned"
-              ? "所持台数が足りません"
+              ? "倉庫台数が足りません"
               : "設置できませんでした";
       setMsg(reason);
     } else {
@@ -103,7 +103,7 @@ export function Collection() {
     <div>
       <PageHeader
         title="パチスロ"
-        subtitle={`収録 ${ALL_MACHINES.length} 機種 · 所持 ${Object.values(user?.ownedMachines ?? {}).reduce((a, b) => a + b, 0)} 台`}
+        subtitle={`収録 ${ALL_MACHINES.length} 機種 · 倉庫 ${Object.values(user?.ownedMachines ?? {}).reduce((a, b) => a + b, 0)}/${useGameStore.getState().warehouseCapacity} 台`}
       />
 
       {/* 設置中ラインナップ (P-World 風) */}
@@ -139,7 +139,7 @@ export function Collection() {
               : "bg-bg-panel text-white/60 border-bg-card"
           }`}
         >
-          所持
+          倉庫
         </button>
         <button
           onClick={() => setFilter("all")}
@@ -242,7 +242,7 @@ export function Collection() {
         {machines.length === 0 ? (
           <li className="text-center text-xs text-white/50 py-8">
             {filter === "owned"
-              ? "まだ所持機種がありません。ガチャで入手しましょう。"
+              ? "まだ倉庫機種がありません。ガチャで入手しましょう。"
               : "該当なし"}
           </li>
         ) : (
@@ -312,7 +312,7 @@ function MachineRow({
             {machine.rarity}
           </span>
           <div className="flex gap-2 text-[10px] text-gray-700">
-            {owned > 0 && <span>所持×{owned}</span>}
+            {owned > 0 && <span>倉庫×{owned}</span>}
             {installedCount > 0 && (
               <span className="text-pachi-red font-bold">設置×{installedCount}</span>
             )}

@@ -65,8 +65,8 @@ export function Sell() {
   return (
     <div className="pb-6">
       <PageHeader
-        title="台の売却"
-        subtitle={`所持金 ¥${(user?.cash ?? 0).toLocaleString()} · 設置していない台のみ売却可能`}
+        title="台の売却 (倉庫)"
+        subtitle={`所持金 ¥${(user?.cash ?? 0).toLocaleString()} · 倉庫の台のみ売却可能`}
       />
 
       <div className="px-4 pt-2">
@@ -114,7 +114,7 @@ export function Sell() {
                   <p
                     className={`text-[10px] font-pixel mt-0.5 ${RARITY_COLOR[m.rarity]}`}
                   >
-                    {m.rarity} · 所持 {count} 台 · 単価 ¥{unit.toLocaleString()}
+                    {m.rarity} · 倉庫 {count} 台 · 単価 ¥{unit.toLocaleString()}
                   </p>
                 </div>
                 <div className="flex flex-col gap-1 shrink-0">

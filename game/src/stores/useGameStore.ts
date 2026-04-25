@@ -118,6 +118,10 @@ interface GameState {
   } | null;
   /** 市場から引いた累計 (machineId → withdrawn count) */
   marketWithdrawn: Record<string, number>;
+  /** 倉庫容量 (設置していない所持台数の上限) — 初期 100 台 */
+  warehouseCapacity: number;
+  /** 月内の倉庫保管費 (集計用) */
+  monthlyStorageFee: number;
   /** 抱え込んでいる常連 (最大 50 名) */
   regulars: Array<{
     id: string;
@@ -176,6 +180,8 @@ export const useGameStore = create<GameState>()(
       activeBannerId: "default",
       credentials: null,
       marketWithdrawn: {},
+      warehouseCapacity: 100,
+      monthlyStorageFee: 0,
       regulars: [],
 
       initUser: () => {
@@ -271,6 +277,16 @@ export const useGameStore = create<GameState>()(
           }
         }
 
+        // 倉庫保管費 (¥200/日/台 を 4h=1日 でリアル時間ベースに割る)
+        const warehouseCount = Object.values(user.ownedMachines).reduce(
+          (a, b) => a + b,
+          0
+        );
+        const realSecPerDay = 4 * 3600;
+        const storageFee = Math.round(
+          (warehouseCount * 200 * elapsedSec) / realSecPerDay
+        );
+
         set({
           shop: {
             ...shop,
@@ -280,9 +296,10 @@ export const useGameStore = create<GameState>()(
           },
           user: {
             ...user,
-            cash: Math.max(0, user.cash + Math.round(revenue)),
+            cash: Math.max(0, user.cash + Math.round(revenue) - storageFee),
           },
           regulars,
+          monthlyStorageFee: get().monthlyStorageFee + storageFee,
           lastTickAt: now.toISOString(),
         });
 
@@ -327,11 +344,19 @@ export const useGameStore = create<GameState>()(
       addMachines: (pulls) => {
         const user = get().user;
         if (!user) return;
+        const cap = get().warehouseCapacity;
         const owned = { ...user.ownedMachines };
+        let warehouseCount = Object.values(owned).reduce((a, b) => a + b, 0);
+        let added = 0;
         for (const { machine } of pulls) {
+          if (warehouseCount >= cap) break; // 倉庫満杯
           owned[machine.id] = (owned[machine.id] ?? 0) + 1;
+          warehouseCount++;
+          added++;
         }
-        set({ user: { ...user, ownedMachines: owned } });
+        if (added > 0) {
+          set({ user: { ...user, ownedMachines: owned } });
+        }
       },
 
       installMachine: (machineId, count) => {
@@ -579,6 +604,8 @@ export const useGameStore = create<GameState>()(
           activeBannerId: "default",
           credentials: null,
           marketWithdrawn: {},
+          warehouseCapacity: 100,
+          monthlyStorageFee: 0,
           regulars: [],
         }),
     }),
