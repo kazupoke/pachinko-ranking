@@ -7,6 +7,7 @@ export function Home() {
   const navigate = useNavigate();
   const shop = useGameStore((s) => s.shop);
   const user = useGameStore((s) => s.user);
+  const dreamMachines = useGameStore((s) => s.dreamMachines);
   const createShop = useGameStore((s) => s.createShop);
   const claimLoginBonus = useGameStore((s) => s.claimLoginBonus);
   const loginBonus = useGameStore((s) => s.loginBonus);
@@ -16,6 +17,17 @@ export function Home() {
 
   const today = new Date().toISOString().slice(0, 10);
   const claimed = loginBonus.lastClaimDate === today;
+  const isFirstVisit =
+    !shop &&
+    Object.keys(user?.ownedMachines ?? {}).length === 0 &&
+    Object.keys(dreamMachines ?? {}).length === 0;
+
+  // 初回訪問はオンボーディングへ自動誘導
+  useEffect(() => {
+    if (isFirstVisit) {
+      navigate("/onboarding", { replace: true });
+    }
+  }, [isFirstVisit, navigate]);
 
   useEffect(() => {
     if (bonusMsg) {
