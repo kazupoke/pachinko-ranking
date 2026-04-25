@@ -97,11 +97,9 @@ export function machineMarketRarity(
   return marketRarity(getCurrentSupply(m, withdrawn));
 }
 
-/** 市場流通量を「3.4 万」のような表記に */
+/** 市場流通量を そのまま 整数表記 (3 桁区切り) で返す。略さない。 */
 export function formatSupply(supply: number): string {
-  if (supply >= 10000) return `${(supply / 10000).toFixed(1)} 万`;
-  if (supply >= 1000) return `${(supply / 1000).toFixed(1)} 千`;
-  return supply.toString();
+  return Math.round(supply).toLocaleString();
 }
 
 /** 流通量の経過率 (0-1, 0=ほぼ廃棄, 1=新台時) */
