@@ -4,6 +4,7 @@ import { PageHeader } from "../components/PageHeader";
 import { MachineThumb } from "../components/MachineThumb";
 import { useGameStore } from "../stores/useGameStore";
 import type { Machine, Rarity } from "../lib/types";
+import { MAKER_GROUPS, getMakerGroup, type MakerGroup } from "../data/makerGroups";
 
 const RARITY_ORDER: Rarity[] = ["SSR", "SR", "R", "N"];
 const RARITY_COLOR: Record<Rarity, string> = {
@@ -14,6 +15,15 @@ const RARITY_COLOR: Record<Rarity, string> = {
 };
 
 type Filter = "owned" | "all";
+type SortKey = "rarityYear" | "yearDesc" | "yearAsc" | "name" | "makerGroup";
+
+const SORT_OPTIONS: { key: SortKey; label: string }[] = [
+  { key: "rarityYear", label: "レア順" },
+  { key: "yearDesc", label: "新しい順" },
+  { key: "yearAsc", label: "古い順" },
+  { key: "name", label: "名前順" },
+  { key: "makerGroup", label: "系列順" },
+];
 
 export function Collection() {
   const user = useGameStore((s) => s.user);
@@ -22,6 +32,10 @@ export function Collection() {
 
   const [filter, setFilter] = useState<Filter>("owned");
   const [rarityFilter, setRarityFilter] = useState<Rarity | "all">("all");
+  const [groupFilter, setGroupFilter] = useState<MakerGroup | "all">("all");
+  const [keyword, setKeyword] = useState("");
+  const [sortKey, setSortKey] = useState<SortKey>("rarityYear");
+  const [groupOpen, setGroupOpen] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
 
   const machines = useMemo(() => {
@@ -32,12 +46,45 @@ export function Collection() {
     if (rarityFilter !== "all") {
       list = list.filter((m) => m.rarity === rarityFilter);
     }
+    if (groupFilter !== "all") {
+      list = list.filter((m) => getMakerGroup(m.maker) === groupFilter);
+    }
+    const k = keyword.trim().toLowerCase();
+    if (k) {
+      list = list.filter((m) => {
+        const group = getMakerGroup(m.maker);
+        return (
+          m.name.toLowerCase().includes(k) ||
+          m.maker.toLowerCase().includes(k) ||
+          group.toLowerCase().includes(k)
+        );
+      });
+    }
     return [...list].sort((a, b) => {
-      const r = RARITY_ORDER.indexOf(a.rarity) - RARITY_ORDER.indexOf(b.rarity);
-      if (r !== 0) return r;
-      return b.releaseYear - a.releaseYear;
+      switch (sortKey) {
+        case "yearDesc":
+          return b.releaseYear - a.releaseYear || a.name.localeCompare(b.name, "ja");
+        case "yearAsc":
+          return a.releaseYear - b.releaseYear || a.name.localeCompare(b.name, "ja");
+        case "name":
+          return a.name.localeCompare(b.name, "ja");
+        case "makerGroup": {
+          const ga = getMakerGroup(a.maker);
+          const gb = getMakerGroup(b.maker);
+          const r = MAKER_GROUPS.indexOf(ga) - MAKER_GROUPS.indexOf(gb);
+          if (r !== 0) return r;
+          if (a.maker !== b.maker) return a.maker.localeCompare(b.maker, "ja");
+          return b.releaseYear - a.releaseYear;
+        }
+        case "rarityYear":
+        default: {
+          const r = RARITY_ORDER.indexOf(a.rarity) - RARITY_ORDER.indexOf(b.rarity);
+          if (r !== 0) return r;
+          return b.releaseYear - a.releaseYear;
+        }
+      }
     });
-  }, [filter, rarityFilter, user]);
+  }, [filter, rarityFilter, groupFilter, keyword, sortKey, user]);
 
   const handleInstall = (machineId: string) => {
     const res = installMachine(machineId, 1);
@@ -64,7 +111,17 @@ export function Collection() {
         subtitle={`収録 ${ALL_MACHINES.length} 機種 · 所持 ${Object.values(user?.ownedMachines ?? {}).reduce((a, b) => a + b, 0)} 台`}
       />
 
-      <div className="px-4 pt-3 flex gap-2 text-xs">
+      <div className="px-4 pt-3">
+        <input
+          type="text"
+          value={keyword}
+          onChange={(e) => setKeyword(e.target.value)}
+          placeholder="機種名・メーカー・系列で検索"
+          className="block w-full px-3 py-2 bg-bg-base border-2 border-bg-card text-white font-dot text-xs focus:border-pachi-pink outline-none"
+        />
+      </div>
+
+      <div className="px-4 pt-2 flex gap-2 text-xs">
         <button
           onClick={() => setFilter("owned")}
           className={`px-3 py-2 font-dot border-2 ${
@@ -85,6 +142,18 @@ export function Collection() {
         >
           すべて
         </button>
+        <select
+          value={sortKey}
+          onChange={(e) => setSortKey(e.target.value as SortKey)}
+          className="ml-auto px-2 py-2 font-dot text-[11px] bg-bg-panel border-2 border-bg-card text-white"
+          aria-label="並び替え"
+        >
+          {SORT_OPTIONS.map((o) => (
+            <option key={o.key} value={o.key}>
+              {o.label}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div className="px-4 pt-2 flex gap-1 text-[11px] overflow-x-auto">
@@ -101,6 +170,55 @@ export function Collection() {
             {r === "all" ? "全レア" : r}
           </button>
         ))}
+      </div>
+
+      {/* メーカー系列フィルタ (折りたたみ) */}
+      <div className="px-4 pt-2">
+        <button
+          onClick={() => setGroupOpen((v) => !v)}
+          className="w-full px-3 py-2 font-dot text-[11px] bg-bg-panel border-2 border-bg-card text-white/80 flex justify-between items-center"
+        >
+          <span>
+            メーカー系列:{" "}
+            <span className="text-pachi-cyan">
+              {groupFilter === "all" ? "全系列" : groupFilter}
+            </span>
+          </span>
+          <span className="text-white/50">{groupOpen ? "▲" : "▼"}</span>
+        </button>
+        {groupOpen && (
+          <div className="mt-2 grid grid-cols-3 gap-1 text-[10px]">
+            <button
+              onClick={() => {
+                setGroupFilter("all");
+                setGroupOpen(false);
+              }}
+              className={`px-2 py-1.5 font-dot border ${
+                groupFilter === "all"
+                  ? "bg-pachi-pink border-pachi-pink"
+                  : "bg-bg-panel border-bg-card text-white/60"
+              }`}
+            >
+              全系列
+            </button>
+            {MAKER_GROUPS.map((g) => (
+              <button
+                key={g}
+                onClick={() => {
+                  setGroupFilter(g);
+                  setGroupOpen(false);
+                }}
+                className={`px-2 py-1.5 font-dot border ${
+                  groupFilter === g
+                    ? "bg-pachi-pink border-pachi-pink"
+                    : "bg-bg-panel border-bg-card text-white/60"
+                }`}
+              >
+                {g}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {msg && (
@@ -164,8 +282,10 @@ function MachineRow({
         <div className="flex-1 min-w-0 p-2 flex flex-col justify-between">
           <div>
             <p className="font-dot text-xs leading-tight line-clamp-2">{machine.name}</p>
-            <p className="text-[10px] text-white/50 mt-1">
-              {machine.maker} · {machine.releaseYear}
+            <p className="text-[10px] text-white/50 mt-1 truncate">
+              {machine.maker}{" "}
+              <span className="text-pachi-cyan">[{getMakerGroup(machine.maker)}]</span> ·{" "}
+              {machine.releaseYear}
             </p>
           </div>
           <div className="flex items-center justify-between">
