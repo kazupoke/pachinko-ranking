@@ -134,19 +134,27 @@ export function Onboarding() {
         <div className="relative max-w-md w-full">
           <div className="text-center">
             <p className="font-pixel text-[10px] text-pachi-cyan tracking-widest mb-2">
-              WELCOME TO
+              STEP 2 / 3 · 初期ラインナップを引く
             </p>
-            <h1 className="font-pixel text-2xl leading-tight">
+            <h1 className="font-pixel text-xl leading-tight">
               <span className="rainbow-gradient animate-rainbow-bg bg-clip-text text-transparent">
-                マイパチ店
+                運命の100連で
               </span>
+              <br />
+              <span className="text-pachi-yellow">スタート機種を集める</span>
             </h1>
             <p className="mt-4 text-[11px] text-white/80 leading-relaxed">
-              まずは100連を回して、
+              ここで引いた台が、
               <br />
-              あなたの<span className="text-pachi-yellow">運命の機種</span>と出会おう。
+              あなたの理想店の
+              <span className="text-pachi-pink">スタート地点</span>になります。
+            </p>
+            <p className="mt-3 text-[10px] text-white/50 leading-relaxed">
+              この後、200台×40機種の枠に並べて
               <br />
-              引いた台で「あなたの理想ホール」が決まります。
+              SNSで友達にシェア。
+              <br />
+              さらにゲームを進めて理想を完成させよう。
             </p>
           </div>
 
@@ -214,22 +222,27 @@ export function Onboarding() {
         {phase === "summary" && (
           <div className="text-center mb-4">
             <p className="font-pixel text-[10px] text-pachi-cyan tracking-widest">
-              YOUR FAVORITE SHOP
+              STEP 3 / 3 · 初期ラインナップ完成
             </p>
             <h2 className="mt-2 font-pixel text-lg sm:text-xl leading-tight">
               <span className="rainbow-gradient animate-rainbow-bg bg-clip-text text-transparent">
-                あなたが好きなお店は
+                これがあなたの
               </span>
               <br />
-              <span className="text-pachi-yellow">こんなお店！</span>
+              <span className="text-pachi-yellow">スタート店！</span>
             </h2>
             <p className="mt-2 font-pixel text-xs text-pachi-pink">
               「{shopName.trim() || "ドリームホール"}」
             </p>
-            <p className="mt-3 text-[11px] text-white/70 leading-relaxed">
-              この {results.length} 台のラインナップが
+            <p className="mt-3 text-[11px] text-white/80 leading-relaxed">
+              <span className="font-pixel text-pachi-cyan">{results.length}</span> 台のスタート機種を獲得！
               <br />
-              本格モードの目標になります
+              この先 200 台 × 40 機種の枠を埋めて理想店を完成させよう。
+            </p>
+            <p className="mt-2 text-[10px] text-white/50 leading-relaxed">
+              いつでも URL でシェア可能・
+              <br />
+              ガチャと経営でラインナップを充実させて世界に見せよう
             </p>
           </div>
         )}
@@ -480,17 +493,40 @@ function ChooseShopPhase({ onSelect }: { onSelect: (id: string) => void }) {
     <div className="min-h-dvh gacha-stage relative flex flex-col">
       <div className="absolute inset-0 scanlines opacity-30 pointer-events-none" />
 
-      {/* ヘッダ */}
-      <div className="relative px-4 pt-6 pb-2 text-center">
+      {/* ヘッダ — ゲームの目的を最初に明示 */}
+      <div className="relative px-4 pt-6 pb-3 text-center">
         <p className="font-pixel text-[10px] text-pachi-cyan tracking-widest">
-          STEP 1 / 3
+          YOUR PACHI SHOP
         </p>
-        <h1 className="mt-2 font-pixel text-base">
+        <h1 className="mt-2 font-pixel text-base sm:text-lg leading-tight">
           <span className="rainbow-gradient animate-rainbow-bg bg-clip-text text-transparent">
-            開店する店舗を選ぼう
+            あなたの理想のパチ店を
           </span>
+          <br />
+          <span className="text-pachi-yellow">世界にシェアしよう</span>
         </h1>
-        <p className="mt-2 text-[11px] text-white/60">
+        <div className="mt-3 inline-flex flex-wrap justify-center gap-2 text-[10px]">
+          <span className="px-2 py-0.5 bg-bg-panel border border-pachi-cyan font-pixel text-pachi-cyan">
+            最大 200 台
+          </span>
+          <span className="px-2 py-0.5 bg-bg-panel border border-pachi-pink font-pixel text-pachi-pink">
+            最大 40 機種
+          </span>
+          <span className="px-2 py-0.5 bg-bg-panel border border-pachi-yellow font-pixel text-pachi-yellow">
+            URL でシェア
+          </span>
+        </div>
+        <p className="mt-3 text-[11px] text-white/70 leading-relaxed">
+          限られた枠で組み立てた
+          <br />
+          あなたのラインナップを SNS で見せよう
+        </p>
+        <div className="mt-3 px-3 py-1 bg-bg-panel border-2 border-bg-card inline-block">
+          <p className="font-pixel text-[10px] text-pachi-cyan">
+            STEP 1 / 3 · 開店する店舗を選ぶ
+          </p>
+        </div>
+        <p className="mt-2 text-[10px] text-white/50">
           ← スワイプで切り替え →
         </p>
       </div>
