@@ -538,11 +538,24 @@ function ShopCard({
   series: ShopSeries;
   onSelect: () => void;
 }) {
+  const BASE = import.meta.env.BASE_URL;
   return (
     <div
       className={`pixel-panel border-2 ${series.accent} h-full flex flex-col`}
     >
-      {/* 看板 */}
+      {/* バナー画像 (あれば) */}
+      {series.bannerImage && (
+        <div className="bg-bg-base border-b-2 border-black aspect-[17/14] overflow-hidden">
+          <img
+            src={`${BASE}${series.bannerImage}`}
+            alt={`${series.name} 看板`}
+            className="w-full h-full object-cover"
+            style={{ imageRendering: "pixelated" }}
+          />
+        </div>
+      )}
+
+      {/* 看板テキスト */}
       <div
         className={`${series.bannerBg} px-4 py-3 border-b-4 border-black flex items-center justify-between`}
       >
@@ -552,7 +565,7 @@ function ShopCard({
             {series.tagline}
           </p>
         </div>
-        <span className="text-3xl">{series.emoji}</span>
+        {!series.bannerImage && <span className="text-3xl">{series.emoji}</span>}
       </div>
 
       {/* チラシ風情報 */}

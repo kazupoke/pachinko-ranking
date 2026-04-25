@@ -30,8 +30,10 @@ export interface ShopSeries {
   bannerBg: string;
   /** アクセント線 */
   accent: string;
-  /** ピクセル絵文字 (代用) */
+  /** ピクセル絵文字 (代用 / SVG が無い場合のフォールバック) */
   emoji: string;
+  /** 看板用 SVG (game/public/images/* 配下を相対パスで指定) */
+  bannerImage?: string;
 }
 
 const inGroup = (m: Machine, groups: MakerGroup[]) =>
@@ -54,6 +56,7 @@ export const SHOP_SERIES: ShopSeries[] = [
     bannerBg: "bg-pachi-yellow text-bg-base",
     accent: "border-pachi-yellow",
     emoji: "🎰",
+    bannerImage: "images/dreampark_banner.svg",
   },
   {
     id: "anime",
