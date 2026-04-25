@@ -79,6 +79,30 @@ export function MyShop() {
         subtitle={`Tier ${shop.tier} · ${totalMachines}/${shop.capacity.machines}台 · ${shop.layout.length}/${shop.capacity.types}機種`}
       />
 
+      {/* 設置容量メーター — ゲームの核となる「200台×40機種枠」を可視化 */}
+      <div className="px-4 pt-3">
+        <div className="pixel-panel p-3">
+          <p className="font-pixel text-[10px] text-pachi-cyan mb-2">
+            理想店進捗
+          </p>
+          <CapacityBar
+            label="台数"
+            current={totalMachines}
+            max={shop.capacity.machines}
+            color="bg-pachi-green"
+          />
+          <CapacityBar
+            label="機種数"
+            current={shop.layout.length}
+            max={shop.capacity.types}
+            color="bg-pachi-pink"
+          />
+          <p className="text-[10px] text-white/50 mt-2 leading-relaxed">
+            この枠を埋めて、SNSで自慢のラインナップをシェアしよう
+          </p>
+        </div>
+      </div>
+
       <div className="px-4 py-4 grid grid-cols-2 gap-3">
         <Stat label="本日の客数" value={shop.dailyCustomers.toLocaleString()} color="text-pachi-green" />
         <Stat label="累計来店" value={shop.totalCustomers.toLocaleString()} color="text-pachi-cyan" />
@@ -375,6 +399,37 @@ function Stat({ label, value, color }: { label: string; value: string; color: st
     <div className="pixel-panel p-3">
       <p className="text-[10px] text-white/60">{label}</p>
       <p className={`mt-1 font-pixel text-xs ${color}`}>{value}</p>
+    </div>
+  );
+}
+
+function CapacityBar({
+  label,
+  current,
+  max,
+  color,
+}: {
+  label: string;
+  current: number;
+  max: number;
+  color: string;
+}) {
+  const pct = Math.min(100, Math.round((current / Math.max(1, max)) * 100));
+  return (
+    <div className="mb-2 last:mb-0">
+      <div className="flex justify-between items-baseline text-[10px]">
+        <span className="text-white/70 font-dot">{label}</span>
+        <span className="font-pixel text-pachi-yellow">
+          {current} / {max}{" "}
+          <span className="text-white/40">({pct}%)</span>
+        </span>
+      </div>
+      <div className="mt-1 h-2 bg-bg-base border border-bg-card overflow-hidden">
+        <div
+          className={`${color} h-full transition-all duration-500`}
+          style={{ width: `${pct}%` }}
+        />
+      </div>
     </div>
   );
 }
