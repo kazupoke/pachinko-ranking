@@ -150,7 +150,7 @@ export function Market() {
                 />
               </div>
               <p className="text-[10px] text-white/60 mt-1">
-                市場 {formatSupply(r.cur)} / 元 {formatSupply(r.init)}
+                市場 {formatSupply(r.cur)} 台 / 元 {formatSupply(r.init)} 台
                 {r.withdrawn > 0 && (
                   <span className="text-pachi-yellow ml-1">
                     (引: {r.withdrawn})
