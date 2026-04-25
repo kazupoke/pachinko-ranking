@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { ALL_MACHINES } from "../data/machines";
 import { PageHeader } from "../components/PageHeader";
+import { LineupTable } from "../components/LineupTable";
 import { MachineThumb } from "../components/MachineThumb";
 import { useGameStore } from "../stores/useGameStore";
 import type { Machine, Rarity } from "../lib/types";
@@ -101,9 +102,21 @@ export function Collection() {
   return (
     <div>
       <PageHeader
-        title="機種コレクション"
+        title="パチスロ"
         subtitle={`収録 ${ALL_MACHINES.length} 機種 · 所持 ${Object.values(user?.ownedMachines ?? {}).reduce((a, b) => a + b, 0)} 台`}
       />
+
+      {/* 設置中ラインナップ (P-World 風) */}
+      <div className="px-3 pt-3">
+        <p className="font-pixel text-[10px] text-pachi-cyan mb-2">
+          現在のラインナップ
+        </p>
+        <LineupTable />
+      </div>
+
+      <p className="px-4 pt-3 pb-1 font-pixel text-[10px] text-pachi-pink">
+        全機種から探す
+      </p>
 
       {/* 検索・フィルタ群 (上部固定) */}
       <div className="sticky top-[84px] z-10 bg-bg-base pb-2 border-b-2 border-bg-card">
