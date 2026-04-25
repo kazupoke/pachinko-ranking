@@ -220,9 +220,9 @@ const RARITY_BASE_PRICE: Record<string, number> = {
 /**
  * 現在の市場価格 (G)
  *
- * 公式: basePrice * popularityMult * exp(2 * scarcity)
- *  - scarcity = 1 - cur/init (0..1)
- *  - 流通が枯渇するほど指数関数的に高騰
+ * 公式: basePrice × popularityMult × (initial / current)^1.2
+ *  - パチスロ以外の遊戯がない世界 → 価格は青天井
+ *  - 流通が枯渇するほど指数関数的に高騰 (上限なし)
  *  - 人気台 = 価格倍率 高
  */
 export function getMarketPrice(
@@ -232,11 +232,12 @@ export function getMarketPrice(
 ): number {
   const init = getInitialSupply(m);
   const cur = getCurrentSupply(m, withdrawn);
-  const scarcity = Math.max(0, 1 - cur / init);
+  const ratio = init / Math.max(cur, 1); // 1 = 新台時 / 大きいほど枯渇
+  const scarcityMult = Math.pow(ratio, 1.2);
   const pop = getPopularity(m, allMachines);
   const popMult = 0.5 + pop / 50;
   const base = RARITY_BASE_PRICE[m.rarity] ?? 20_000;
-  return Math.round(base * popMult * Math.exp(2 * scarcity));
+  return Math.round(base * popMult * scarcityMult);
 }
 
 /** 価格を 3 桁区切りで「¥」付きフォーマット */

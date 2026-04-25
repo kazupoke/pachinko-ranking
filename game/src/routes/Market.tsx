@@ -88,9 +88,14 @@ export function Market() {
   return (
     <div>
       <PageHeader
-        title="市場流通量"
-        subtitle={`市場 ${formatSupply(totalCurrent)} 台 / 元 ${formatSupply(totalInit)} 台 (年 20% 減・引いた分は減少)`}
+        title="市場相場"
+        subtitle={`市場 ${formatSupply(totalCurrent)} 台 / 元 ${formatSupply(totalInit)} 台 (年 20% 減 / 引いた分は減少)`}
       />
+      <p className="px-4 pt-2 text-[10px] text-pachi-yellow leading-relaxed">
+        ⚠ 市場価格は参考値。直接購入は不可 — 機種は ガチャ / 他店訪問の出玉ドロップで獲得。
+        <br />
+        この世界はパチスロしか遊戯がないため、価格は青天井で高騰します。
+      </p>
 
       {/* sticky フィルタ */}
       <div className="sticky top-[84px] z-10 bg-bg-base pb-2 border-b-2 border-bg-card">
