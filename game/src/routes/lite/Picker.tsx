@@ -39,10 +39,15 @@ export function LitePicker() {
   const [viewFilter, setViewFilter] = useState<ViewFilter>("all");
   const [sortKey, setSortKey] = useState<SortKey>("rarityYear");
   const [groupOpen, setGroupOpen] = useState(false);
+  const [includeOldGen, setIncludeOldGen] = useState(false);
 
   const entries = shop?.entries;
   const machines = useMemo(() => {
     let list: Machine[] = ALL_MACHINES;
+    // 初期は 6 号機のみ。トグルで 4/5 号機も表示
+    if (!includeOldGen) {
+      list = list.filter((m) => m.generation === 6);
+    }
     if (rarityFilter !== "all") {
       list = list.filter((m) => m.rarity === rarityFilter);
     }
@@ -91,7 +96,7 @@ export function LitePicker() {
       }
     });
     return sorted;
-  }, [rarityFilter, groupFilter, kanaFilter, yearFilter, viewFilter, sortKey, entries]);
+  }, [rarityFilter, groupFilter, kanaFilter, yearFilter, viewFilter, sortKey, entries, includeOldGen]);
 
   if (!shop) {
     return (
@@ -194,6 +199,19 @@ export function LitePicker() {
             />
           ))}
         </div>
+      </div>
+
+      {/* 世代トグル */}
+      <div className="px-4 pt-2 flex items-center justify-between">
+        <span className="font-pixel text-[9px] text-pachi-cyan">
+          {includeOldGen ? "全世代表示中" : "6号機のみ"}
+        </span>
+        <button
+          onClick={() => setIncludeOldGen((v) => !v)}
+          className="text-[10px] text-white/60 underline"
+        >
+          {includeOldGen ? "6号機だけに絞る" : "4/5号機も表示"}
+        </button>
       </div>
 
       {/* 年代 */}
