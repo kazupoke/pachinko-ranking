@@ -17,6 +17,8 @@ export interface ShopLayoutEntry {
   count: number;
   islandX: number;
   islandY: number;
+  /** 設定値 (1-6) — 未設定なら 1 として扱う */
+  setting?: 1 | 2 | 3 | 4 | 5 | 6;
 }
 
 export interface ShopInterior {

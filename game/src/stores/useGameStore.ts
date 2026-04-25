@@ -97,6 +97,7 @@ interface GameState {
   addMachines: (machines: Array<{ machine: Machine }>) => void;
   installMachine: (machineId: string, count: number) => { ok: boolean; reason?: string };
   uninstallMachine: (machineId: string, count: number) => void;
+  setMachineSetting: (machineId: string, setting: 1 | 2 | 3 | 4 | 5 | 6) => void;
   claimLoginBonus: () => { claimed: boolean; amount: number; streak: number };
   bumpPity: (inc: number) => void;
   resetPity: () => void;
@@ -147,21 +148,36 @@ export const useGameStore = create<GameState>()(
           return { elapsedSec: 0, newCustomers: 0, revenue: 0 };
         }
 
+        // 設定値による客付き倍率テーブル
+        const attractBySetting: Record<number, number> = {
+          1: 0.55, 2: 0.7, 3: 0.95, 4: 1.15, 5: 1.35, 6: 1.6,
+        };
+        // 設定値による粗利率 (高設定で店マイナス, 低設定で店プラス)
+        const marginBySetting: Record<number, number> = {
+          1: 0.35, 2: 0.28, 3: 0.18, 4: 0.05, 5: -0.08, 6: -0.20,
+        };
         let attract = 0;
         let totalMachines = 0;
+        let weightedMargin = 0;
+        let totalWeight = 0;
         for (const entry of shop.layout) {
           const r = rarityMap[entry.machineId] ?? "N";
-          attract += RARITY_WEIGHT_MAP[r] * entry.count;
+          const setting = entry.setting ?? 1;
+          const settingFactor = attractBySetting[setting] ?? 1;
+          const w = RARITY_WEIGHT_MAP[r] * entry.count * settingFactor;
+          attract += w;
           totalMachines += entry.count;
+          weightedMargin += (marginBySetting[setting] ?? 0.18) * entry.count;
+          totalWeight += entry.count;
         }
         const cap = Math.round(attract * 5);
-        // 1秒あたりの新規来店
-        const perSec = attract / 300; // 60秒で attract/5 人
+        const perSec = attract / 300;
         const grow = Math.floor(perSec * elapsedSec);
         const newDaily = Math.min(shop.dailyCustomers + grow, cap);
         const newCustomers = Math.max(0, newDaily - shop.dailyCustomers);
-        // 収益: 新規客 × 平均単価 × 粗利率
-        const revenue = newCustomers * 5000 * 0.2;
+        // 収益: 新規客 × 平均単価 × 平均粗利率 (設定で変動 / 高設定だとマイナスもある)
+        const margin = totalWeight > 0 ? weightedMargin / totalWeight : 0.2;
+        const revenue = newCustomers * 5000 * margin;
 
         set({
           shop: {
@@ -170,7 +186,10 @@ export const useGameStore = create<GameState>()(
             totalCustomers: shop.totalCustomers + newCustomers,
             updatedAt: now.toISOString(),
           },
-          user: { ...user, cash: user.cash + Math.round(revenue) },
+          user: {
+            ...user,
+            cash: Math.max(0, user.cash + Math.round(revenue)),
+          },
           lastTickAt: now.toISOString(),
         });
 
@@ -287,6 +306,15 @@ export const useGameStore = create<GameState>()(
           user: { ...user, ownedMachines: owned },
           shop: { ...shop, layout, updatedAt: new Date().toISOString() },
         });
+      },
+
+      setMachineSetting: (machineId, setting) => {
+        const shop = get().shop;
+        if (!shop) return;
+        const layout = shop.layout.map((e) =>
+          e.machineId === machineId ? { ...e, setting } : e
+        );
+        set({ shop: { ...shop, layout, updatedAt: new Date().toISOString() } });
       },
 
       claimLoginBonus: () => {

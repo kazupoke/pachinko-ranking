@@ -226,12 +226,27 @@ function PWorldView({
               if (!m) return null;
               const ownedExtra = user?.ownedMachines[entry.machineId] ?? 0;
               const canAdd = ownedExtra > 0;
+              const setting = entry.setting ?? 1;
+              const settingBg =
+                setting >= 5
+                  ? "bg-yellow-200"
+                  : setting === 4
+                    ? "bg-green-200"
+                    : setting === 3
+                      ? "bg-cyan-200"
+                      : "bg-gray-200";
               return (
                 <tr key={entry.machineId} className="border-t border-gray-300">
                   <td className="px-2 py-1.5 align-top">
                     <span className="block truncate max-w-[170px]">{m.name}</span>
                     <span className={`text-[9px] ${RARITY_COLOR[m.rarity]} font-pixel`}>
                       {m.rarity}
+                    </span>
+                    <span
+                      className={`ml-1 inline-block text-[9px] font-pixel px-1 ${settingBg} text-gray-800`}
+                      title="設定値"
+                    >
+                      設{setting}
                     </span>
                   </td>
                   <td className="px-2 py-1.5 text-gray-600 align-top">{m.maker}</td>
