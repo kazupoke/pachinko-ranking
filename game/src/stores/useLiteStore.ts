@@ -109,6 +109,9 @@ export const useLiteStore = create<LiteState>()(
   )
 );
 
+export const LITE_MAX_MACHINES = 200;
+export const LITE_MAX_TYPES = 40;
+
 export function totalMachines(shop: LiteShop | null): number {
   if (!shop) return 0;
   let n = 0;
@@ -119,4 +122,17 @@ export function totalMachines(shop: LiteShop | null): number {
 export function totalKinds(shop: LiteShop | null): number {
   if (!shop) return 0;
   return Object.keys(shop.entries).length;
+}
+
+/** 容量超過しているか */
+export function isOverCapacity(shop: LiteShop | null): {
+  over: boolean;
+  overMachines: boolean;
+  overTypes: boolean;
+} {
+  const m = totalMachines(shop);
+  const k = totalKinds(shop);
+  const overMachines = m > LITE_MAX_MACHINES;
+  const overTypes = k > LITE_MAX_TYPES;
+  return { over: overMachines || overTypes, overMachines, overTypes };
 }

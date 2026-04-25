@@ -112,7 +112,7 @@ export function Collection() {
       />
 
       {/* 検索・フィルタ群 (上部固定) */}
-      <div className="sticky top-12 z-10 bg-bg-base pb-2 border-b-2 border-bg-card">
+      <div className="sticky top-[84px] z-10 bg-bg-base pb-2 border-b-2 border-bg-card">
       <div className="px-4 pt-3">
         <input
           type="text"
