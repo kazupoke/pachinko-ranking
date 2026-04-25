@@ -116,6 +116,8 @@ interface GameState {
     password: string | null;
     registeredAt: string;
   } | null;
+  /** 市場から引いた累計 (machineId → withdrawn count) */
+  marketWithdrawn: Record<string, number>;
   /** 抱え込んでいる常連 (最大 50 名) */
   regulars: Array<{
     id: string;
@@ -153,6 +155,7 @@ interface GameState {
     managerName: string;
     birthday: string;
   }) => void;
+  withdrawFromMarket: (machineId: string, count?: number) => void;
   setPassword: (password: string) => void;
   clearPassword: () => void;
   resetAll: () => void;
@@ -172,6 +175,7 @@ export const useGameStore = create<GameState>()(
       ownedBanners: ["default"],
       activeBannerId: "default",
       credentials: null,
+      marketWithdrawn: {},
       regulars: [],
 
       initUser: () => {
@@ -551,6 +555,16 @@ export const useGameStore = create<GameState>()(
         set({ credentials: { ...cred, password: null } });
       },
 
+      withdrawFromMarket: (machineId, count = 1) => {
+        const cur = get().marketWithdrawn;
+        set({
+          marketWithdrawn: {
+            ...cur,
+            [machineId]: (cur[machineId] ?? 0) + count,
+          },
+        });
+      },
+
       resetAll: () =>
         set({
           user: null,
@@ -564,6 +578,7 @@ export const useGameStore = create<GameState>()(
           ownedBanners: ["default"],
           activeBannerId: "default",
           credentials: null,
+          marketWithdrawn: {},
           regulars: [],
         }),
     }),

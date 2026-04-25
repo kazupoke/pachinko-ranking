@@ -33,6 +33,7 @@ export function Gacha() {
   const user = useGameStore((s) => s.user);
   const addCash = useGameStore((s) => s.addCash);
   const addMachines = useGameStore((s) => s.addMachines);
+  const withdrawFromMarket = useGameStore((s) => s.withdrawFromMarket);
 
   const shops = useMemo(() => todaysVisitableShops(SHOP_SERIES), []);
   const [phase, setPhase] = useState<Phase>("select-shop");
@@ -55,7 +56,10 @@ export function Gacha() {
     setTimeout(() => {
       const r = playMachine(m, setting, selectedShop.payoutMult);
       setResult(r);
-      if (r.drop) addMachines([{ machine: r.drop.machine }]);
+      if (r.drop) {
+        addMachines([{ machine: r.drop.machine }]);
+        withdrawFromMarket(r.drop.machine.id, 1);
+      }
       setPhase("result");
     }, 1800);
   };

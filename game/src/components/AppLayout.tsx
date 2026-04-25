@@ -66,6 +66,7 @@ const NAV_ITEMS = [
   { to: "/",           label: "最新情報" },
   { to: "/collection", label: "パチスロ" },
   { to: "/gacha",      label: "新台!!" },
+  { to: "/market",     label: "市場" },
   { to: "/manager",    label: "店長" },
 ];
 
