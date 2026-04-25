@@ -60,6 +60,13 @@ const MENU: MenuItem[] = [
     emoji: "🔐",
     accent: "border-pachi-cyan",
   },
+  {
+    to: "/title",
+    label: "タイトルへ戻る",
+    desc: "タイトル画面に戻る (セーブはそのまま)",
+    emoji: "🏠",
+    accent: "border-pachi-yellow",
+  },
 ];
 
 export function ManagerHub() {

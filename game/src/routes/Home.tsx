@@ -22,10 +22,10 @@ export function Home() {
     Object.keys(user?.ownedMachines ?? {}).length === 0 &&
     Object.keys(dreamMachines ?? {}).length === 0;
 
-  // 初回訪問はオンボーディングへ自動誘導
+  // 初回訪問はタイトル画面へ自動誘導
   useEffect(() => {
     if (isFirstVisit) {
-      navigate("/onboarding", { replace: true });
+      navigate("/title", { replace: true });
     }
   }, [isFirstVisit, navigate]);
 
