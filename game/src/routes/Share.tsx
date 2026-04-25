@@ -91,6 +91,38 @@ export function Share() {
         </div>
       </div>
 
+      {/* 系列フレーバー (チラシ風) */}
+      {series && (
+        <div className="mx-3 mt-3 bg-bg-panel border-2 border-bg-card overflow-hidden">
+          <div
+            className={`${series.bannerBg} px-3 py-2 border-b-4 border-black flex items-center justify-between`}
+          >
+            <span className="font-pixel text-[11px]">{series.name}</span>
+            <span className="text-2xl">{series.emoji}</span>
+          </div>
+          <div className="px-3 py-3 grid grid-cols-3 gap-2 text-[10px]">
+            <div>
+              <p className="font-pixel text-[9px] text-pachi-yellow mb-1">
+                特日
+              </p>
+              <p className="text-white">{series.specialDay}</p>
+            </div>
+            <div>
+              <p className="font-pixel text-[9px] text-pachi-pink mb-1">
+                イベント
+              </p>
+              <p className="text-white">{series.event}</p>
+            </div>
+            <div>
+              <p className="font-pixel text-[9px] text-pachi-cyan mb-1">
+                来店演者
+              </p>
+              <p className="text-white">{series.mascot}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* スタッツ */}
       <div className="px-4 mt-3 grid grid-cols-2 gap-2">
         <Stat label="設置台数" value={`${totalCount} 台`} color="text-pachi-green" />
