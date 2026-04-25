@@ -122,6 +122,12 @@ interface GameState {
   warehouseCapacity: number;
   /** 月内の倉庫保管費 (集計用) */
   monthlyStorageFee: number;
+  /** 貯玉 (デイリークエストで貯まる遊戯ポイント。換金不可、ガチャに使う) */
+  chodama: number;
+  /** 本日の店舗訪問回数 (デイリーリセット) */
+  dailyVisits: number;
+  /** 本日訪問回数の最終リセット日 (YYYY-MM-DD) */
+  dailyVisitsResetDate: string | null;
   /** 店長レベル */
   managerLevel: number;
   /** 店長経験値 (次レベルまで) */
@@ -166,6 +172,9 @@ interface GameState {
   setShopSeries: (id: string) => void;
   buyBanner: (id: string, price: number) => { ok: boolean; reason?: string };
   setActiveBanner: (id: string) => void;
+  addChodama: (amount: number) => void;
+  spendChodama: (amount: number) => boolean;
+  recordVisit: () => void;
   buyPart: (part: import("../lib/repair").BrokenPart) => { ok: boolean; reason?: string };
   repairWithPart: (
     machineId: string
@@ -201,6 +210,9 @@ export const useGameStore = create<GameState>()(
       marketWithdrawn: {},
       warehouseCapacity: 100,
       monthlyStorageFee: 0,
+      chodama: 0,
+      dailyVisits: 0,
+      dailyVisitsResetDate: null,
       managerLevel: 1,
       managerXp: 0,
       partInventory: {
@@ -646,6 +658,28 @@ export const useGameStore = create<GameState>()(
         set({ credentials: { ...cred, password: null } });
       },
 
+      addChodama: (amount) => {
+        if (amount <= 0) return;
+        set({ chodama: get().chodama + amount });
+      },
+
+      spendChodama: (amount) => {
+        const cur = get().chodama;
+        if (cur < amount) return false;
+        set({ chodama: cur - amount });
+        return true;
+      },
+
+      recordVisit: () => {
+        const today = todayKey();
+        const last = get().dailyVisitsResetDate;
+        if (last !== today) {
+          set({ dailyVisits: 1, dailyVisitsResetDate: today });
+        } else {
+          set({ dailyVisits: get().dailyVisits + 1 });
+        }
+      },
+
       buyPart: (part) => {
         const user = get().user;
         if (!user) return { ok: false, reason: "no-user" };
@@ -737,6 +771,9 @@ export const useGameStore = create<GameState>()(
           marketWithdrawn: {},
           warehouseCapacity: 100,
           monthlyStorageFee: 0,
+          chodama: 0,
+          dailyVisits: 0,
+          dailyVisitsResetDate: null,
           managerLevel: 1,
           managerXp: 0,
           partInventory: {
