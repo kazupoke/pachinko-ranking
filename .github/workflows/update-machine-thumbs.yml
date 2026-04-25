@@ -1,0 +1,70 @@
+name: Update Machine Pixel Thumbs
+
+on:
+  # 機種リストが更新されたら自動実行
+  push:
+    branches:
+      - master
+    paths:
+      - 'game/public/machines_thumb.json'
+      - 'game/scripts/download_machine_images.py'
+      - 'game/scripts/pixelize_machines.py'
+  # 月1でも再取得 (新機種が間接的に増えるケース)
+  schedule:
+    - cron: '0 18 1 * *'  # 毎月1日 JST 3:00
+  workflow_dispatch:
+
+jobs:
+  update-thumbs:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install curl_cffi Pillow
+
+      - name: Restore machine original cache
+        uses: actions/cache@v4
+        with:
+          path: game/cache/machines_original
+          # ハッシュに thumb json 含めることで、機種リスト変更時にキャッシュ再構築
+          key: machine-originals-v1-${{ hashFiles('game/public/machines_thumb.json') }}
+          restore-keys: |
+            machine-originals-v1-
+
+      - name: Download new machine images (incremental)
+        run: python game/scripts/download_machine_images.py
+        timeout-minutes: 20
+
+      - name: Pixelize new machines (incremental)
+        run: python game/scripts/pixelize_machines.py
+        timeout-minutes: 10
+
+      - name: Check for new pixel outputs
+        id: diff
+        run: |
+          git add game/public/machines_pixel/
+          if git diff --staged --quiet; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "追加なし"
+          else
+            count=$(git diff --staged --name-only | wc -l)
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "新規 PNG: $count 件"
+          fi
+
+      - name: Commit and push new pixel thumbs
+        if: steps.diff.outputs.has_changes == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -m "機種ピクセル化サムネ更新: $(date +'%Y/%m/%d %H:%M' -d '+9 hours')"
+          git push

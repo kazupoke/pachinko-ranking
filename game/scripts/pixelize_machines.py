@@ -103,19 +103,33 @@ def process_one(mid: str, src_path: Path) -> list[Path]:
     return outs
 
 
+def all_outputs_exist(mid: str) -> bool:
+    for sz in SIZES_COLOR:
+        if not (OUT_DIR / f"{mid}_{sz}.png").exists():
+            return False
+    if not (OUT_DIR / f"{mid}_gb{GB_SIZE}.png").exists():
+        return False
+    return True
+
+
 def main() -> int:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
     with THUMB_JSON.open(encoding="utf-8") as f:
         mapping: dict[str, int] = json.load(f)
 
-    # コマンドライン引数で特定機種だけ処理可能 (テスト用)
-    only = set(sys.argv[1:])
+    # コマンドライン引数
+    args = sys.argv[1:]
+    force = "--force" in args
+    only = set(a for a in args if a != "--force")
     if only:
         print(f"指定モード: {len(only)} 機種のみ処理")
+    if force:
+        print("強制再生成モード: 既存ファイルも上書き")
 
     total = len(mapping)
     done = 0
+    skipped = 0
     missing = 0
     for i, (mid, pid) in enumerate(mapping.items(), start=1):
         if only and mid not in only and str(pid) not in only:
@@ -124,13 +138,17 @@ def main() -> int:
         if not src.exists():
             missing += 1
             continue
+        # 既に全出力が揃っていればスキップ (インクリメンタル対応)
+        if not force and all_outputs_exist(mid):
+            skipped += 1
+            continue
         outs = process_one(mid, src)
         if outs:
             done += 1
             if done % 20 == 0 or only:
                 print(f"[{i:4d}/{total}] {mid} -> {len(outs)} files")
 
-    print(f"\n完了: 処理 {done} / 原本なし {missing}")
+    print(f"\n完了: 新規 {done} / スキップ {skipped} / 原本なし {missing}")
     print(f"出力先: {OUT_DIR}")
     return 0
 
