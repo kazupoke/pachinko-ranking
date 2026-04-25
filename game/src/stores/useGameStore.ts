@@ -122,6 +122,18 @@ interface GameState {
   warehouseCapacity: number;
   /** 月内の倉庫保管費 (集計用) */
   monthlyStorageFee: number;
+  /** 店長レベル */
+  managerLevel: number;
+  /** 店長経験値 (次レベルまで) */
+  managerXp: number;
+  /** 修理部品在庫 */
+  partInventory: {
+    メダル詰まり: number;
+    ボタン: number;
+    レバー: number;
+    液晶: number;
+    基盤: number;
+  };
   /** 抱え込んでいる常連 (最大 50 名) */
   regulars: Array<{
     id: string;
@@ -154,6 +166,13 @@ interface GameState {
   setShopSeries: (id: string) => void;
   buyBanner: (id: string, price: number) => { ok: boolean; reason?: string };
   setActiveBanner: (id: string) => void;
+  buyPart: (part: import("../lib/repair").BrokenPart) => { ok: boolean; reason?: string };
+  repairWithPart: (
+    machineId: string
+  ) => { ok: boolean; reason?: string };
+  repairWithManagerLevel: (
+    machineId: string
+  ) => { ok: boolean; reason?: string };
   registerShop: (info: {
     shopName: string;
     managerName: string;
@@ -182,6 +201,15 @@ export const useGameStore = create<GameState>()(
       marketWithdrawn: {},
       warehouseCapacity: 100,
       monthlyStorageFee: 0,
+      managerLevel: 1,
+      managerXp: 0,
+      partInventory: {
+        メダル詰まり: 2,
+        ボタン: 1,
+        レバー: 0,
+        液晶: 0,
+        基盤: 0,
+      },
       regulars: [],
 
       initUser: () => {
@@ -277,7 +305,7 @@ export const useGameStore = create<GameState>()(
           }
         }
 
-        // 倉庫保管費 (¥200/日/台 を 4h=1日 でリアル時間ベースに割る)
+        // 倉庫保管費 (¥200/日/台)
         const warehouseCount = Object.values(user.ownedMachines).reduce(
           (a, b) => a + b,
           0
@@ -287,9 +315,47 @@ export const useGameStore = create<GameState>()(
           (warehouseCount * 200 * elapsedSec) / realSecPerDay
         );
 
+        // 営業時間ゲージから閉店作業帯か判定 (anchor 経由)
+        const anchorStr = localStorage.getItem("pachi-biz-anchor-v1");
+        const anchor = anchorStr ? parseInt(anchorStr, 10) : Date.now();
+        const cyclePos =
+          ((Date.now() - anchor) % (4 * 3600_000)) / (4 * 3600_000);
+        const inClosing = cyclePos >= 0.75;
+
+        // HP 処理: 営業中は減 / 閉店作業中は回復
+        const hpDecayMap = { N: 1.0, R: 1.1, SR: 1.3, SSR: 1.5 } as const;
+        const elapsedTickRatio = elapsedSec / 30; // 30s=1 tick 換算
+        const decayPerTick = 0.4 * elapsedTickRatio;
+        const recoverPerTick = 1.5 * elapsedTickRatio;
+        const updatedLayout = shop.layout.map((entry) => {
+          const m = MACHINES_BY_ID[entry.machineId];
+          if (!m) return entry;
+          let hp = entry.hp ?? 100;
+          let brokenPart = entry.brokenPart;
+          let brokenSince = entry.brokenSince;
+          if (brokenPart) {
+            // 故障中は放置時間が増える
+            brokenSince = (brokenSince ?? 0) + elapsedTickRatio;
+          } else if (inClosing) {
+            // 閉店作業: HP 回復
+            hp = Math.min(100, hp + recoverPerTick);
+          } else {
+            // 営業中: HP 減
+            const dmg = decayPerTick * hpDecayMap[m.rarity] * entry.count;
+            hp = Math.max(0, hp - dmg);
+            if (hp <= 0) {
+              const parts = ["液晶", "レバー", "基盤", "ボタン", "メダル詰まり"] as const;
+              brokenPart = parts[Math.floor(Math.random() * parts.length)];
+              brokenSince = 0;
+            }
+          }
+          return { ...entry, hp, brokenPart, brokenSince };
+        });
+
         set({
           shop: {
             ...shop,
+            layout: updatedLayout,
             dailyCustomers: newDaily,
             totalCustomers: shop.totalCustomers + newCustomers,
             updatedAt: now.toISOString(),
@@ -580,6 +646,71 @@ export const useGameStore = create<GameState>()(
         set({ credentials: { ...cred, password: null } });
       },
 
+      buyPart: (part) => {
+        const user = get().user;
+        if (!user) return { ok: false, reason: "no-user" };
+        const PRICES: Record<string, number> = {
+          メダル詰まり: 2_000,
+          ボタン: 8_000,
+          レバー: 15_000,
+          液晶: 35_000,
+          基盤: 50_000,
+        };
+        const price = PRICES[part];
+        if (user.cash < price) return { ok: false, reason: "no-cash" };
+        const inv = get().partInventory;
+        set({
+          user: { ...user, cash: user.cash - price },
+          partInventory: { ...inv, [part]: inv[part] + 1 },
+        });
+        return { ok: true };
+      },
+
+      repairWithPart: (machineId) => {
+        const shop = get().shop;
+        if (!shop) return { ok: false, reason: "no-shop" };
+        const entry = shop.layout.find((e) => e.machineId === machineId);
+        if (!entry || !entry.brokenPart)
+          return { ok: false, reason: "not-broken" };
+        const since = entry.brokenSince ?? 0;
+        if (since >= 30)
+          return { ok: false, reason: "abandoned" }; // 部品では治らない
+        const inv = get().partInventory;
+        const part = entry.brokenPart;
+        if (inv[part] <= 0) return { ok: false, reason: "no-part" };
+        // 修理
+        const layout = shop.layout.map((e) =>
+          e.machineId === machineId
+            ? { ...e, hp: 100, brokenPart: undefined, brokenSince: undefined }
+            : e
+        );
+        set({
+          partInventory: { ...inv, [part]: inv[part] - 1 },
+          shop: { ...shop, layout, updatedAt: new Date().toISOString() },
+        });
+        return { ok: true };
+      },
+
+      repairWithManagerLevel: (machineId) => {
+        const shop = get().shop;
+        if (!shop) return { ok: false, reason: "no-shop" };
+        const entry = shop.layout.find((e) => e.machineId === machineId);
+        if (!entry || !entry.brokenPart)
+          return { ok: false, reason: "not-broken" };
+        const lv = get().managerLevel;
+        if (lv < 2) return { ok: false, reason: "low-level" };
+        const layout = shop.layout.map((e) =>
+          e.machineId === machineId
+            ? { ...e, hp: 100, brokenPart: undefined, brokenSince: undefined }
+            : e
+        );
+        set({
+          managerLevel: lv - 1,
+          shop: { ...shop, layout, updatedAt: new Date().toISOString() },
+        });
+        return { ok: true };
+      },
+
       withdrawFromMarket: (machineId, count = 1) => {
         const cur = get().marketWithdrawn;
         set({
@@ -606,6 +737,15 @@ export const useGameStore = create<GameState>()(
           marketWithdrawn: {},
           warehouseCapacity: 100,
           monthlyStorageFee: 0,
+          managerLevel: 1,
+          managerXp: 0,
+          partInventory: {
+            メダル詰まり: 2,
+            ボタン: 1,
+            レバー: 0,
+            液晶: 0,
+            基盤: 0,
+          },
           regulars: [],
         }),
     }),

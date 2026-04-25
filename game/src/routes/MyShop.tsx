@@ -99,7 +99,13 @@ export function MyShop() {
 
       {/* 俯瞰のみ (ラインナップは パチスロタブに移動) */}
       <ShopFloor
-        entries={shop.layout.map((e) => ({ machineId: e.machineId, count: e.count }))}
+        entries={shop.layout.map((e) => ({
+          machineId: e.machineId,
+          count: e.count,
+          hp: e.hp,
+          setting: e.setting,
+          brokenPart: e.brokenPart,
+        }))}
         customerCount={shop.dailyCustomers}
       />
       <p className="px-4 mt-2 text-[10px] text-white/40 text-center">

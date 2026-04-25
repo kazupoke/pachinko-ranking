@@ -19,6 +19,12 @@ export interface ShopLayoutEntry {
   islandY: number;
   /** 設定値 (1-6) — 未設定なら 1 として扱う */
   setting?: 1 | 2 | 3 | 4 | 5 | 6;
+  /** 状態 HP (0-100) — 未設定なら 100 として扱う */
+  hp?: number;
+  /** 故障の種類 (HP=0 で発生) */
+  brokenPart?: "液晶" | "レバー" | "基盤" | "ボタン" | "メダル詰まり";
+  /** 故障してからの経過 tick (放置度) */
+  brokenSince?: number;
 }
 
 export interface ShopInterior {
