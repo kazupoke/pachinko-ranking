@@ -1,6 +1,26 @@
 import type { Machine, Rarity, Generation } from "../lib/types";
 import raw from "./machines.json";
 import legacy from "./legacy_machines.json";
+import popularityRaw from "./pworld_popularity.json";
+
+const POPULARITY: Record<string, { bbs?: number; pv?: number; err?: unknown }> =
+  popularityRaw as Record<string, { bbs?: number; pv?: number; err?: unknown }>;
+
+/** P-World 掲示板コメント数による レア度ブースト */
+function bbsRarityBoost(machineId: string, base: Rarity): Rarity {
+  const e = POPULARITY[machineId];
+  if (!e || e.err || e.bbs === undefined) return base;
+  const bbs = e.bbs ?? 0;
+  // データ統計: p95=735 / p90=543 / p75=285 / p50=109 / p25=20
+  // bbs ≥ 700 → SSR / 350+ → SR 以上 / 100+ → R 以上
+  const order = ["N", "R", "SR", "SSR"] as const;
+  const baseIdx = order.indexOf(base);
+  let boostIdx = baseIdx;
+  if (bbs >= 700) boostIdx = Math.max(boostIdx, 3);
+  else if (bbs >= 350) boostIdx = Math.max(boostIdx, 2);
+  else if (bbs >= 100) boostIdx = Math.max(boostIdx, 1);
+  return order[boostIdx];
+}
 
 interface RawMachine {
   id: string;
@@ -73,6 +93,8 @@ function toMachine(m: RawMachine): Machine {
   let rarity = assignRarity(m);
   if (m.generation === 4) rarity = "SSR";
   else if (m.generation === 5 && rarity === "N") rarity = "SR";
+  // P-World コメント数で人気台のレア度をブースト
+  rarity = bbsRarityBoost(m.id, rarity);
   return {
     id: m.id,
     name: m.name,

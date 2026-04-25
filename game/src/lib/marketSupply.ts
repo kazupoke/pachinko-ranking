@@ -172,21 +172,27 @@ function heuristicPopularity(m: Machine): number {
   return Math.max(1, Math.min(100, p));
 }
 
-/** 全機種のコメント密度の最大値 (正規化用、初回計算で memo) */
-let _maxDensity: number | null = null;
+/** 全機種のコメント密度の 95 パーセンタイル (正規化用、初回計算で memo)
+ *  外れ値 1-2 機種に引っ張られないよう p95 を分母に使う。 */
+let _p95Density: number | null = null;
 function getMaxDensity(allMachines: Iterable<Machine>): number {
-  if (_maxDensity != null) return _maxDensity;
-  let max = 0;
+  if (_p95Density != null) return _p95Density;
+  const arr: number[] = [];
   for (const m of allMachines) {
     const e = POPULARITY[m.id];
     if (!e || e.err) continue;
     const bbs = e.bbs ?? 0;
     const supply = getInitialSupply(m);
-    const density = bbs / Math.max(supply, 1);
-    if (density > max) max = density;
+    arr.push(bbs / Math.max(supply, 1));
   }
-  _maxDensity = max > 0 ? max : 1;
-  return _maxDensity;
+  arr.sort((a, b) => a - b);
+  if (arr.length === 0) {
+    _p95Density = 1;
+    return _p95Density;
+  }
+  const p95 = arr[Math.floor(arr.length * 0.95)];
+  _p95Density = p95 > 0 ? p95 : 1;
+  return _p95Density;
 }
 
 export function getPopularity(m: Machine, allMachines?: Iterable<Machine>): number {
