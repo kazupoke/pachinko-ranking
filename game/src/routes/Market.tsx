@@ -5,8 +5,11 @@ import { useGameStore } from "../stores/useGameStore";
 import { ALL_MACHINES } from "../data/machines";
 import {
   formatSupply,
+  formatPrice,
   getCurrentSupply,
   getInitialSupply,
+  getMarketPrice,
+  getPopularity,
   machineMarketRarity,
   supplyRatio,
 } from "../lib/marketSupply";
@@ -26,7 +29,14 @@ const RARITY_BG: Record<Rarity, string> = {
   SSR: "bg-rarity-ssr/30",
 };
 
-type SortKey = "supplyAsc" | "supplyDesc" | "yearDesc" | "rarity";
+type SortKey =
+  | "supplyAsc"
+  | "supplyDesc"
+  | "yearDesc"
+  | "rarity"
+  | "priceDesc"
+  | "priceAsc"
+  | "popDesc";
 
 export function Market() {
   const withdrawn = useGameStore((s) => s.marketWithdrawn);
@@ -41,7 +51,9 @@ export function Market() {
       const init = getInitialSupply(m);
       const ratio = supplyRatio(m, w);
       const mRarity = machineMarketRarity(m, w);
-      return { m, withdrawn: w, cur, init, ratio, mRarity };
+      const price = getMarketPrice(m, w);
+      const pop = getPopularity(m);
+      return { m, withdrawn: w, cur, init, ratio, mRarity, price, pop };
     });
 
     let filtered = list;
@@ -61,6 +73,9 @@ export function Market() {
       if (sort === "supplyAsc") return a.cur - b.cur;
       if (sort === "supplyDesc") return b.cur - a.cur;
       if (sort === "yearDesc") return b.m.releaseYear - a.m.releaseYear;
+      if (sort === "priceDesc") return b.price - a.price;
+      if (sort === "priceAsc") return a.price - b.price;
+      if (sort === "popDesc") return b.pop - a.pop;
       const order: Rarity[] = ["SSR", "SR", "R", "N"];
       return order.indexOf(a.mRarity) - order.indexOf(b.mRarity);
     });
@@ -96,6 +111,9 @@ export function Market() {
           >
             <option value="supplyAsc">流通量 少→多</option>
             <option value="supplyDesc">流通量 多→少</option>
+            <option value="priceDesc">価格 高→安</option>
+            <option value="priceAsc">価格 安→高</option>
+            <option value="popDesc">人気 高→低</option>
             <option value="yearDesc">新しい順</option>
             <option value="rarity">市場レア度順</option>
           </select>
@@ -157,6 +175,21 @@ export function Market() {
                   </span>
                 )}
               </p>
+              <p className="text-[10px] text-white/60">
+                人気度{" "}
+                <span
+                  className={
+                    r.pop >= 70
+                      ? "text-pachi-pink font-pixel"
+                      : r.pop >= 40
+                        ? "text-pachi-yellow font-pixel"
+                        : "text-white/50 font-pixel"
+                  }
+                >
+                  {r.pop}
+                </span>{" "}
+                / 100
+              </p>
             </div>
             <div className="text-right shrink-0 ml-2">
               <span className={`font-pixel text-[10px] ${RARITY_COLOR[r.mRarity]}`}>
@@ -164,6 +197,9 @@ export function Market() {
               </span>
               <p className="text-[9px] text-white/40 mt-0.5">
                 元: {r.m.rarity}
+              </p>
+              <p className="font-pixel text-[11px] text-pachi-yellow mt-1">
+                {formatPrice(r.price)}
               </p>
             </div>
           </li>
