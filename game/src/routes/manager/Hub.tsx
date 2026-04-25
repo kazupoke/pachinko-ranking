@@ -53,6 +53,13 @@ const MENU: MenuItem[] = [
     emoji: "👥",
     accent: "border-pachi-purple",
   },
+  {
+    to: "/manager/security",
+    label: "セキュリティ",
+    desc: "パスワード設定 / ログイン情報の確認",
+    emoji: "🔐",
+    accent: "border-pachi-cyan",
+  },
 ];
 
 export function ManagerHub() {
