@@ -25,6 +25,12 @@ from curl_cffi import requests
 from bs4 import BeautifulSoup
 
 
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATA_DIR = os.path.join(REPO_ROOT, "data")
+DOCS_DIR = os.path.join(REPO_ROOT, "docs")
+CACHE_DIR = os.path.join(REPO_ROOT, "cache")
+
+
 # 湘南地区（手動登録の近隣店舗）
 MY_HALL_HIDS = [
     "254001300000014260",  # マルハン平塚店
@@ -59,7 +65,7 @@ def fetch_page(url):
 
 def load_store_hids(filename):
     """JSONファイルからHIDリストを読み込む"""
-    json_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), filename)
+    json_path = os.path.join(DATA_DIR, filename)
     with open(json_path, encoding="utf-8") as f:
         stores = json.load(f)
     return [s["hid"] for s in stores]
@@ -336,10 +342,9 @@ def generate_map_html(all_entries, today, tomorrow):
     tomorrow_wd = weekdays[tomorrow.weekday()]
 
     # 店舗JSONから緯度経度を読み込み
-    base_dir = os.path.dirname(os.path.abspath(__file__))
     store_coords = {}
     for filename in ["kanagawa_stores.json", "yamanashi_stores.json"]:
-        filepath = os.path.join(base_dir, filename)
+        filepath = os.path.join(DATA_DIR, filename)
         if os.path.exists(filepath):
             with open(filepath, encoding="utf-8") as f:
                 for s in json.load(f):
@@ -499,9 +504,6 @@ showMarkers(todayData);
     return html
 
 
-CACHE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "cache")
-
-
 def save_cache(key, data, date_str):
     """スクレイピング結果をキャッシュに保存"""
     os.makedirs(CACHE_DIR, exist_ok=True)
@@ -567,7 +569,7 @@ def main():
     yamanashi_entries = scrape_or_cache("yamanashi", yamanashi_hids, today_str, tomorrow_str, "山梨県")
 
     # HTML生成
-    output_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "docs")
+    output_dir = DOCS_DIR
     os.makedirs(output_dir, exist_ok=True)
     output_path = os.path.join(output_dir, "index.html")
 

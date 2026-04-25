@@ -4,6 +4,3 @@ ranking_result.txt
 debug*.png
 .env
 cache/
-game/node_modules/
-game/dist/
-game/*.tsbuildinfo

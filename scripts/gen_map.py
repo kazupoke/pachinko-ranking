@@ -1,15 +1,20 @@
 """マップHTML生成スクリプト（神奈川+山梨）"""
 import io
 import json
+import os
 import sys
 
 if sys.platform == "win32":
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATA_DIR = os.path.join(REPO_ROOT, "data")
+DOCS_DIR = os.path.join(REPO_ROOT, "docs")
+
 # 両県のデータを読み込み
 all_stores = []
 for filename in ["kanagawa_stores.json", "yamanashi_stores.json"]:
-    with open(filename, encoding="utf-8") as f:
+    with open(os.path.join(DATA_DIR, filename), encoding="utf-8") as f:
         all_stores.extend(json.load(f))
 
 markers_js = ""
@@ -67,6 +72,6 @@ L.tileLayer("https://{{s}}.tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png", {{
 </body>
 </html>"""
 
-with open("docs/map.html", "w", encoding="utf-8") as f:
+with open(os.path.join(DOCS_DIR, "map.html"), "w", encoding="utf-8") as f:
     f.write(html)
 print(f"Map generated: {len(all_stores)} markers")
