@@ -5,6 +5,7 @@ import { PageHeader } from "../components/PageHeader";
 import { MachineThumb } from "../components/MachineThumb";
 import type { ShopInterior, Rarity } from "../lib/types";
 import { MACHINES_BY_ID } from "../data/machines";
+import { buildShareUrl } from "../lib/shareUrl";
 
 const RARITY_COLOR: Record<Rarity, string> = {
   N: "text-rarity-n",
@@ -38,9 +39,15 @@ export function MyShop() {
   }
 
   const handleShare = async () => {
-    const url = `${window.location.origin}/s/${shop.id}`;
-    const text = `【${shop.name}】設置台数 ${totalMachines}台 / ${shop.layout.length}機種\n遊びに来てね！`;
-    // Web Share API 優先
+    // 設置台数を {machineId: count} に
+    const entries: Record<string, number> = {};
+    for (const e of shop.layout) entries[e.machineId] = e.count;
+    const url = buildShareUrl({
+      name: shop.name,
+      seriesId: useGameStore.getState().shopSeriesId,
+      entries,
+    });
+    const text = `【${shop.name}】設置台数 ${totalMachines}台 / ${shop.layout.length}機種\n遊びに来てね！\n#マイパチ店`;
     if ("share" in navigator) {
       try {
         await navigator.share({ title: shop.name, text, url });
@@ -49,9 +56,20 @@ export function MyShop() {
         // キャンセルされても無視
       }
     }
-    // fallback: Twitter intent
     const intent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
     window.open(intent, "_blank");
+  };
+
+  const handleViewShareScreen = () => {
+    const entries: Record<string, number> = {};
+    for (const e of shop.layout) entries[e.machineId] = e.count;
+    const url = buildShareUrl({
+      name: shop.name,
+      seriesId: useGameStore.getState().shopSeriesId,
+      entries,
+    });
+    // 同タブで開いて "戻る" で戻れる
+    window.open(url, "_blank");
   };
 
   return (
@@ -103,6 +121,12 @@ export function MyShop() {
         </button>
         <button onClick={() => navigate("/expand")} className="pixel-btn-secondary text-xs">
           店舗拡張
+        </button>
+        <button
+          onClick={handleViewShareScreen}
+          className="pixel-btn-secondary text-xs col-span-2"
+        >
+          シェア用画面を開く (スクショ向け)
         </button>
         <button onClick={handleShare} className="pixel-btn text-xs col-span-2">
           シェアする
