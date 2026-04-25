@@ -1,6 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useLiteStore, totalMachines, totalKinds } from "../../stores/useLiteStore";
+import {
+  useLiteStore,
+  totalMachines,
+  totalKinds,
+  isOverCapacity,
+  LITE_MAX_MACHINES,
+  LITE_MAX_TYPES,
+} from "../../stores/useLiteStore";
 import { MACHINES_BY_ID } from "../../data/machines";
 import type { Machine, Rarity } from "../../lib/types";
 import { calcScore, totalCost, starRating } from "../../lib/litePricing";
@@ -18,6 +25,7 @@ export function LiteView() {
   const navigate = useNavigate();
   const shop = useLiteStore((s) => s.shop);
   const removeMachine = useLiteStore((s) => s.removeMachine);
+  const incrementMachine = useLiteStore((s) => s.incrementMachine);
   const fullGameShop = useGameStore((s) => s.shop);
   const createFullShop = useGameStore((s) => s.createShop);
 
@@ -64,6 +72,7 @@ export function LiteView() {
   const kindCount = totalKinds(shop);
   const score = calcScore(shop.entries, MACHINES_BY_ID);
   const cost = totalCost(shop.entries, MACHINES_BY_ID);
+  const cap = isOverCapacity(shop);
 
   const handleShare = async () => {
     const text = `【${shop.name}】設置 ${totalCount}台 / ${kindCount}機種\n理想店レベル ${starRating(score.total)} (${score.total.toFixed(1)})\n#マイパチ店`;
@@ -90,6 +99,51 @@ export function LiteView() {
 
   return (
     <div className="pb-6">
+      {/* 容量超過警告 (sticky top) */}
+      {cap.over && (
+        <div className="sticky top-[84px] z-20 bg-pachi-red text-white px-3 py-2 text-[11px] font-dot border-b-2 border-black flex items-center justify-between gap-2">
+          <span>
+            ⚠ 容量オーバー:{" "}
+            {cap.overMachines && (
+              <span>
+                台数 {totalCount}/{LITE_MAX_MACHINES}
+              </span>
+            )}
+            {cap.overMachines && cap.overTypes && " · "}
+            {cap.overTypes && (
+              <span>
+                機種 {kindCount}/{LITE_MAX_TYPES}
+              </span>
+            )}
+          </span>
+          <span className="font-pixel text-[10px] animate-blink">
+            一覧で調整してください ↓
+          </span>
+        </div>
+      )}
+
+      {/* 容量サマリ (常時表示) */}
+      <div className="px-4 pt-3">
+        <div
+          className={`pixel-panel p-2 flex justify-between items-center font-pixel text-[10px] ${
+            cap.over ? "border-2 border-pachi-red" : ""
+          }`}
+        >
+          <span className="text-white/60">設置容量</span>
+          <span>
+            <span className={cap.overMachines ? "text-pachi-red" : "text-pachi-green"}>
+              {totalCount}
+            </span>
+            <span className="text-white/40"> / {LITE_MAX_MACHINES}台</span>
+            <span className="text-white/40"> · </span>
+            <span className={cap.overTypes ? "text-pachi-red" : "text-pachi-cyan"}>
+              {kindCount}
+            </span>
+            <span className="text-white/40"> / {LITE_MAX_TYPES}機種</span>
+          </span>
+        </div>
+      </div>
+
       {/* === 「これがあなたの理想のお店！」演出ヘッダ === */}
       <div className="bg-bg-base relative overflow-hidden">
         <div className="absolute inset-0 scanlines pointer-events-none opacity-30" />
@@ -228,13 +282,33 @@ export function LiteView() {
                     <td className="px-2 py-1.5 text-gray-600 hidden sm:table-cell">
                       {m.maker}
                     </td>
-                    <td className="px-2 py-1.5 text-right font-pixel">{count}</td>
+                    <td className="px-2 py-1.5 text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        <button
+                          onClick={() => incrementMachine(m.id, -1)}
+                          className="w-6 h-6 font-pixel text-[10px] bg-gray-200 border border-gray-400 text-gray-700"
+                          aria-label="台数を減らす"
+                        >
+                          −
+                        </button>
+                        <span className="font-pixel text-xs w-7 text-center">
+                          {count}
+                        </span>
+                        <button
+                          onClick={() => incrementMachine(m.id, 1)}
+                          className="w-6 h-6 font-pixel text-[10px] bg-pachi-red border border-pachi-red text-white"
+                          aria-label="台数を増やす"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </td>
                     <td className="px-1 py-1.5 text-right">
                       <button
                         onClick={() => removeMachine(m.id)}
-                        className="text-[10px] text-red-600 px-1"
+                        className="text-[9px] text-red-600 px-1"
                       >
-                        外す
+                        全外
                       </button>
                     </td>
                   </tr>
@@ -265,8 +339,9 @@ export function LiteView() {
         </button>
         <button
           onClick={handleShare}
-          className="pixel-btn-secondary text-xs"
-          disabled={rows.length === 0}
+          className="pixel-btn-secondary text-xs disabled:opacity-30"
+          disabled={rows.length === 0 || cap.over}
+          title={cap.over ? "容量オーバー中はシェアできません" : ""}
         >
           シェア
         </button>

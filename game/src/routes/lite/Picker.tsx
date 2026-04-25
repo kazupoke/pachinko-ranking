@@ -3,7 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { ALL_MACHINES } from "../../data/machines";
 import { PageHeader } from "../../components/PageHeader";
 import { MachineThumb } from "../../components/MachineThumb";
-import { useLiteStore, totalMachines, totalKinds } from "../../stores/useLiteStore";
+import {
+  useLiteStore,
+  totalMachines,
+  totalKinds,
+  isOverCapacity,
+  LITE_MAX_MACHINES,
+  LITE_MAX_TYPES,
+} from "../../stores/useLiteStore";
 import type { Machine, Rarity } from "../../lib/types";
 import { MAKER_GROUPS, getMakerGroup, type MakerGroup } from "../../data/makerGroups";
 import { KANA_FILTERS, YEAR_BUCKETS, getKanaKey } from "../../lib/machineSort";
@@ -120,15 +127,48 @@ export function LitePicker() {
     setViewFilter("all");
   };
 
+  const cap = isOverCapacity(shop);
+  const totalM = totalMachines(shop);
+  const totalK = totalKinds(shop);
+
   return (
     <div>
       <PageHeader
         title="機種を選ぶ"
-        subtitle={`${shop.name} · 設置 ${totalMachines(shop)} 台 / ${totalKinds(shop)} 機種`}
+        subtitle={`${shop.name}`}
       />
 
       {/* 検索・フィルタ群 (上部固定) */}
-      <div className="sticky top-12 z-10 bg-bg-base pb-2 border-b-2 border-bg-card">
+      <div className="sticky top-[84px] z-10 bg-bg-base pb-2 border-b-2 border-bg-card">
+      {/* 容量カウンタ + ラインナップへ */}
+      <div className="px-4 pt-2 flex items-center gap-2">
+        <div
+          className={`flex-1 px-2 py-1.5 border-2 font-pixel text-[10px] flex justify-between items-center ${
+            cap.over
+              ? "bg-pachi-red/20 border-pachi-red text-pachi-red animate-blink"
+              : "bg-bg-panel border-bg-card text-white"
+          }`}
+        >
+          <span>
+            <span className={cap.overMachines ? "text-pachi-red" : ""}>
+              {totalM}
+            </span>
+            <span className="text-white/40"> / {LITE_MAX_MACHINES}台</span>
+          </span>
+          <span>
+            <span className={cap.overTypes ? "text-pachi-red" : ""}>
+              {totalK}
+            </span>
+            <span className="text-white/40"> / {LITE_MAX_TYPES}機種</span>
+          </span>
+        </div>
+        <button
+          onClick={() => navigate("/lite/view")}
+          className="shrink-0 px-2 py-1.5 font-pixel text-[10px] bg-pachi-yellow text-bg-base border-2 border-pachi-yellow"
+        >
+          一覧 ▶
+        </button>
+      </div>
       <div className="px-4 pt-3 flex gap-2 text-xs items-center">
         <button
           onClick={() => setViewFilter("all")}
@@ -358,19 +398,32 @@ export function LitePicker() {
         )}
       </ul>
 
-      <div className="sticky bottom-0 bg-bg-panel border-t-2 border-bg-card px-4 py-3 grid grid-cols-2 gap-2">
-        <button
-          onClick={() => navigate("/lite")}
-          className="pixel-btn-secondary text-xs"
-        >
-          戻る
-        </button>
-        <button
-          onClick={() => navigate("/lite/view")}
-          className="pixel-btn text-xs"
-        >
-          ページを見る
-        </button>
+      <div className="sticky bottom-0 bg-bg-panel border-t-2 border-bg-card px-4 py-3">
+        {cap.over && (
+          <p className="text-[10px] text-pachi-red text-center mb-2 animate-blink">
+            ⚠ 容量オーバー: 一覧で {cap.overMachines && `台数 (${totalM}/${LITE_MAX_MACHINES})`}
+            {cap.overMachines && cap.overTypes && " と "}
+            {cap.overTypes && `機種 (${totalK}/${LITE_MAX_TYPES})`} を調整してください
+          </p>
+        )}
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            onClick={() => navigate("/lite")}
+            className="pixel-btn-secondary text-xs"
+          >
+            戻る
+          </button>
+          <button
+            onClick={() => navigate("/lite/view")}
+            className={
+              cap.over
+                ? "pixel-btn text-xs animate-blink bg-pachi-red"
+                : "pixel-btn text-xs"
+            }
+          >
+            {cap.over ? "一覧で調整 ▶" : "ページを見る"}
+          </button>
+        </div>
       </div>
     </div>
   );
