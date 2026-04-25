@@ -108,3 +108,86 @@ export function supplyRatio(m: Machine, withdrawn: number = 0): number {
   const cur = getCurrentSupply(m, withdrawn);
   return Math.max(0, Math.min(1, cur / init));
 }
+
+// ============================================================
+// 人気指標 + 市場価格
+// ============================================================
+
+const MEGA_POP = [
+  "北斗の拳",
+  "ジャグラー",
+  "ハナビ",
+  "番長",
+  "まどマギ",
+  "まどか",
+  "リゼロ",
+  "Re:ゼロ",
+  "ゴッド",
+  "凱旋",
+];
+const POP = [
+  "エヴァ",
+  "吉宗",
+  "モンキーターン",
+  "ガンダム",
+  "コードギアス",
+  "戦国乙女",
+  "アクエリオン",
+  "ハナハナ",
+  "麻雀物語",
+  "鬼武者",
+  "バイオハザード",
+  "沖ドキ",
+  "アイドル",
+  "ラブライブ",
+];
+
+/**
+ * 人気指標 (1-100)
+ *
+ * TODO: 将来 P-World のコメント数をスクレイピングして
+ *       (コメント数 / 流通台数) で動的に算出する。
+ *       スクレイパは scripts/fetch_pworld_popularity.py 予定。
+ *       今はキーワード + レア度 + 年代のヒューリスティック。
+ */
+export function getPopularity(m: Machine): number {
+  let p = 30;
+  if (MEGA_POP.some((k) => m.name.includes(k))) p += 30;
+  else if (POP.some((k) => m.name.includes(k))) p += 18;
+  if (m.rarity === "SSR") p += 18;
+  else if (m.rarity === "SR") p += 10;
+  else if (m.rarity === "R") p += 4;
+  if (m.releaseYear >= 2024) p += 10;
+  else if (m.releaseYear >= 2022) p += 5;
+  return Math.max(1, Math.min(100, p));
+}
+
+const RARITY_BASE_PRICE: Record<string, number> = {
+  N: 20_000,
+  R: 50_000,
+  SR: 100_000,
+  SSR: 200_000,
+};
+
+/**
+ * 現在の市場価格 (G)
+ *
+ * 公式: basePrice * popularityMult * exp(2 * scarcity)
+ *  - scarcity = 1 - cur/init (0..1)
+ *  - 流通が枯渇するほど指数関数的に高騰
+ *  - 人気台 = 価格倍率 高
+ */
+export function getMarketPrice(m: Machine, withdrawn: number = 0): number {
+  const init = getInitialSupply(m);
+  const cur = getCurrentSupply(m, withdrawn);
+  const scarcity = Math.max(0, 1 - cur / init);
+  const pop = getPopularity(m);
+  const popMult = 0.5 + pop / 50; // 1: 0.52x / 100: 2.5x
+  const base = RARITY_BASE_PRICE[m.rarity] ?? 20_000;
+  return Math.round(base * popMult * Math.exp(2 * scarcity));
+}
+
+/** 価格を 3 桁区切りで「¥」付きフォーマット */
+export function formatPrice(price: number): string {
+  return "¥" + Math.round(price).toLocaleString();
+}
