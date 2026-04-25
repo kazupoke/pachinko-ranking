@@ -84,6 +84,10 @@ interface GameState {
   dreamMachines: Record<string, number>;
   /** オンボーディングで選んだ店舗シリーズ ID */
   shopSeriesId: string | null;
+  /** 所持しているバナー ID 一覧 */
+  ownedBanners: string[];
+  /** 現在表示中のバナー ID */
+  activeBannerId: string | null;
   initUser: () => void;
   tickSimulation: (machineRarityMap: Record<string, keyof typeof RARITY_WEIGHT_MAP>) => TickResult;
   createShop: (name: string) => void;
@@ -103,6 +107,8 @@ interface GameState {
   setDreamMachines: (entries: Record<string, number>) => void;
   clearDreamMachines: () => void;
   setShopSeries: (id: string) => void;
+  buyBanner: (id: string, price: number) => { ok: boolean; reason?: string };
+  setActiveBanner: (id: string) => void;
   resetAll: () => void;
 }
 
@@ -117,6 +123,8 @@ export const useGameStore = create<GameState>()(
       mysteryRecords: [],
       dreamMachines: {},
       shopSeriesId: null,
+      ownedBanners: ["default"],
+      activeBannerId: "default",
 
       initUser: () => {
         if (!get().user) set({ user: createUser() });
@@ -374,6 +382,25 @@ export const useGameStore = create<GameState>()(
 
       setShopSeries: (id) => set({ shopSeriesId: id }),
 
+      buyBanner: (id, price) => {
+        const user = get().user;
+        if (!user) return { ok: false, reason: "no-user" };
+        const owned = get().ownedBanners;
+        if (owned.includes(id)) return { ok: false, reason: "already-owned" };
+        if (user.cash < price) return { ok: false, reason: "no-cash" };
+        set({
+          user: { ...user, cash: user.cash - price },
+          ownedBanners: [...owned, id],
+        });
+        return { ok: true };
+      },
+
+      setActiveBanner: (id) => {
+        const owned = get().ownedBanners;
+        if (!owned.includes(id)) return;
+        set({ activeBannerId: id });
+      },
+
       resetAll: () =>
         set({
           user: null,
@@ -384,6 +411,8 @@ export const useGameStore = create<GameState>()(
           mysteryRecords: [],
           dreamMachines: {},
           shopSeriesId: null,
+          ownedBanners: ["default"],
+          activeBannerId: "default",
         }),
     }),
     {

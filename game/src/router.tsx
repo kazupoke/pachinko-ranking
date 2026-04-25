@@ -13,6 +13,10 @@ import { LitePicker } from "./routes/lite/Picker";
 import { LiteView } from "./routes/lite/View";
 import { Onboarding } from "./routes/Onboarding";
 import { Share } from "./routes/Share";
+import { ManagerHub } from "./routes/manager/Hub";
+import { BannerShop } from "./routes/manager/BannerShop";
+import { Sell } from "./routes/manager/Sell";
+import { Maintain } from "./routes/manager/Maintain";
 import { DevPreview } from "./routes/dev/Preview";
 import { NotFound } from "./routes/NotFound";
 
@@ -28,6 +32,11 @@ export const router = createBrowserRouter(
         { path: "gacha", element: <Gacha /> },
         { path: "favorites", element: <Favorites /> },
         { path: "mystery", element: <MysteryShopper /> },
+        { path: "manager", element: <ManagerHub /> },
+        { path: "manager/inspect", element: <MysteryShopper /> },
+        { path: "manager/shop", element: <BannerShop /> },
+        { path: "manager/sell", element: <Sell /> },
+        { path: "manager/maintain", element: <Maintain /> },
         { path: "expand", element: <Expand /> },
         { path: "s/:shopId", element: <ShopView /> },
         { path: "lite", element: <LiteEntry /> },

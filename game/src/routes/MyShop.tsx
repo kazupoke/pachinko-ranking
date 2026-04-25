@@ -6,6 +6,8 @@ import { MachineThumb } from "../components/MachineThumb";
 import type { ShopInterior, Rarity } from "../lib/types";
 import { MACHINES_BY_ID } from "../data/machines";
 import { buildShareUrl } from "../lib/shareUrl";
+import { getBannerById, BANNERS } from "../data/banners";
+import { BannerImage } from "../components/BannerImage";
 
 const RARITY_COLOR: Record<Rarity, string> = {
   N: "text-rarity-n",
@@ -20,6 +22,8 @@ export function MyShop() {
   const shop = useGameStore((s) => s.shop);
   const user = useGameStore((s) => s.user);
   const uninstall = useGameStore((s) => s.uninstallMachine);
+  const activeBannerId = useGameStore((s) => s.activeBannerId);
+  const banner = getBannerById(activeBannerId) ?? BANNERS[0];
   const [mode, setMode] = useState<"overview" | "pworld">("overview");
 
   const totalMachines = useMemo(
@@ -74,6 +78,11 @@ export function MyShop() {
 
   return (
     <div>
+      {/* 店舗バナー (現在使用中) */}
+      <div className="bg-bg-base border-b-2 border-bg-card">
+        <BannerImage banner={banner} shopName={shop.name} />
+      </div>
+
       <PageHeader
         title={shop.name}
         subtitle={`Tier ${shop.tier} · ${totalMachines}/${shop.capacity.machines}台 · ${shop.layout.length}/${shop.capacity.types}機種`}
