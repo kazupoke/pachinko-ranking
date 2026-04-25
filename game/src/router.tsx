@@ -8,6 +8,9 @@ import { Favorites } from "./routes/Favorites";
 import { MysteryShopper } from "./routes/MysteryShopper";
 import { Expand } from "./routes/Expand";
 import { ShopView } from "./routes/ShopView";
+import { LiteEntry } from "./routes/lite/Entry";
+import { LitePicker } from "./routes/lite/Picker";
+import { LiteView } from "./routes/lite/View";
 import { DevPreview } from "./routes/dev/Preview";
 import { NotFound } from "./routes/NotFound";
 
@@ -25,6 +28,9 @@ export const router = createBrowserRouter(
         { path: "mystery", element: <MysteryShopper /> },
         { path: "expand", element: <Expand /> },
         { path: "s/:shopId", element: <ShopView /> },
+        { path: "lite", element: <LiteEntry /> },
+        { path: "lite/build", element: <LitePicker /> },
+        { path: "lite/view", element: <LiteView /> },
       ],
     },
     { path: "/dev/preview", element: <DevPreview /> },
