@@ -93,6 +93,10 @@ export const MACHINES_BY_ID: Record<string, Machine> = Object.fromEntries(
   ALL_MACHINES.map((m) => [m.id, m])
 );
 
-export function machinesByRarity(rarity: Rarity): Machine[] {
-  return ALL_MACHINES.filter((m) => m.rarity === rarity);
+export function machinesByRarity(rarity: Rarity, generation?: Generation): Machine[] {
+  return ALL_MACHINES.filter(
+    (m) =>
+      m.rarity === rarity &&
+      (generation === undefined || m.generation === generation)
+  );
 }

@@ -346,6 +346,14 @@ function PWorldView({
       </div>
     );
   }
+  // 設置機種は 台数DESC + 年代DESC で並べる
+  const sortedLayout = [...shop.layout].sort((a, b) => {
+    if (b.count !== a.count) return b.count - a.count;
+    const ma = MACHINES_BY_ID[a.machineId];
+    const mb = MACHINES_BY_ID[b.machineId];
+    if (!ma || !mb) return 0;
+    return mb.releaseYear - ma.releaseYear;
+  });
   return (
     <div className="mx-4 mt-3">
       <div className="bg-white text-black font-dot border-2 border-black">
@@ -363,7 +371,7 @@ function PWorldView({
             </tr>
           </thead>
           <tbody>
-            {shop.layout.map((entry) => {
+            {sortedLayout.map((entry) => {
               const m = MACHINES_BY_ID[entry.machineId];
               if (!m) return null;
               return (

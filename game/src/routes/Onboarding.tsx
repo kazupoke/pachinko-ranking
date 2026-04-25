@@ -6,6 +6,9 @@ import { MachineThumb } from "../components/MachineThumb";
 import type { Rarity } from "../lib/types";
 import { SHOP_SERIES, getSeriesById, type ShopSeries } from "../lib/shopSeries";
 import { buildShareUrl } from "../lib/shareUrl";
+import { MACHINES_BY_ID } from "../data/machines";
+
+const RARITY_RANK: Record<Rarity, number> = { N: 0, R: 1, SR: 2, SSR: 3 };
 
 const RARITY_COLOR: Record<Rarity, string> = {
   N: "text-rarity-n",
@@ -60,10 +63,10 @@ export function Onboarding() {
   };
 
   const startPulls = () => {
-    // 10 連 × 10 = 100 連 (シリーズバイアス付き)
+    // 10 連 × 10 = 100 連 (シリーズバイアス + 6 号機限定)
     const all: PullResult[] = [];
     for (let i = 0; i < 10; i++) {
-      all.push(...pullTen(Math.random, series));
+      all.push(...pullTen(Math.random, series, 6));
     }
     setResults(all);
     setRevealedCount(0);
@@ -91,12 +94,45 @@ export function Onboarding() {
     return dream;
   };
 
+  const installMachine = useGameStore((s) => s.installMachine);
+
   const ensureShopAndDream = () => {
     const dream = buildDreamMap();
     setDream(dream);
     const trimmed = shopName.trim() || "ドリームホール";
     if (!existingShop) {
       createShop(trimmed);
+    }
+    // 100連の結果を 200台×40機種枠まで自動配置
+    // 配置順: レア度高い順 → 同レア度なら新しい年式 → 多く引いたものから多く配置
+    const sorted = Object.entries(dream)
+      .map(([mid, count]) => ({ mid, count, machine: MACHINES_BY_ID[mid] }))
+      .filter((e) => e.machine != null)
+      .sort((a, b) => {
+        const r =
+          (RARITY_RANK[b.machine.rarity] ?? 0) -
+          (RARITY_RANK[a.machine.rarity] ?? 0);
+        if (r !== 0) return r;
+        return b.machine.releaseYear - a.machine.releaseYear;
+      });
+    for (const { mid, count } of sorted) {
+      // capacity 上限まで詰めていく。失敗 (no-shop / capacity 等) なら次の機種へ
+      const res = installMachine(mid, count);
+      if (!res.ok && res.reason === "capacity-machines") {
+        // 残り枠ぶんだけ install を試みる
+        const state = useGameStore.getState();
+        const shop = state.shop;
+        if (!shop) break;
+        const remaining =
+          shop.capacity.machines -
+          shop.layout.reduce((s, e) => s + e.count, 0);
+        if (remaining > 0) installMachine(mid, remaining);
+        break; // 容量限界なので終了
+      }
+      if (!res.ok && res.reason === "capacity-types") {
+        // 機種枠は埋まったが台数余ってるかもしれない。続ける
+        continue;
+      }
     }
     return { dream, name: trimmed };
   };

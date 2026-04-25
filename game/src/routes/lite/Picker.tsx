@@ -60,6 +60,13 @@ export function LitePicker() {
       list = list.filter((m) => (entries?.[m.id] ?? 0) > 0);
     }
     const sorted = [...list].sort((a, b) => {
+      // 「設置中」ビューでは固定で 台数DESC + 年代DESC
+      if (viewFilter === "selected") {
+        const ca = entries?.[a.id] ?? 0;
+        const cb = entries?.[b.id] ?? 0;
+        if (cb !== ca) return cb - ca;
+        return b.releaseYear - a.releaseYear;
+      }
       switch (sortKey) {
         case "yearDesc":
           return b.releaseYear - a.releaseYear || a.name.localeCompare(b.name, "ja");
@@ -115,6 +122,8 @@ export function LitePicker() {
         subtitle={`${shop.name} · 設置 ${totalMachines(shop)} 台 / ${totalKinds(shop)} 機種`}
       />
 
+      {/* 検索・フィルタ群 (上部固定) */}
+      <div className="sticky top-12 z-10 bg-bg-base pb-2 border-b-2 border-bg-card">
       <div className="px-4 pt-3 flex gap-2 text-xs items-center">
         <button
           onClick={() => setViewFilter("all")}
@@ -255,6 +264,8 @@ export function LitePicker() {
           フィルタをクリア
         </button>
       </div>
+      </div>
+      {/* /sticky filter wrapper */}
 
       <ul className="px-4 py-3 space-y-2">
         {machines.length === 0 ? (
