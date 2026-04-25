@@ -18,6 +18,7 @@ import { BannerShop } from "./routes/manager/BannerShop";
 import { Sell } from "./routes/manager/Sell";
 import { Maintain } from "./routes/manager/Maintain";
 import { Settings } from "./routes/manager/Settings";
+import { Regulars } from "./routes/manager/Regulars";
 import { DevPreview } from "./routes/dev/Preview";
 import { NotFound } from "./routes/NotFound";
 
@@ -39,6 +40,7 @@ export const router = createBrowserRouter(
         { path: "manager/sell", element: <Sell /> },
         { path: "manager/maintain", element: <Maintain /> },
         { path: "manager/settings", element: <Settings /> },
+        { path: "manager/regulars", element: <Regulars /> },
         { path: "expand", element: <Expand /> },
         { path: "s/:shopId", element: <ShopView /> },
         { path: "lite", element: <LiteEntry /> },
