@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { MachineThumb } from "./MachineThumb";
 import { MACHINES_BY_ID } from "../data/machines";
 
@@ -243,7 +243,68 @@ export function ShopFloor({ entries, customerCount }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [floor, customerCount, machineMap, cols, rows]);
 
-  const customers = seatedCustomers;
+  // 徘徊客 (席が埋まり切った後の余剰)
+  const seatCount = seatedCustomers.length;
+  const extraCount = Math.max(0, customerCount - seatCount);
+  const [wandering, setWandering] = useState<CustomerPos[]>([]);
+  useEffect(() => {
+    // 余剰客を床タイル (.) 上に配置
+    const floorTiles: Array<{ x: number; y: number }> = [];
+    for (let y = 0; y < map.rows.length; y++) {
+      for (let x = 0; x < map.rows[y].length; x++) {
+        if (map.rows[y][x] === ".") floorTiles.push({ x, y });
+      }
+    }
+    const placed: CustomerPos[] = [];
+    const num = Math.min(extraCount, 30); // 表示上限
+    for (let i = 0; i < num && floorTiles.length > 0; i++) {
+      const t = floorTiles[Math.floor(Math.random() * floorTiles.length)];
+      const palette = CUSTOMER_COLORS[(seatCount + i) % CUSTOMER_COLORS.length];
+      placed.push({
+        id: 1000 + i,
+        x: t.x,
+        y: t.y,
+        facing: ["down", "up", "left", "right"][
+          Math.floor(Math.random() * 4)
+        ] as CustomerPos["facing"],
+        color: palette.color,
+        hat: palette.hat,
+      });
+    }
+    setWandering(placed);
+  }, [floor, extraCount, seatCount, map.rows]);
+
+  // 徘徊客のランダムウォーク (1.6 秒ごと)
+  useEffect(() => {
+    if (wandering.length === 0) return;
+    const iv = window.setInterval(() => {
+      setWandering((prev) =>
+        prev.map((c) => {
+          const dir = Math.floor(Math.random() * 5);
+          let dx = 0,
+            dy = 0;
+          let facing = c.facing;
+          if (dir === 1) { dx = -1; facing = "left"; }
+          else if (dir === 2) { dx = 1; facing = "right"; }
+          else if (dir === 3) { dy = -1; facing = "up"; }
+          else if (dir === 4) { dy = 1; facing = "down"; }
+          const nx = c.x + dx;
+          const ny = c.y + dy;
+          if (
+            ny >= 0 && ny < rows &&
+            nx >= 0 && nx < cols &&
+            map.rows[ny][nx] === "."
+          ) {
+            return { ...c, x: nx, y: ny, facing };
+          }
+          return { ...c, facing };
+        })
+      );
+    }, 1600);
+    return () => window.clearInterval(iv);
+  }, [wandering.length, cols, rows, map.rows]);
+
+  const customers = [...seatedCustomers, ...wandering];
 
   // ズーム
   const [zoom, setZoom] = useState<1 | 1.5 | 2>(1);
