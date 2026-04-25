@@ -110,7 +110,7 @@ export function LineupTable({ className = "" }: Props) {
                   </div>
                   {ownedExtra > 0 && (
                     <span className="block text-[9px] text-gray-500 mt-0.5">
-                      所持 +{ownedExtra}
+                      倉庫 +{ownedExtra}
                     </span>
                   )}
                 </td>
