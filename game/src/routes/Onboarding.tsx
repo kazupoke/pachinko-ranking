@@ -4,6 +4,7 @@ import { useGameStore } from "../stores/useGameStore";
 import { pullTen, type PullResult } from "../lib/gacha";
 import { MachineThumb } from "../components/MachineThumb";
 import type { Rarity } from "../lib/types";
+import { SHOP_SERIES, getSeriesById, type ShopSeries } from "../lib/shopSeries";
 
 const RARITY_COLOR: Record<Rarity, string> = {
   N: "text-rarity-n",
@@ -22,21 +23,25 @@ const RARITY_BORDER: Record<Rarity, string> = {
 const ROLL_MS = 2500;
 const STAGGER_MS = 30;
 
-type Phase = "welcome" | "rolling" | "revealing" | "summary";
+type Phase = "chooseShop" | "welcome" | "rolling" | "revealing" | "summary";
 
 export function Onboarding() {
   const navigate = useNavigate();
   const initUser = useGameStore((s) => s.initUser);
   const addMachines = useGameStore((s) => s.addMachines);
   const setDream = useGameStore((s) => s.setDreamMachines);
+  const setShopSeries = useGameStore((s) => s.setShopSeries);
   const createShop = useGameStore((s) => s.createShop);
   const existingShop = useGameStore((s) => s.shop);
 
-  const [phase, setPhase] = useState<Phase>("welcome");
+  const [phase, setPhase] = useState<Phase>("chooseShop");
+  const [selectedSeriesId, setSelectedSeriesId] = useState<string | null>(null);
   const [results, setResults] = useState<PullResult[]>([]);
   const [revealedCount, setRevealedCount] = useState(0);
   const [shopName, setShopName] = useState("");
   const timersRef = useRef<number[]>([]);
+
+  const series: ShopSeries | null = getSeriesById(selectedSeriesId);
 
   useEffect(() => {
     initUser();
@@ -54,10 +59,10 @@ export function Onboarding() {
   };
 
   const startPulls = () => {
-    // 10 連 × 10 = 100 連
+    // 10 連 × 10 = 100 連 (シリーズバイアス付き)
     const all: PullResult[] = [];
     for (let i = 0; i < 10; i++) {
-      all.push(...pullTen());
+      all.push(...pullTen(Math.random, series));
     }
     setResults(all);
     setRevealedCount(0);
@@ -92,9 +97,22 @@ export function Onboarding() {
     navigate("/shop");
   };
 
+  const handleSelectShop = (id: string) => {
+    setSelectedSeriesId(id);
+    setShopSeries(id);
+    // 店舗名のデフォルトを店舗名に
+    const s = getSeriesById(id);
+    if (s && !shopName) setShopName(s.name);
+    setPhase("welcome");
+  };
+
   // ============================================================
   // フェーズ別 UI
   // ============================================================
+  if (phase === "chooseShop") {
+    return <ChooseShopPhase onSelect={handleSelectShop} />;
+  }
+
   if (phase === "welcome") {
     return (
       <div className="min-h-dvh gacha-stage flex flex-col items-center justify-center px-6 py-10 relative overflow-hidden">
@@ -303,6 +321,145 @@ function RarityCount({
     <div>
       <p className={`font-pixel ${color}`}>{label}</p>
       <p className="font-pixel text-pachi-yellow mt-1">{count}</p>
+    </div>
+  );
+}
+
+// ============================================================
+// 店舗選択フェーズ (3 軒からスワイプで選ぶ)
+// ============================================================
+
+function ChooseShopPhase({ onSelect }: { onSelect: (id: string) => void }) {
+  const [activeIdx, setActiveIdx] = useState(0);
+  const scrollerRef = useRef<HTMLDivElement | null>(null);
+
+  // スクロール位置から activeIdx を計算
+  const handleScroll = () => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const idx = Math.round(el.scrollLeft / el.clientWidth);
+    if (idx !== activeIdx) setActiveIdx(idx);
+  };
+
+  const scrollTo = (idx: number) => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    el.scrollTo({ left: idx * el.clientWidth, behavior: "smooth" });
+  };
+
+  return (
+    <div className="min-h-dvh gacha-stage relative flex flex-col">
+      <div className="absolute inset-0 scanlines opacity-30 pointer-events-none" />
+
+      {/* ヘッダ */}
+      <div className="relative px-4 pt-6 pb-2 text-center">
+        <p className="font-pixel text-[10px] text-pachi-cyan tracking-widest">
+          STEP 1 / 3
+        </p>
+        <h1 className="mt-2 font-pixel text-base">
+          <span className="rainbow-gradient animate-rainbow-bg bg-clip-text text-transparent">
+            開店する店舗を選ぼう
+          </span>
+        </h1>
+        <p className="mt-2 text-[11px] text-white/60">
+          ← スワイプで切り替え →
+        </p>
+      </div>
+
+      {/* スワイプ可能なカードカルーセル */}
+      <div
+        ref={scrollerRef}
+        onScroll={handleScroll}
+        className="relative flex-1 flex overflow-x-auto snap-x snap-mandatory"
+        style={{ scrollbarWidth: "none" }}
+      >
+        {SHOP_SERIES.map((s) => (
+          <div
+            key={s.id}
+            className="snap-center shrink-0 w-full px-4 py-3"
+          >
+            <ShopCard series={s} onSelect={() => onSelect(s.id)} />
+          </div>
+        ))}
+      </div>
+
+      {/* ページインジケータ */}
+      <div className="relative flex justify-center gap-2 py-3">
+        {SHOP_SERIES.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => scrollTo(i)}
+            className={`w-2 h-2 transition-all ${
+              i === activeIdx
+                ? "bg-pachi-yellow w-6"
+                : "bg-white/30"
+            }`}
+            aria-label={`店舗 ${i + 1}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ShopCard({
+  series,
+  onSelect,
+}: {
+  series: ShopSeries;
+  onSelect: () => void;
+}) {
+  return (
+    <div
+      className={`pixel-panel border-2 ${series.accent} h-full flex flex-col`}
+    >
+      {/* 看板 */}
+      <div
+        className={`${series.bannerBg} px-4 py-3 border-b-4 border-black flex items-center justify-between`}
+      >
+        <div>
+          <p className="font-pixel text-xs leading-tight">{series.name}</p>
+          <p className="font-dot text-[10px] mt-0.5 opacity-80">
+            {series.tagline}
+          </p>
+        </div>
+        <span className="text-3xl">{series.emoji}</span>
+      </div>
+
+      {/* チラシ風情報 */}
+      <div className="bg-bg-base px-4 py-4 flex-1 flex flex-col gap-3 text-[11px]">
+        <div className="flex justify-between items-baseline border-b border-bg-card pb-2">
+          <span className="font-pixel text-[10px] text-pachi-yellow">特日</span>
+          <span className="text-white">{series.specialDay}</span>
+        </div>
+        <div className="flex justify-between items-baseline border-b border-bg-card pb-2">
+          <span className="font-pixel text-[10px] text-pachi-pink">本日のイベント</span>
+          <span className="text-white">{series.event}</span>
+        </div>
+        <div className="flex justify-between items-baseline border-b border-bg-card pb-2">
+          <span className="font-pixel text-[10px] text-pachi-cyan">来店演者</span>
+          <span className="text-white">{series.mascot}</span>
+        </div>
+        <div className="border-b border-bg-card pb-2">
+          <span className="font-pixel text-[10px] text-pachi-green">看板機種</span>
+          <ul className="mt-1.5 space-y-0.5">
+            {series.examples.map((ex, i) => (
+              <li key={i} className="text-white/80 truncate">
+                ・{ex}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="mt-auto pt-2">
+          <button
+            onClick={onSelect}
+            className="pixel-btn w-full text-xs py-3"
+          >
+            この店で開店する
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
