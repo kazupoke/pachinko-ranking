@@ -4,6 +4,8 @@ import { useGameStore } from "../stores/useGameStore";
 import { pullTen, type PullResult } from "../lib/gacha";
 import { MachineThumb } from "../components/MachineThumb";
 import type { Rarity } from "../lib/types";
+import { SHOP_SERIES, getSeriesById, type ShopSeries } from "../lib/shopSeries";
+import { buildShareUrl } from "../lib/shareUrl";
 
 const RARITY_COLOR: Record<Rarity, string> = {
   N: "text-rarity-n",
@@ -22,21 +24,25 @@ const RARITY_BORDER: Record<Rarity, string> = {
 const ROLL_MS = 2500;
 const STAGGER_MS = 30;
 
-type Phase = "welcome" | "rolling" | "revealing" | "summary";
+type Phase = "chooseShop" | "welcome" | "rolling" | "revealing" | "summary";
 
 export function Onboarding() {
   const navigate = useNavigate();
   const initUser = useGameStore((s) => s.initUser);
   const addMachines = useGameStore((s) => s.addMachines);
   const setDream = useGameStore((s) => s.setDreamMachines);
+  const setShopSeries = useGameStore((s) => s.setShopSeries);
   const createShop = useGameStore((s) => s.createShop);
   const existingShop = useGameStore((s) => s.shop);
 
-  const [phase, setPhase] = useState<Phase>("welcome");
+  const [phase, setPhase] = useState<Phase>("chooseShop");
+  const [selectedSeriesId, setSelectedSeriesId] = useState<string | null>(null);
   const [results, setResults] = useState<PullResult[]>([]);
   const [revealedCount, setRevealedCount] = useState(0);
   const [shopName, setShopName] = useState("");
   const timersRef = useRef<number[]>([]);
+
+  const series: ShopSeries | null = getSeriesById(selectedSeriesId);
 
   useEffect(() => {
     initUser();
@@ -54,10 +60,10 @@ export function Onboarding() {
   };
 
   const startPulls = () => {
-    // 10 連 × 10 = 100 連
+    // 10 連 × 10 = 100 連 (シリーズバイアス付き)
     const all: PullResult[] = [];
     for (let i = 0; i < 10; i++) {
-      all.push(...pullTen());
+      all.push(...pullTen(Math.random, series));
     }
     setResults(all);
     setRevealedCount(0);
@@ -77,24 +83,50 @@ export function Onboarding() {
     }, ROLL_MS);
   };
 
-  const finalize = () => {
-    // 引いた台を理想ラインナップとして登録
+  const buildDreamMap = (): Record<string, number> => {
     const dream: Record<string, number> = {};
     for (const r of results) {
       dream[r.machine.id] = (dream[r.machine.id] ?? 0) + 1;
     }
+    return dream;
+  };
+
+  const ensureShopAndDream = () => {
+    const dream = buildDreamMap();
     setDream(dream);
-    // 本格モードの店を作成 (既存があれば名前のみ更新)
     const trimmed = shopName.trim() || "ドリームホール";
     if (!existingShop) {
       createShop(trimmed);
     }
+    return { dream, name: trimmed };
+  };
+
+  const goToShop = () => {
+    ensureShopAndDream();
     navigate("/shop");
+  };
+
+  const goToGacha = () => {
+    ensureShopAndDream();
+    navigate("/gacha");
+  };
+
+  const handleSelectShop = (id: string) => {
+    setSelectedSeriesId(id);
+    setShopSeries(id);
+    // 店舗名のデフォルトを店舗名に
+    const s = getSeriesById(id);
+    if (s && !shopName) setShopName(s.name);
+    setPhase("welcome");
   };
 
   // ============================================================
   // フェーズ別 UI
   // ============================================================
+  if (phase === "chooseShop") {
+    return <ChooseShopPhase onSelect={handleSelectShop} />;
+  }
+
   if (phase === "welcome") {
     return (
       <div className="min-h-dvh gacha-stage flex flex-col items-center justify-center px-6 py-10 relative overflow-hidden">
@@ -102,19 +134,27 @@ export function Onboarding() {
         <div className="relative max-w-md w-full">
           <div className="text-center">
             <p className="font-pixel text-[10px] text-pachi-cyan tracking-widest mb-2">
-              WELCOME TO
+              STEP 2 / 3 · 初期ラインナップを引く
             </p>
-            <h1 className="font-pixel text-2xl leading-tight">
+            <h1 className="font-pixel text-xl leading-tight">
               <span className="rainbow-gradient animate-rainbow-bg bg-clip-text text-transparent">
-                マイパチ店
+                運命の100連で
               </span>
+              <br />
+              <span className="text-pachi-yellow">スタート機種を集める</span>
             </h1>
             <p className="mt-4 text-[11px] text-white/80 leading-relaxed">
-              まずは100連を回して、
+              ここで引いた台が、
               <br />
-              あなたの<span className="text-pachi-yellow">運命の機種</span>と出会おう。
+              あなたの理想店の
+              <span className="text-pachi-pink">スタート地点</span>になります。
+            </p>
+            <p className="mt-3 text-[10px] text-white/50 leading-relaxed">
+              この後、200台×40機種の枠に並べて
               <br />
-              引いた台で「あなたの理想ホール」が決まります。
+              SNSで友達にシェア。
+              <br />
+              さらにゲームを進めて理想を完成させよう。
             </p>
           </div>
 
@@ -182,17 +222,27 @@ export function Onboarding() {
         {phase === "summary" && (
           <div className="text-center mb-4">
             <p className="font-pixel text-[10px] text-pachi-cyan tracking-widest">
-              YOUR DESTINY
+              STEP 3 / 3 · 初期ラインナップ完成
             </p>
-            <h2 className="mt-2 font-pixel text-xl">
+            <h2 className="mt-2 font-pixel text-lg sm:text-xl leading-tight">
               <span className="rainbow-gradient animate-rainbow-bg bg-clip-text text-transparent">
-                これがあなたの理想ホール！
+                これがあなたの
               </span>
-            </h2>
-            <p className="mt-3 text-[11px] text-white/70 leading-relaxed">
-              この {results.length} 台のラインナップを実現するのが
               <br />
-              本格モードの目標です
+              <span className="text-pachi-yellow">スタート店！</span>
+            </h2>
+            <p className="mt-2 font-pixel text-xs text-pachi-pink">
+              「{shopName.trim() || "ドリームホール"}」
+            </p>
+            <p className="mt-3 text-[11px] text-white/80 leading-relaxed">
+              <span className="font-pixel text-pachi-cyan">{results.length}</span> 台のスタート機種を獲得！
+              <br />
+              この先 200 台 × 40 機種の枠を埋めて理想店を完成させよう。
+            </p>
+            <p className="mt-2 text-[10px] text-white/50 leading-relaxed">
+              いつでも URL でシェア可能・
+              <br />
+              ガチャと経営でラインナップを充実させて世界に見せよう
             </p>
           </div>
         )}
@@ -234,15 +284,35 @@ export function Onboarding() {
               </p>
             </div>
 
+            {/* シェアセクション */}
+            <ShareSection
+              shopName={shopName.trim() || "ドリームホール"}
+              seriesId={selectedSeriesId}
+              entries={(() => {
+                const e: Record<string, number> = {};
+                for (const r of results) {
+                  e[r.machine.id] = (e[r.machine.id] ?? 0) + 1;
+                }
+                return e;
+              })()}
+            />
+
             {/* CTA */}
-            <div className="mt-5 max-w-md mx-auto">
+            <div className="mt-5 max-w-md mx-auto space-y-2">
               <button
-                onClick={finalize}
-                className="pixel-btn w-full py-4 text-sm"
+                onClick={goToGacha}
+                className="pixel-btn w-full py-4 text-sm animate-rolling-pulse"
+                style={{ animationDuration: "1.4s" }}
               >
-                ▶ 本格モードを開始する
+                ▶ 続けてガチャを引く
               </button>
-              <p className="text-[10px] text-white/50 text-center mt-3">
+              <button
+                onClick={goToShop}
+                className="pixel-btn-secondary w-full py-3 text-xs"
+              >
+                マイショップを見る
+              </button>
+              <p className="text-[10px] text-white/50 text-center mt-2">
                 この {uniqueMachineCount} 機種を集めるのが目標になります
               </p>
             </div>
@@ -303,6 +373,271 @@ function RarityCount({
     <div>
       <p className={`font-pixel ${color}`}>{label}</p>
       <p className="font-pixel text-pachi-yellow mt-1">{count}</p>
+    </div>
+  );
+}
+
+// ============================================================
+// シェアセクション (URL コピー / X / LINE)
+// ============================================================
+
+function ShareSection({
+  shopName,
+  seriesId,
+  entries,
+}: {
+  shopName: string;
+  seriesId: string | null;
+  entries: Record<string, number>;
+}) {
+  const [copied, setCopied] = useState(false);
+  const url = buildShareUrl({ name: shopName, seriesId, entries });
+  const text = `【${shopName}】が完成！ ${Object.values(entries).reduce((a, b) => a + b, 0)}台のあなたの理想ホール 🎰\n#マイパチ店`;
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    } catch {
+      // fallback: 新規ウィンドウで表示
+      window.prompt("以下の URL をコピーしてください", url);
+    }
+  };
+
+  const handleNativeShare = async () => {
+    if ("share" in navigator) {
+      try {
+        await navigator.share({ title: shopName, text, url });
+      } catch {
+        /* キャンセルは無視 */
+      }
+    } else {
+      handleCopy();
+    }
+  };
+
+  const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+  const lineUrl = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+
+  return (
+    <div className="mt-5 max-w-md mx-auto pixel-panel p-3">
+      <p className="font-pixel text-[10px] text-pachi-pink mb-2">
+        友だちにシェア
+      </p>
+      <div className="flex items-center gap-2 bg-bg-base border-2 border-bg-card px-2 py-2">
+        <input
+          readOnly
+          value={url}
+          onClick={(e) => (e.target as HTMLInputElement).select()}
+          className="flex-1 bg-transparent text-[10px] text-white/80 font-dot outline-none truncate"
+        />
+        <button
+          onClick={handleCopy}
+          className="shrink-0 px-2 py-1 font-pixel text-[10px] bg-pachi-yellow text-bg-base"
+        >
+          {copied ? "✓" : "COPY"}
+        </button>
+      </div>
+      <div className="grid grid-cols-3 gap-2 mt-2">
+        <button
+          onClick={handleNativeShare}
+          className="pixel-btn-secondary text-[11px] py-2"
+        >
+          シェア
+        </button>
+        <a
+          href={xUrl}
+          target="_blank"
+          rel="noopener"
+          className="pixel-btn-secondary text-[11px] py-2 text-center"
+        >
+          X (旧Twitter)
+        </a>
+        <a
+          href={lineUrl}
+          target="_blank"
+          rel="noopener"
+          className="pixel-btn-secondary text-[11px] py-2 text-center"
+        >
+          LINE
+        </a>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// 店舗選択フェーズ (3 軒からスワイプで選ぶ)
+// ============================================================
+
+function ChooseShopPhase({ onSelect }: { onSelect: (id: string) => void }) {
+  const [activeIdx, setActiveIdx] = useState(0);
+  const scrollerRef = useRef<HTMLDivElement | null>(null);
+
+  // スクロール位置から activeIdx を計算
+  const handleScroll = () => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const idx = Math.round(el.scrollLeft / el.clientWidth);
+    if (idx !== activeIdx) setActiveIdx(idx);
+  };
+
+  const scrollTo = (idx: number) => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    el.scrollTo({ left: idx * el.clientWidth, behavior: "smooth" });
+  };
+
+  return (
+    <div className="min-h-dvh gacha-stage relative flex flex-col">
+      <div className="absolute inset-0 scanlines opacity-30 pointer-events-none" />
+
+      {/* ヘッダ — ゲームの目的を最初に明示 */}
+      <div className="relative px-4 pt-6 pb-3 text-center">
+        <p className="font-pixel text-[10px] text-pachi-cyan tracking-widest">
+          YOUR PACHI SHOP
+        </p>
+        <h1 className="mt-2 font-pixel text-base sm:text-lg leading-tight">
+          <span className="rainbow-gradient animate-rainbow-bg bg-clip-text text-transparent">
+            あなたの理想のパチ店を
+          </span>
+          <br />
+          <span className="text-pachi-yellow">世界にシェアしよう</span>
+        </h1>
+        <div className="mt-3 inline-flex flex-wrap justify-center gap-2 text-[10px]">
+          <span className="px-2 py-0.5 bg-bg-panel border border-pachi-cyan font-pixel text-pachi-cyan">
+            最大 200 台
+          </span>
+          <span className="px-2 py-0.5 bg-bg-panel border border-pachi-pink font-pixel text-pachi-pink">
+            最大 40 機種
+          </span>
+          <span className="px-2 py-0.5 bg-bg-panel border border-pachi-yellow font-pixel text-pachi-yellow">
+            URL でシェア
+          </span>
+        </div>
+        <p className="mt-3 text-[11px] text-white/70 leading-relaxed">
+          限られた枠で組み立てた
+          <br />
+          あなたのラインナップを SNS で見せよう
+        </p>
+        <div className="mt-3 px-3 py-1 bg-bg-panel border-2 border-bg-card inline-block">
+          <p className="font-pixel text-[10px] text-pachi-cyan">
+            STEP 1 / 3 · 開店する店舗を選ぶ
+          </p>
+        </div>
+        <p className="mt-2 text-[10px] text-white/50">
+          ← スワイプで切り替え →
+        </p>
+      </div>
+
+      {/* スワイプ可能なカードカルーセル */}
+      <div
+        ref={scrollerRef}
+        onScroll={handleScroll}
+        className="relative flex-1 flex overflow-x-auto snap-x snap-mandatory"
+        style={{ scrollbarWidth: "none" }}
+      >
+        {SHOP_SERIES.map((s) => (
+          <div
+            key={s.id}
+            className="snap-center shrink-0 w-full px-4 py-3"
+          >
+            <ShopCard series={s} onSelect={() => onSelect(s.id)} />
+          </div>
+        ))}
+      </div>
+
+      {/* ページインジケータ */}
+      <div className="relative flex justify-center gap-2 py-3">
+        {SHOP_SERIES.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => scrollTo(i)}
+            className={`w-2 h-2 transition-all ${
+              i === activeIdx
+                ? "bg-pachi-yellow w-6"
+                : "bg-white/30"
+            }`}
+            aria-label={`店舗 ${i + 1}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ShopCard({
+  series,
+  onSelect,
+}: {
+  series: ShopSeries;
+  onSelect: () => void;
+}) {
+  const BASE = import.meta.env.BASE_URL;
+  return (
+    <div
+      className={`pixel-panel border-2 ${series.accent} h-full flex flex-col`}
+    >
+      {/* バナー画像 (あれば) */}
+      {series.bannerImage && (
+        <div className="bg-bg-base border-b-2 border-black aspect-[17/14] overflow-hidden">
+          <img
+            src={`${BASE}${series.bannerImage}`}
+            alt={`${series.name} 看板`}
+            className="w-full h-full object-cover"
+            style={{ imageRendering: "pixelated" }}
+          />
+        </div>
+      )}
+
+      {/* 看板テキスト */}
+      <div
+        className={`${series.bannerBg} px-4 py-3 border-b-4 border-black flex items-center justify-between`}
+      >
+        <div>
+          <p className="font-pixel text-xs leading-tight">{series.name}</p>
+          <p className="font-dot text-[10px] mt-0.5 opacity-80">
+            {series.tagline}
+          </p>
+        </div>
+        {!series.bannerImage && <span className="text-3xl">{series.emoji}</span>}
+      </div>
+
+      {/* チラシ風情報 */}
+      <div className="bg-bg-base px-4 py-4 flex-1 flex flex-col gap-3 text-[11px]">
+        <div className="flex justify-between items-baseline border-b border-bg-card pb-2">
+          <span className="font-pixel text-[10px] text-pachi-yellow">特日</span>
+          <span className="text-white">{series.specialDay}</span>
+        </div>
+        <div className="flex justify-between items-baseline border-b border-bg-card pb-2">
+          <span className="font-pixel text-[10px] text-pachi-pink">本日のイベント</span>
+          <span className="text-white">{series.event}</span>
+        </div>
+        <div className="flex justify-between items-baseline border-b border-bg-card pb-2">
+          <span className="font-pixel text-[10px] text-pachi-cyan">来店演者</span>
+          <span className="text-white">{series.mascot}</span>
+        </div>
+        <div className="border-b border-bg-card pb-2">
+          <span className="font-pixel text-[10px] text-pachi-green">看板機種</span>
+          <ul className="mt-1.5 space-y-0.5">
+            {series.examples.map((ex, i) => (
+              <li key={i} className="text-white/80 truncate">
+                ・{ex}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="mt-auto pt-2">
+          <button
+            onClick={onSelect}
+            className="pixel-btn w-full text-xs py-3"
+          >
+            この店で開店する
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

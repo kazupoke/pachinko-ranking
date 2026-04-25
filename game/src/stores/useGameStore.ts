@@ -82,6 +82,8 @@ interface GameState {
   mysteryRecords: MysteryRecord[];
   /** ライトモードで設定された理想ラインナップ (machine id → 目標台数) */
   dreamMachines: Record<string, number>;
+  /** オンボーディングで選んだ店舗シリーズ ID */
+  shopSeriesId: string | null;
   initUser: () => void;
   tickSimulation: (machineRarityMap: Record<string, keyof typeof RARITY_WEIGHT_MAP>) => TickResult;
   createShop: (name: string) => void;
@@ -100,6 +102,7 @@ interface GameState {
   mysteryVisitsToday: () => number;
   setDreamMachines: (entries: Record<string, number>) => void;
   clearDreamMachines: () => void;
+  setShopSeries: (id: string) => void;
   resetAll: () => void;
 }
 
@@ -113,6 +116,7 @@ export const useGameStore = create<GameState>()(
       lastTickAt: null,
       mysteryRecords: [],
       dreamMachines: {},
+      shopSeriesId: null,
 
       initUser: () => {
         if (!get().user) set({ user: createUser() });
@@ -368,6 +372,8 @@ export const useGameStore = create<GameState>()(
 
       clearDreamMachines: () => set({ dreamMachines: {} }),
 
+      setShopSeries: (id) => set({ shopSeriesId: id }),
+
       resetAll: () =>
         set({
           user: null,
@@ -377,6 +383,7 @@ export const useGameStore = create<GameState>()(
           lastTickAt: null,
           mysteryRecords: [],
           dreamMachines: {},
+          shopSeriesId: null,
         }),
     }),
     {

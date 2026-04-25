@@ -6,6 +6,7 @@ import { MachineThumb } from "../../components/MachineThumb";
 import { useLiteStore, totalMachines, totalKinds } from "../../stores/useLiteStore";
 import type { Machine, Rarity } from "../../lib/types";
 import { MAKER_GROUPS, getMakerGroup, type MakerGroup } from "../../data/makerGroups";
+import { KANA_FILTERS, YEAR_BUCKETS, getKanaKey } from "../../lib/machineSort";
 
 const RARITY_ORDER: Rarity[] = ["SSR", "SR", "R", "N"];
 const RARITY_COLOR: Record<Rarity, string> = {
@@ -33,8 +34,9 @@ export function LitePicker() {
 
   const [rarityFilter, setRarityFilter] = useState<Rarity | "all">("all");
   const [groupFilter, setGroupFilter] = useState<MakerGroup | "all">("all");
+  const [kanaFilter, setKanaFilter] = useState<string>("all");
+  const [yearFilter, setYearFilter] = useState<string>("all");
   const [viewFilter, setViewFilter] = useState<ViewFilter>("all");
-  const [keyword, setKeyword] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("rarityYear");
   const [groupOpen, setGroupOpen] = useState(false);
 
@@ -47,19 +49,15 @@ export function LitePicker() {
     if (groupFilter !== "all") {
       list = list.filter((m) => getMakerGroup(m.maker) === groupFilter);
     }
+    if (kanaFilter !== "all") {
+      list = list.filter((m) => getKanaKey(m.name) === kanaFilter);
+    }
+    if (yearFilter !== "all") {
+      const bucket = YEAR_BUCKETS.find((b) => b.key === yearFilter);
+      if (bucket) list = list.filter((m) => bucket.test(m.releaseYear));
+    }
     if (viewFilter === "selected") {
       list = list.filter((m) => (entries?.[m.id] ?? 0) > 0);
-    }
-    const k = keyword.trim().toLowerCase();
-    if (k) {
-      list = list.filter((m) => {
-        const group = getMakerGroup(m.maker);
-        return (
-          m.name.toLowerCase().includes(k) ||
-          m.maker.toLowerCase().includes(k) ||
-          group.toLowerCase().includes(k)
-        );
-      });
     }
     const sorted = [...list].sort((a, b) => {
       switch (sortKey) {
@@ -86,7 +84,7 @@ export function LitePicker() {
       }
     });
     return sorted;
-  }, [rarityFilter, groupFilter, viewFilter, keyword, sortKey, entries]);
+  }, [rarityFilter, groupFilter, kanaFilter, yearFilter, viewFilter, sortKey, entries]);
 
   if (!shop) {
     return (
@@ -102,6 +100,14 @@ export function LitePicker() {
     );
   }
 
+  const clearFilters = () => {
+    setRarityFilter("all");
+    setGroupFilter("all");
+    setKanaFilter("all");
+    setYearFilter("all");
+    setViewFilter("all");
+  };
+
   return (
     <div>
       <PageHeader
@@ -109,17 +115,7 @@ export function LitePicker() {
         subtitle={`${shop.name} · 設置 ${totalMachines(shop)} 台 / ${totalKinds(shop)} 機種`}
       />
 
-      <div className="px-4 pt-3">
-        <input
-          type="text"
-          value={keyword}
-          onChange={(e) => setKeyword(e.target.value)}
-          placeholder="機種名・メーカー・系列で検索"
-          className="block w-full px-3 py-2 bg-bg-base border-2 border-bg-card text-white font-dot text-xs focus:border-pachi-pink outline-none"
-        />
-      </div>
-
-      <div className="px-4 pt-2 flex gap-2 text-xs">
+      <div className="px-4 pt-3 flex gap-2 text-xs items-center">
         <button
           onClick={() => setViewFilter("all")}
           className={`px-3 py-2 font-dot border-2 ${
@@ -154,6 +150,7 @@ export function LitePicker() {
         </select>
       </div>
 
+      {/* レアリティ */}
       <div className="px-4 pt-2 flex gap-1 text-[11px] overflow-x-auto">
         {(["all", "SSR", "SR", "R", "N"] as const).map((r) => (
           <button
@@ -170,7 +167,47 @@ export function LitePicker() {
         ))}
       </div>
 
-      {/* メーカー系列フィルタ (折りたたみ) */}
+      {/* 50 音 */}
+      <div className="px-4 pt-2">
+        <p className="font-pixel text-[9px] text-pachi-cyan mb-1">50 音</p>
+        <div className="flex gap-1 text-[11px] flex-wrap">
+          <ChipBtn
+            label="全て"
+            active={kanaFilter === "all"}
+            onClick={() => setKanaFilter("all")}
+          />
+          {KANA_FILTERS.map((k) => (
+            <ChipBtn
+              key={k.key}
+              label={k.label}
+              active={kanaFilter === k.key}
+              onClick={() => setKanaFilter(k.key)}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* 年代 */}
+      <div className="px-4 pt-2">
+        <p className="font-pixel text-[9px] text-pachi-cyan mb-1">年代</p>
+        <div className="flex gap-1 text-[11px] flex-wrap">
+          <ChipBtn
+            label="全年代"
+            active={yearFilter === "all"}
+            onClick={() => setYearFilter("all")}
+          />
+          {YEAR_BUCKETS.map((b) => (
+            <ChipBtn
+              key={b.key}
+              label={b.label}
+              active={yearFilter === b.key}
+              onClick={() => setYearFilter(b.key)}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* メーカー系列 (折りたたみ) */}
       <div className="px-4 pt-2">
         <button
           onClick={() => setGroupOpen((v) => !v)}
@@ -186,60 +223,68 @@ export function LitePicker() {
         </button>
         {groupOpen && (
           <div className="mt-2 grid grid-cols-3 gap-1 text-[10px]">
-            <button
+            <ChipBtn
+              label="全系列"
+              active={groupFilter === "all"}
               onClick={() => {
                 setGroupFilter("all");
                 setGroupOpen(false);
               }}
-              className={`px-2 py-1.5 font-dot border ${
-                groupFilter === "all"
-                  ? "bg-pachi-pink border-pachi-pink"
-                  : "bg-bg-panel border-bg-card text-white/60"
-              }`}
-            >
-              全系列
-            </button>
+            />
             {MAKER_GROUPS.map((g) => (
-              <button
+              <ChipBtn
                 key={g}
+                label={g}
+                active={groupFilter === g}
                 onClick={() => {
                   setGroupFilter(g);
                   setGroupOpen(false);
                 }}
-                className={`px-2 py-1.5 font-dot border ${
-                  groupFilter === g
-                    ? "bg-pachi-pink border-pachi-pink"
-                    : "bg-bg-panel border-bg-card text-white/60"
-                }`}
-              >
-                {g}
-              </button>
+              />
             ))}
           </div>
         )}
       </div>
 
+      {/* 一括クリア */}
+      <div className="px-4 pt-2">
+        <button
+          onClick={clearFilters}
+          className="text-[10px] text-white/50 underline"
+        >
+          フィルタをクリア
+        </button>
+      </div>
+
       <ul className="px-4 py-3 space-y-2">
         {machines.length === 0 ? (
-          <li className="text-center text-xs text-white/50 py-8">
-            該当なし
-          </li>
+          <li className="text-center text-xs text-white/50 py-8">該当なし</li>
         ) : (
           machines.map((m) => {
             const count = shop.entries[m.id] ?? 0;
             const group = getMakerGroup(m.maker);
+            const isSelected = count > 0;
             return (
               <li
                 key={m.id}
-                className="pixel-panel p-3 flex items-center gap-3"
+                className={`pixel-panel p-3 flex items-center gap-3 transition-colors ${
+                  isSelected
+                    ? "bg-pachi-green/10 border-pachi-green border-2"
+                    : ""
+                }`}
               >
-                <div className="w-12 h-16 shrink-0 border border-bg-card">
+                <div className="w-12 h-16 shrink-0 border border-bg-card relative">
                   <MachineThumb
                     machineId={m.id}
                     name={m.name}
                     rarity={m.rarity}
                     size={48}
                   />
+                  {isSelected && (
+                    <span className="absolute -top-1 -right-1 bg-pachi-green text-bg-base font-pixel text-[8px] px-1 leading-none py-0.5">
+                      ✓
+                    </span>
+                  )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs text-white truncate">{m.name}</p>
@@ -263,7 +308,11 @@ export function LitePicker() {
                   >
                     −
                   </button>
-                  <span className="font-pixel text-xs text-pachi-yellow w-8 text-center">
+                  <span
+                    className={`font-pixel text-xs w-8 text-center ${
+                      isSelected ? "text-pachi-green" : "text-pachi-yellow"
+                    }`}
+                  >
                     {count}
                   </span>
                   <button
@@ -295,5 +344,28 @@ export function LitePicker() {
         </button>
       </div>
     </div>
+  );
+}
+
+function ChipBtn({
+  label,
+  active,
+  onClick,
+}: {
+  label: string;
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`px-2 py-1 font-dot whitespace-nowrap border ${
+        active
+          ? "bg-pachi-pink border-pachi-pink text-white"
+          : "bg-bg-panel border-bg-card text-white/60"
+      }`}
+    >
+      {label}
+    </button>
   );
 }
