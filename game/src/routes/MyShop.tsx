@@ -78,9 +78,16 @@ export function MyShop() {
 
   return (
     <div>
-      {/* 店舗バナー (現在使用中) */}
-      <div className="bg-bg-base border-b-2 border-bg-card">
-        <BannerImage banner={banner} shopName={shop.name} />
+      {/* 店舗バナー (現在使用中) — 細めに */}
+      <div
+        className="bg-bg-base border-b-2 border-bg-card overflow-hidden"
+        style={{ aspectRatio: "5 / 1", maxHeight: 80 }}
+      >
+        <BannerImage
+          banner={banner}
+          shopName={shop.name}
+          className="w-full h-full object-cover"
+        />
       </div>
 
       <PageHeader
@@ -88,7 +95,12 @@ export function MyShop() {
         subtitle={`Tier ${shop.tier} · ${totalMachines}/${shop.capacity.machines}台 · ${shop.layout.length}/${shop.capacity.types}機種`}
       />
 
-      {/* 設置容量メーター — ゲームの核となる「200台×40機種枠」を可視化 */}
+      {/* 店舗外観 (写真風プレースホルダ) */}
+      <div className="mx-3 mt-3 pixel-panel overflow-hidden">
+        <ShopExteriorPlaceholder banner={banner} shopName={shop.name} />
+      </div>
+
+      {/* 設置容量メーター */}
       <div className="px-4 pt-3">
         <div className="pixel-panel p-3">
           <p className="font-pixel text-[10px] text-pachi-cyan mb-2">
@@ -330,4 +342,94 @@ function calcInteriorScore(i: ShopInterior): number {
   const sum =
     i.floor + i.wall + i.ceiling + i.entrance + i.counter + i.lounge + i.decor + i.signboard + i.restroom + i.parking;
   return Math.round((sum / 50) * 100);
+}
+
+/** 店舗外観 (写真風プレースホルダ SVG) */
+function ShopExteriorPlaceholder({
+  banner,
+  shopName,
+}: {
+  banner: { primary: string; secondary: string; accent: string; prefix?: string };
+  shopName: string;
+}) {
+  return (
+    <svg
+      viewBox="0 0 400 200"
+      className="block w-full h-auto"
+      style={{ imageRendering: "pixelated" }}
+      shapeRendering="crispEdges"
+    >
+      {/* 空 (グラデ) */}
+      <defs>
+        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#1a0a3a" />
+          <stop offset="60%" stopColor="#3c1428" />
+          <stop offset="100%" stopColor="#643c50" />
+        </linearGradient>
+      </defs>
+      <rect width="400" height="120" fill="url(#sky)" />
+      {/* 月 */}
+      <circle cx="340" cy="40" r="14" fill="#ffcc00" opacity="0.85" />
+      {/* 星 */}
+      <g fill="#fff8dc">
+        <rect x="60" y="20" width="2" height="2" />
+        <rect x="120" y="35" width="2" height="2" />
+        <rect x="200" y="18" width="2" height="2" />
+        <rect x="260" y="42" width="2" height="2" />
+        <rect x="380" y="60" width="2" height="2" />
+      </g>
+      {/* 地面 (アスファルト) */}
+      <rect x="0" y="170" width="400" height="30" fill="#22223a" />
+      {/* 駐車場の白線 */}
+      <g fill="#fff" opacity="0.4">
+        <rect x="20" y="180" width="20" height="2" />
+        <rect x="60" y="180" width="20" height="2" />
+        <rect x="100" y="180" width="20" height="2" />
+        <rect x="320" y="180" width="20" height="2" />
+        <rect x="360" y="180" width="20" height="2" />
+      </g>
+      {/* 建物本体 */}
+      <rect x="40" y="60" width="320" height="110" fill="#1a1a2e" />
+      <rect x="40" y="60" width="320" height="6" fill={banner.primary} />
+      <rect x="40" y="160" width="320" height="10" fill={banner.primary} opacity="0.6" />
+      {/* 看板 (上部) */}
+      <rect x="60" y="70" width="280" height="32" fill={banner.primary} />
+      <rect x="64" y="74" width="272" height="24" fill="#0a0a14" />
+      <text
+        x="200"
+        y="86"
+        fontSize="10"
+        fill={banner.secondary}
+        fontFamily='"Press Start 2P", monospace'
+        textAnchor="middle"
+      >
+        {banner.prefix ?? "PACHI"}
+      </text>
+      <text
+        x="200"
+        y="98"
+        fontSize="9"
+        fill={banner.accent}
+        fontFamily='"DotGothic16", monospace'
+        textAnchor="middle"
+      >
+        {shopName}
+      </text>
+      {/* 窓 (中段) */}
+      <g>
+        {[80, 130, 180, 230, 280, 330].map((x, i) => (
+          <g key={i}>
+            <rect x={x - 14} y="115" width="28" height="20" fill="#22223a" />
+            <rect x={x - 12} y="117" width="24" height="16" fill="#ffcc00" opacity="0.7" />
+          </g>
+        ))}
+      </g>
+      {/* 入口 (中央) */}
+      <rect x="180" y="138" width="40" height="22" fill="#0a0a14" />
+      <rect x="184" y="142" width="32" height="18" fill={banner.secondary} opacity="0.6" />
+      {/* ネオン縦看板 */}
+      <rect x="50" y="110" width="6" height="50" fill={banner.accent} />
+      <rect x="344" y="110" width="6" height="50" fill={banner.accent} />
+    </svg>
+  );
 }

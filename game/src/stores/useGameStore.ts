@@ -43,7 +43,7 @@ function createShop(ownerId: string, name: string): Shop {
     ownerId,
     name,
     tier: 1,
-    capacity: { machines: 200, types: 40 },
+    capacity: { machines: 200, types: 20 },
     layout: [],
     interior: { ...INITIAL_INTERIOR },
     totalCustomers: 0,
