@@ -1,6 +1,6 @@
 """
 パチンコ店イベント ランキング生成スクリプト
-hall-navi.com から今日・明日のイベント情報を取得し、スコア順にランキングHTMLを生成する
+hall-navi.com から今日・明日・明後日のイベント情報を取得し、スコア順にランキングHTMLを生成する
 
 エリア:
   - 湘南地区（手動登録の近隣店舗）
@@ -51,6 +51,16 @@ MY_HALL_HIDS = [
 BASE_URL = "https://hall-navi.com/hole_view?hid="
 
 
+# ランキングに載せる日（今日から順に）
+DAY_LABELS = ["今日", "明日", "明後日"]
+WEEKDAYS = "月火水木金土日"
+
+
+def md_str(d):
+    """datetime → サイト表記の "月/日"（ゼロ埋めなし）"""
+    return f"{d.month}/{d.day}"
+
+
 def fetch_page(url):
     """curl_cffiでページを取得（Cloudflare回避）"""
     resp = requests.get(
@@ -71,8 +81,9 @@ def load_store_hids(filename):
     return [s["hid"] for s in stores]
 
 
-def extract_store_data(html, today_str, tomorrow_str):
-    """HTMLから店舗名・今日/明日のスコアとイベントを抽出"""
+def extract_store_data(html, day_strs):
+    """HTMLから店舗名・対象日（今日〜明後日）のスコアとイベントを抽出"""
+    today_str = day_strs[0]
     soup = BeautifulSoup(html, "html.parser")
 
     h1 = soup.select_one("h1.box_hole_view_hole_name")
@@ -117,7 +128,7 @@ def extract_store_data(html, today_str, tomorrow_str):
                 current_score = float(score_match.group(1)) if score_match else 0.0
 
         elif el.name == "h4":
-            if current_date in (today_str, tomorrow_str) and current_score > 0:
+            if current_date in day_strs and current_score > 0:
                 rank = text[0] if text else "-"
                 event_name = text[2:].strip() if len(text) > 2 else text
                 entries.append({
@@ -130,7 +141,7 @@ def extract_store_data(html, today_str, tomorrow_str):
     return store_name, entries, pworld_link
 
 
-def scrape_stores(hids, today_str, tomorrow_str, label=""):
+def scrape_stores(hids, day_strs, label=""):
     """店舗リストをスクレイピング"""
     all_entries = []
     total = len(hids)
@@ -140,7 +151,7 @@ def scrape_stores(hids, today_str, tomorrow_str, label=""):
         print(f"  [{i+1}/{total}] ", end="", flush=True)
         try:
             html = fetch_page(url)
-            store_name, entries, pworld_link = extract_store_data(html, today_str, tomorrow_str)
+            store_name, entries, pworld_link = extract_store_data(html, day_strs)
             print(f"{store_name} ({len(entries)}件)")
             for entry in entries:
                 all_entries.append({
@@ -158,13 +169,9 @@ def scrape_stores(hids, today_str, tomorrow_str, label=""):
     return all_entries
 
 
-def generate_html(my_entries, kanagawa_entries, yamanashi_entries, today, tomorrow):
+def generate_html(my_entries, kanagawa_entries, yamanashi_entries, days):
     """タブ切り替え付きランキングHTMLを生成"""
-    today_str = f"{today.month}/{today.day}"
-    tomorrow_str = f"{tomorrow.month}/{tomorrow.day}"
-    weekdays = "月火水木金土日"
-    today_wd = weekdays[today.weekday()]
-    tomorrow_wd = weekdays[tomorrow.weekday()]
+    today = days[0]
 
     rank_priority = {"S": 0, "A": 1, "B": 2, "C": 3}
 
@@ -220,14 +227,13 @@ def generate_html(my_entries, kanagawa_entries, yamanashi_entries, today, tomorr
         return f'<div class="section"><h2>{label} {date_str}({wd})</h2>{rows}</div>'
 
     def make_tab_content(entries, tab_id):
-        today_e = merge_same_store(sorted([e for e in entries if e["date"] == today_str], key=lambda x: x["score"], reverse=True))
-        today_e.sort(key=lambda x: x["score"], reverse=True)
-        tomorrow_e = merge_same_store(sorted([e for e in entries if e["date"] == tomorrow_str], key=lambda x: x["score"], reverse=True))
-        tomorrow_e.sort(key=lambda x: x["score"], reverse=True)
-
-        today_sec = make_ranking_section(today_e, today_str, "今日", today_wd)
-        tomorrow_sec = make_ranking_section(tomorrow_e, tomorrow_str, "明日", tomorrow_wd)
-        return f'<div id="{tab_id}" class="tab-content">{today_sec}{tomorrow_sec}</div>'
+        sections = ""
+        for label, d in zip(DAY_LABELS, days):
+            date_str = md_str(d)
+            day_e = merge_same_store(sorted([e for e in entries if e["date"] == date_str], key=lambda x: x["score"], reverse=True))
+            day_e.sort(key=lambda x: x["score"], reverse=True)
+            sections += make_ranking_section(day_e, date_str, label, WEEKDAYS[d.weekday()])
+        return f'<div id="{tab_id}" class="tab-content">{sections}</div>'
 
     my_content = make_tab_content(my_entries, "tab-my")
     kanagawa_content = make_tab_content(kanagawa_entries, "tab-kanagawa")
@@ -333,13 +339,9 @@ def generate_html(my_entries, kanagawa_entries, yamanashi_entries, today, tomorr
     return html
 
 
-def generate_map_html(all_entries, today, tomorrow):
+def generate_map_html(all_entries, days):
     """スコア付きマップHTMLを生成"""
-    today_str = f"{today.month}/{today.day}"
-    tomorrow_str = f"{tomorrow.month}/{tomorrow.day}"
-    weekdays = "月火水木金土日"
-    today_wd = weekdays[today.weekday()]
-    tomorrow_wd = weekdays[tomorrow.weekday()]
+    day_strs = [md_str(d) for d in days]
 
     # 店舗JSONから緯度経度を読み込み
     store_coords = {}
@@ -367,18 +369,14 @@ def generate_map_html(all_entries, today, tomorrow):
             store_scores[hid] = {
                 "store": e["store"], "url": e["url"],
                 "pworld": e.get("pworld", ""),
-                "today_score": 0, "today_events": [],
-                "tomorrow_score": 0, "tomorrow_events": [],
+                "scores": {s: 0 for s in day_strs},
+                "events": {s: [] for s in day_strs},
             }
         ss = store_scores[hid]
-        if e["date"] == today_str:
-            if e["score"] > ss["today_score"]:
-                ss["today_score"] = e["score"]
-            ss["today_events"].append(f"{e['rank']} {e['event']}")
-        elif e["date"] == tomorrow_str:
-            if e["score"] > ss["tomorrow_score"]:
-                ss["tomorrow_score"] = e["score"]
-            ss["tomorrow_events"].append(f"{e['rank']} {e['event']}")
+        if e["date"] in ss["scores"]:
+            if e["score"] > ss["scores"][e["date"]]:
+                ss["scores"][e["date"]] = e["score"]
+            ss["events"][e["date"]].append(f"{e['rank']} {e['event']}")
 
     def score_color(score):
         if score >= 10: return "#ff4444"
@@ -386,19 +384,15 @@ def generate_map_html(all_entries, today, tomorrow):
         if score > 0: return "#3388dd"
         return "#666666"
 
-    def make_markers(date_key, label):
+    def make_markers(date_str):
         markers = ""
         for hid, (lat, lon) in store_coords.items():
             ss = store_scores.get(hid)
             score = 0
             events = []
             if ss:
-                if date_key == "today":
-                    score = ss["today_score"]
-                    events = ss["today_events"]
-                else:
-                    score = ss["tomorrow_score"]
-                    events = ss["tomorrow_events"]
+                score = ss["scores"][date_str]
+                events = ss["events"][date_str]
 
             name = ss["store"] if ss else ""
             if not name:
@@ -414,8 +408,11 @@ def generate_map_html(all_entries, today, tomorrow):
             markers += f"""      {{lat:{lat},lon:{lon},score:"{score_text}",color:"{color}",popup:"{popup}"}},\n"""
         return markers
 
-    today_markers = make_markers("today", "今日")
-    tomorrow_markers = make_markers("tomorrow", "明日")
+    day_data = ",\n".join(f"[\n{make_markers(s)}]" for s in day_strs)
+    day_tabs = "\n".join(
+        f'  <button class="map-tab{" active" if i == 0 else ""}" onclick="showDay({i},this)">{label} {md_str(d)}({WEEKDAYS[d.weekday()]})</button>'
+        for i, (label, d) in enumerate(zip(DAY_LABELS, days))
+    )
 
     html = f"""<!DOCTYPE html>
 <html lang="ja">
@@ -454,8 +451,7 @@ def generate_map_html(all_entries, today, tomorrow):
 </head>
 <body>
 <div class="top-bar">
-  <button class="map-tab active" onclick="showDay('today',this)">今日 {today_str}({today_wd})</button>
-  <button class="map-tab" onclick="showDay('tomorrow',this)">明日 {tomorrow_str}({tomorrow_wd})</button>
+{day_tabs}
 </div>
 <a href="./index.html" class="back-link">ランキングに戻る</a>
 <div id="map"></div>
@@ -465,10 +461,8 @@ L.tileLayer("https://{{s}}.tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png", {{
   attribution: "&copy; OpenStreetMap"
 }}).addTo(map);
 
-var todayData = [
-{today_markers}];
-var tomorrowData = [
-{tomorrow_markers}];
+var dayData = [
+{day_data}];
 
 var currentMarkers = [];
 
@@ -494,10 +488,10 @@ function showMarkers(data) {{
 function showDay(day, btn) {{
   document.querySelectorAll('.map-tab').forEach(function(b) {{ b.classList.remove('active'); }});
   btn.classList.add('active');
-  showMarkers(day === 'today' ? todayData : tomorrowData);
+  showMarkers(dayData[day]);
 }}
 
-showMarkers(todayData);
+showMarkers(dayData[0]);
 </script>
 </body>
 </html>"""
@@ -521,23 +515,23 @@ def load_cache(key, date_str):
     return None
 
 
-def scrape_or_cache(key, hids, today_str, tomorrow_str, label):
+def scrape_or_cache(key, hids, day_strs, label):
     """キャッシュがあれば使用、なければスクレイピングしてキャッシュ保存"""
-    cached = load_cache(key, today_str)
+    # 対象日数をキー名に含める（日数を変えた日に古い形のキャッシュを使わないため）
+    key = f"{key}_{len(day_strs)}d"
+    cached = load_cache(key, day_strs[0])
     if cached is not None:
         print(f"  キャッシュ使用 ({len(cached)}件)")
         return cached
-    entries = scrape_stores(hids, today_str, tomorrow_str, label)
-    save_cache(key, entries, today_str)
+    entries = scrape_stores(hids, day_strs, label)
+    save_cache(key, entries, day_strs[0])
     return entries
 
 
 def main():
     today = datetime.now(JST)
-    tomorrow = today + timedelta(days=1)
-    today_str = f"{today.month}/{today.day}"
-    tomorrow_str = f"{tomorrow.month}/{tomorrow.day}"
-    date_key = today.strftime("%Y-%m-%d")
+    days = [today + timedelta(days=i) for i in range(len(DAY_LABELS))]
+    day_strs = [md_str(d) for d in days]
 
     if sys.platform == "win32":
         sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
@@ -556,30 +550,30 @@ def main():
 
     # --- 湘南地区 ---
     print(f"\n[湘南地区] {len(MY_HALL_HIDS)}店舗")
-    my_entries = scrape_or_cache("shonan", MY_HALL_HIDS, today_str, tomorrow_str, "湘南地区")
+    my_entries = scrape_or_cache("shonan", MY_HALL_HIDS, day_strs, "湘南地区")
 
     # --- 神奈川県全域 ---
     kanagawa_hids = load_store_hids("kanagawa_stores.json")
     print(f"\n[神奈川県] {len(kanagawa_hids)}店舗")
-    kanagawa_entries = scrape_or_cache("kanagawa", kanagawa_hids, today_str, tomorrow_str, "神奈川県")
+    kanagawa_entries = scrape_or_cache("kanagawa", kanagawa_hids, day_strs, "神奈川県")
 
     # --- 山梨県全域 ---
     yamanashi_hids = load_store_hids("yamanashi_stores.json")
     print(f"\n[山梨県] {len(yamanashi_hids)}店舗")
-    yamanashi_entries = scrape_or_cache("yamanashi", yamanashi_hids, today_str, tomorrow_str, "山梨県")
+    yamanashi_entries = scrape_or_cache("yamanashi", yamanashi_hids, day_strs, "山梨県")
 
     # HTML生成
     output_dir = DOCS_DIR
     os.makedirs(output_dir, exist_ok=True)
     output_path = os.path.join(output_dir, "index.html")
 
-    html_content = generate_html(my_entries, kanagawa_entries, yamanashi_entries, today, tomorrow)
+    html_content = generate_html(my_entries, kanagawa_entries, yamanashi_entries, days)
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(html_content)
 
     # マップHTML生成（スコア付き）
     all_entries = my_entries + kanagawa_entries + yamanashi_entries
-    map_html = generate_map_html(all_entries, today, tomorrow)
+    map_html = generate_map_html(all_entries, days)
     map_path = os.path.join(output_dir, "map.html")
     with open(map_path, "w", encoding="utf-8") as f:
         f.write(map_html)
