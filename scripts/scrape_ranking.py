@@ -48,6 +48,15 @@ MY_HALL_HIDS = [
     "257001500000047010",  # ジャパンニューアルファテームズ
 ]
 
+# イベントが無い日も0点で必ず表示する店（P-WORLD・hall-navi へのリンク用）
+ALWAYS_SHOW_HIDS = [
+    "254001300000058382",  # ＡＲＲＯＷ平塚店
+    "254001300000014260",  # マルハン平塚店
+    "254007600000001150",  # ジャラン平塚店
+    "254004300000005180",  # キコーナ平塚店
+    "254082100000000180",  # ニラク平塚黒部丘店
+]
+
 BASE_URL = "https://hall-navi.com/hole_view?hid="
 
 
@@ -141,8 +150,8 @@ def extract_store_data(html, day_strs):
     return store_name, entries, pworld_link
 
 
-def scrape_stores(hids, day_strs, label=""):
-    """店舗リストをスクレイピング"""
+def scrape_stores(hids, day_strs, label="", always_show=()):
+    """店舗リストをスクレイピング（always_show の店は、イベントの無い日に0点の行を足す）"""
     all_entries = []
     total = len(hids)
 
@@ -160,6 +169,14 @@ def scrape_stores(hids, day_strs, label=""):
                     "pworld": pworld_link,
                     **entry,
                 })
+            if hid in always_show:
+                event_days = {e["date"] for e in entries}
+                for d in day_strs:
+                    if d not in event_days:
+                        all_entries.append({
+                            "store": store_name, "url": url, "pworld": pworld_link,
+                            "date": d, "score": 0.0, "rank": "-", "event": "イベントなし",
+                        })
         except Exception as e:
             print(f"エラー: {e}")
 
@@ -178,6 +195,7 @@ def generate_html(my_entries, kanagawa_entries, yamanashi_entries, days):
     def hall_score_color(score):
         if score >= 10: return "#ff4444"
         if score >= 7: return "#22aa44"
+        if score <= 0: return "#666666"
         return "#3388dd"
 
     def rank_color(rank):
@@ -211,6 +229,9 @@ def generate_html(my_entries, kanagawa_entries, yamanashi_entries, days):
         for i, e in enumerate(entries, 1):
             event_lines = ""
             for ev in e["events"]:
+                if ev["rank"] == "-" and ev["event"] == "イベントなし":
+                    event_lines += '<div class="event-line no-event">イベントなし</div>'
+                    continue
                 erc = rank_color(ev["rank"])
                 event_lines += f'<div class="event-line"><span class="event-rank" style="background:{erc}">{ev["rank"]}</span> {ev["event"]}</div>'
 
@@ -307,6 +328,7 @@ def generate_html(my_entries, kanagawa_entries, yamanashi_entries, days):
   a.store:active {{ opacity: 0.7; }}
   .events {{ margin-top: 3px; }}
   .event-line {{ font-size: 12px; color: #aaa; margin-top: 2px; }}
+  .event-line.no-event {{ color: #666; }}
   .event-rank {{ display: inline-block; color: #fff; font-weight: bold; font-size: 10px; padding: 0px 5px; border-radius: 3px; margin-right: 3px; }}
 </style>
 </head>
@@ -515,7 +537,7 @@ def load_cache(key, date_str):
     return None
 
 
-def scrape_or_cache(key, hids, day_strs, label):
+def scrape_or_cache(key, hids, day_strs, label, always_show=()):
     """キャッシュがあれば使用、なければスクレイピングしてキャッシュ保存"""
     # 対象日数をキー名に含める（日数を変えた日に古い形のキャッシュを使わないため）
     key = f"{key}_{len(day_strs)}d"
@@ -523,7 +545,7 @@ def scrape_or_cache(key, hids, day_strs, label):
     if cached is not None:
         print(f"  キャッシュ使用 ({len(cached)}件)")
         return cached
-    entries = scrape_stores(hids, day_strs, label)
+    entries = scrape_stores(hids, day_strs, label, always_show)
     save_cache(key, entries, day_strs[0])
     return entries
 
@@ -550,7 +572,7 @@ def main():
 
     # --- 湘南地区 ---
     print(f"\n[湘南地区] {len(MY_HALL_HIDS)}店舗")
-    my_entries = scrape_or_cache("shonan", MY_HALL_HIDS, day_strs, "湘南地区")
+    my_entries = scrape_or_cache("shonan", MY_HALL_HIDS, day_strs, "湘南地区", ALWAYS_SHOW_HIDS)
 
     # --- 神奈川県全域 ---
     kanagawa_hids = load_store_hids("kanagawa_stores.json")
